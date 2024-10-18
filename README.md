@@ -1,4 +1,3 @@
-```
 # Wikimedia Supporting Tools
 
 ![Suyash Dwivedi](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Suyash_Dwivedi_01%28cropped%29.jpg/180px-Suyash_Dwivedi_01%28cropped%29.jpg)
@@ -80,4 +79,4 @@ This project is licensed under the CC BY-SA 4.0 license.
 
 Image by [Manavpreet Kaur, CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via Wikimedia Commons.
 
-```
+
