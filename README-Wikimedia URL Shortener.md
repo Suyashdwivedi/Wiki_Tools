@@ -1,6 +1,3 @@
-Here is the updated `README.md` with your correct GitHub username:
-
-```markdown
 # Wikimedia URL Shortener
 
 ![Suyash Dwivedi](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Suyash_Dwivedi_01%28cropped%29.jpg/180px-Suyash_Dwivedi_01%28cropped%29.jpg)
@@ -45,7 +42,6 @@ No installation is required. Simply clone the repository and open the `index.htm
 git clone https://github.com/Suyashdwivedi/wikimedia-url-shortener.git
 cd wikimedia-url-shortener
 open index.html
-```
 
 ## Usage
 
