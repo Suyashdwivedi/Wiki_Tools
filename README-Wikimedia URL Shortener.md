@@ -70,5 +70,3 @@ This project is licensed under the [CC BY-SA 4.0](https://creativecommons.org/li
 ## Attribution
 
 Image by [Manavpreet Kaur, CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via Wikimedia Commons.
-
-You can now use this `README.md` in your project!
