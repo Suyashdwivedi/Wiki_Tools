@@ -1,8 +1,10 @@
 # MediaWiki Image Zoom CSS Script
 
+![Suyash Dwivedi](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Suyash_Dwivedi_01%28cropped%29.jpg/180px-Suyash_Dwivedi_01%28cropped%29.jpg)
+
 This script adds a hover-based zoom effect to images in a MediaWiki instance using CSS. When users hover over an image, it enlarges smoothly while maintaining its aspect ratio. This effect enhances visual interaction for viewers without altering the original page layout.
 
-**Author:** Suyash Dwivedi (https://meta.wikimedia.org/wiki/User:Suyash.dwivedi)
+**Author:** Suyash Dwivedi ([User:Suyash.dwivedi](https://meta.wikimedia.org/wiki/User:Suyash.dwivedi))
 
 ## Features
 
@@ -41,3 +43,12 @@ img:hover {
     transform: scale(2); /* Scale up the image to 2x its size */
     z-index: 1000; /* Bring the zoomed image to the front */
 }
+```
+
+## License
+
+This project is licensed under the CC BY-SA 4.0 license.
+
+## Attribution
+
+Image by [Manavpreet Kaur, CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via Wikimedia Commons.
