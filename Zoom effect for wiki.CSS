@@ -1,0 +1,15 @@
+/* 
+  Zoom effect for images using CSS
+  Author: Suyash Dwivedi (https://meta.wikimedia.org/wiki/User:Suyash.dwivedi)
+*/
+img {
+    transition: transform 0.25s ease, z-index 0.10s ease; /* Smooth zoom transition and instant z-index change */
+    /* cursor: zoom-in; /* Change the cursor on hover */
+    z-index: 1; /* Set default z-index for images */
+    position: relative; /* Ensure z-index works */
+}
+
+img:hover {
+    transform: scale(2); /* Scale up the image to 2x its size */
+    z-index: 1000; /* Bring the zoomed image to the front */
+}
