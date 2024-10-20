@@ -1,25 +1,25 @@
 # Wikimedia URL Shortener
 
-![Suyash Dwivedi](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Suyash_Dwivedi_01%28cropped%29.jpg/180px-Suyash_Dwivedi_01%28cropped%29.jpg)
-
-This project provides a simple web interface to shorten URLs that link to Wikimedia projects (like Wikipedia, Wiktionary, Wikimedia Commons, etc.) using the Wikimedia URL Shortener API. 
+This project provides a simple web interface to shorten URLs that link to Wikimedia projects (such as Wikipedia, Wikimedia Commons, etc.) using the Wikimedia URL Shortener API.
 
 ## Author
 
 **Suyash Dwivedi**  
 [User:Suyash.dwivedi](https://meta.wikimedia.org/wiki/User:Suyash.dwivedi)
 
+![Suyash Dwivedi](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Suyash_Dwivedi_01%28cropped%29.jpg/180px-Suyash_Dwivedi_01%28cropped%29.jpg)
+
 ## Features
 
-- **Input Validation**: Ensures the URL input is not empty before sending a request.
-- **Wikimedia URL Shortening**: Shortens URLs to Wikimedia project pages.
-- **User-Friendly UI**: Simple, clean interface for entering long URLs and getting shortened ones.
-- **Copy to Clipboard**: Allows the user to easily copy the shortened URL with a button click.
-- **Error Handling**: Displays appropriate error messages in case of failure.
+- **Input Validation**: Ensures the URL is a valid Wikimedia project link before shortening.
+- **URL Shortening**: Generates short URLs for Wikimedia pages using the Wikimedia URL Shortener API.
+- **Copy to Clipboard**: Users can copy the shortened URL directly with a button click.
+- **Error Handling**: Displays user-friendly error messages in case of invalid input or API failure.
+- **Simple Interface**: Clean and easy-to-use interface for quickly shortening URLs.
 
-## Supported Domains
+## Supported Wikimedia Domains
 
-This tool supports URL shortening for the following Wikimedia projects:
+This tool supports shortening URLs from the following Wikimedia projects:
 
 - `*.wikipedia.org`
 - `*.wiktionary.org`
@@ -36,37 +36,35 @@ This tool supports URL shortening for the following Wikimedia projects:
 
 ## Installation
 
-No installation is required. Simply clone the repository and open the `index.html` file in any modern browser to use the URL Shortener.
+No installation is necessary. To use the tool, simply clone the repository and open the `index.html` file in a modern browser.
 
 ```bash
 git clone https://github.com/Suyashdwivedi/wikimedia-url-shortener.git
 cd wikimedia-url-shortener
 open index.html
+```
 
-## Usage
+## Usage Instructions
 
-1. Open the webpage.
-2. Enter a Wikimedia project URL in the input box.
+### 1. Shortening Wikimedia URLs
+
+1. Open the webpage in your browser.
+2. Enter a valid Wikimedia project URL (such as a Wikipedia article URL) in the input box.
 3. Click the "Shorten URL" button.
-4. The shortened URL will be displayed. You can click the "Copy Shortened URL" button to copy it to your clipboard.
+4. The shortened URL will appear below the input box.
+5. You can click the "Copy Shortened URL" button to easily copy it to your clipboard for sharing.
 
-## Example
+### 2. MediaWiki User Script
 
-Here's a sample screenshot of the tool in action:
+To use this tool as a MediaWiki User Script, follow these steps:
 
-![Wikimedia URL Shortener Screenshot](screenshot.png)
+1. Go to your MediaWiki user JavaScript page, for example:  
+   `https://your-wiki-instance.org/wiki/User:YourUsername/common.js`
+   
+2. Add the code for URL shortening functionality by integrating the script with your MediaWiki instance.
 
-## Components Used
-
-- **HTML**: For the structure of the page.
-- **CSS**: For styling the elements, providing a clean, responsive design.
-- **JavaScript**: To handle user interaction, API requests, and copy functionality.
-- **Wikimedia API**: The backend service used to generate shortened URLs.
+3. After adding the script, you can use the URL shortener directly in your MediaWiki interface for quick shortening of Wikimedia project URLs.
 
 ## License
 
-This project is licensed under the [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) license.
-
-## Attribution
-
-Image by [Manavpreet Kaur, CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via Wikimedia Commons.
+This project is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0).
