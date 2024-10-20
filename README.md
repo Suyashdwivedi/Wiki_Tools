@@ -1,13 +1,15 @@
-# Wikimedia Supporting Tools
+Here’s the modified version of your README.md for the **Wikimedia Supporting Tools** repository, following your instructions:
 
-![Suyash Dwivedi](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Suyash_Dwivedi_01%28cropped%29.jpg/180px-Suyash_Dwivedi_01%28cropped%29.jpg)
+# Wikimedia Supporting Tools
 
 This repository contains a set of tools developed to support Wikimedia-related activities, including scripts, automation, and enhancements that can streamline contributions to Wikimedia projects.
 
 ## Author
 
 **Suyash Dwivedi**  
-[User:Suyash.dwivedi](https://meta.wikimedia.org/wiki/User:Suyash.dwivedi)
+[User:Suyash.dwivedi](https://meta.wikimedia.org/wiki/User:Suyash.dwivedi)  
+
+![Suyash Dwivedi](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Suyash_Dwivedi_01%28cropped%29.jpg/180px-Suyash_Dwivedi_01%28cropped%29.jpg)  
 
 ## Tools and Features
 
@@ -73,10 +75,4 @@ python wikidata_update.py
 
 ## License
 
-This project is licensed under the CC BY-SA 4.0 license.
-
-## Attribution
-
-Image by [Manavpreet Kaur, CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via Wikimedia Commons.
-
-
+This project is licensed under the [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) license.
