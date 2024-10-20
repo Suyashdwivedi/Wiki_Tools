@@ -1,77 +1,53 @@
 # Scroll to Top and Bottom Buttons with Image Carousel
 
-![Suyash Dwivedi](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Suyash_Dwivedi_01%28cropped%29.jpg/180px-Suyash_Dwivedi_01%28cropped%29.jpg)
-
-This project implements 'Scroll to Top' and 'Scroll to Bottom' buttons on a webpage. The buttons will fade to 25% opacity after 2 seconds of inactivity and will fully reappear when hovered over. Additionally, it includes an image carousel with 'Next' and 'Previous' buttons to cycle through images.
+This project implements 'Scroll to Top' and 'Scroll to Bottom' buttons on a webpage, with a fade effect after 2 seconds of inactivity. It also includes an image carousel with 'Next' and 'Previous' buttons to cycle through images.
 
 ## Author
 
 **Suyash Dwivedi**  
 [User:Suyash.dwivedi](https://meta.wikimedia.org/wiki/User:Suyash.dwivedi)
 
+![Suyash Dwivedi](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Suyash_Dwivedi_01%28cropped%29.jpg/180px-Suyash_Dwivedi_01%28cropped%29.jpg)
+
 ## Features
 
 - **Scroll to Top/Bottom**: 
-  - Scroll to the top or bottom of the page using respective buttons.
-  - The buttons fade to 25% opacity after 2 seconds of inactivity.
-  - Hovering over the buttons restores full visibility.
-  
-- **Image Carousel**:
-  - Navigate through images using 'Next' and 'Previous' buttons.
-  - Images are faded in and out as you navigate between them.
+  - Buttons for smooth scrolling to the top or bottom of a page.
+  - Fade to 25% opacity after 2 seconds of inactivity.
+  - Restores full visibility when hovered.
 
-## Implementation Details
+- **Image Carousel**: 
+  - Allows navigation through images with 'Next' and 'Previous' buttons.
+  - Images are smoothly faded in and out during navigation.
 
-- **Opacity Control**: The scroll buttons are fully visible when hovered over and fade to 25% opacity after 2 seconds of inactivity using a `setTimeout` function.
-  
-- **Image Carousel**: The image carousel hides all images except the current one. Clicking 'Next' or 'Previous' buttons cycles through the images.
+## Implementation Overview
 
 ### 1. Scroll to Top/Bottom Buttons
 
-The buttons are created dynamically and positioned on the page using `jQuery`. They are set to fade to 25% opacity after 2 seconds and restore to full opacity when hovered over.
-
-```javascript
-var scrollButtonTop = $('<button id="scrollToTop" style="position:fixed; bottom:20px; left:20px; z-index:1000; background-color:#007BFF; color:white; border:none; border-radius:5px; padding:10px; font-size:16px; cursor:pointer; opacity: 1;">▲</button>');
-var scrollButtonBottom = $('<button id="scrollToBottom" style="position:fixed; top:20px; left:20px; z-index:1000; background-color:#007BFF; color:white; border:none; border-radius:5px; padding:10px; font-size:16px; cursor:pointer; opacity: 1;">▼</button>');
-```
-
-- The buttons use `.animate()` to scroll the page smoothly to the top or bottom:
-  
-```javascript
-$('html, body').animate({ scrollTop: 0 }, 'slow');  // Scroll to top
-$('html, body').animate({ scrollTop: $(document).height() }, 'slow');  // Scroll to bottom
-```
-
-- The opacity of the buttons fades to 25% after 2 seconds of inactivity:
-  
-```javascript
-setTimeout(function() {
-    scrollButtonTop.css('opacity', 0.25);
-    scrollButtonBottom.css('opacity', 0.25);
-}, 2000);
-```
+- The buttons are dynamically created and positioned using JavaScript.
+- After 2 seconds of inactivity, the buttons fade to 25% opacity but return to full opacity when hovered.
+- Clicking on the buttons scrolls the page smoothly to the top or bottom.
 
 ### 2. Image Carousel
 
-The carousel functionality allows users to navigate through images by clicking 'Next' or 'Previous' buttons. It uses the `fadeIn` and `hide` methods to display images smoothly.
+- The carousel hides all images except for the current one.
+- Users can navigate between images using 'Next' and 'Previous' buttons, with a smooth fade effect between images.
 
-```javascript
-var currentIndex = 0;
-var images = $('.carousel-image');
+## Installation as a MediaWiki User Script
 
-images.hide().eq(currentIndex).show();
+### Step 1: Create Your User Script Page
 
-$('#next').click(function() {
-    images.eq(currentIndex).hide();
-    currentIndex = (currentIndex + 1) % images.length;
-    images.eq(currentIndex).fadeIn('slow');
-});
-```
+1. Go to your MediaWiki instance.
+2. Navigate to your user-specific JavaScript page:  
+   `https://www.your_wiki_instance.org/wiki/User:YourUsername/common.js`
+   - This page allows you to add custom JavaScript that will run for your user across the wiki.
 
-## License
+### Step 2: Add the Functionality
 
-This project is licensed under the CC BY-SA 4.0 license.
+- **Scroll Buttons**: Implement dynamic buttons that appear for scrolling to the top or bottom of the page. Set them to fade after inactivity and return to full opacity on hover.
+  
+- **Image Carousel**: Include functionality for an image carousel, where users can navigate through images with 'Next' and 'Previous' buttons.
 
-## Attribution
+### Step 3: Save the Changes
 
-Image by [Manavpreet Kaur, CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via Wikimedia Commons.
+Once you add the script to your `common.js` page and save, both the scroll buttons and image carousel will be active on your MediaWiki instance.
