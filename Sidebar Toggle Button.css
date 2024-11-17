@@ -1,0 +1,13 @@
+/* 
+  To create a toggle button that will enable or disable the sidebar
+  Author: Suyash Dwivedi (https://meta.wikimedia.org/wiki/User:Suyash.dwivedi)
+*/
+/* Smooth transition for content margin */
+#content {
+    transition: margin-left 0.3s ease;
+}
+
+/* Button hover effect */
+#toggle-sidebar:hover {
+    background-color: darkorange;
+}
