@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asian Female Scientists and Their Birthplaces as per Wikidata</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            position: relative;
+        }
+        #map {
+            width: 100%;
+            height: 70vh;
+            margin-bottom: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 2em;
+            color: #333;
+        }
+        p {
+            text-align: center;
+            font-size: 1.2em;
+            color: #555;
+            margin: 10px 20px;
+        }
+        .credentials {
+            text-align: center;
+            font-size: 1em;
+            color: #777;
+            margin: 5px 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            cursor: pointer;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        th.sortable:hover {
+            background-color: #ddd;
+        }
+        .scroll-btn {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+        .scroll-btn button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 24px;
+        }
+        .scroll-btn button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Asian Female Scientists and Their Birthplaces as per Wikidata</h1>
+    <p>This page highlights notable female scientists from Asia, showcasing their fields of expertise, birthplaces, and countries. Below is a map showing their birthplaces, and a sortable table that provides more detailed information about each scientist.</p>
+    
+    <div class="credentials">
+        Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a>, Wikimedia Contributor (*You may need to wait for some time/refresh the page once).
+    </div>
+
+    <div class="scroll-btn">
+        <button onclick="scrollToTop()">⮝</button>
+        <button onclick="scrollToBottom()">⮟</button>
+    </div>
+    
+    <div id="map"></div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th class="sortable" onclick="sortTable(0)">S.No</th>
+                <th class="sortable" onclick="sortTable(1)">Scientist</th>
+                <th class="sortable" onclick="sortTable(2)">Field</th>
+                <th class="sortable" onclick="sortTable(3)">Birthplace</th>
+                <th class="sortable" onclick="sortTable(4)">Country</th>
+            </tr>
+        </thead>
+        <tbody id="data"></tbody>
+    </table>
+
+    <script>
+        const sparqlQuery = `
+        SELECT ?scientist ?scientistLabel ?fieldLabel ?placeLabel ?placeCoord ?article ?image ?countryLabel WHERE {
+          ?scientist wdt:P31 wd:Q5;
+                    wdt:P106 wd:Q901;
+                    wdt:P21 wd:Q6581072;
+                    wdt:P27 ?country;
+                    wdt:P101 ?field;
+                    wdt:P19 ?place.
+          ?place wdt:P625 ?placeCoord.
+          ?country wdt:P30 wd:Q48.
+          OPTIONAL { ?article schema:about ?scientist ; schema:inLanguage "en" ; schema:isPartOf <https://en.wikipedia.org/>. }
+          OPTIONAL { ?scientist wdt:P18 ?image. }
+          SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+        }
+        LIMIT 500`;
+
+        fetch("https://query.wikidata.org/sparql?query=" + encodeURIComponent(sparqlQuery) + "&format=json")
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = d3.select("#data");
+                const scientistsData = data.results.bindings.map((person, index) => {
+                    const coords = person.placeCoord.value.replace('Point(', '').replace(')', '').split(' ');
+                    return {
+                        name: person.scientistLabel.value,
+                        field: person.fieldLabel.value,
+                        birthplace: person.placeLabel.value,
+                        country: person.countryLabel.value,
+                        coordinates: [parseFloat(coords[1]), parseFloat(coords[0])],
+                        article: person.article ? person.article.value : null,
+                        image: person.image ? person.image.value : null,
+                        wikidata: `https://www.wikidata.org/wiki/${person.scientist.value.split('/').pop()}`
+                    };
+                });
+
+                const uniqueScientists = {};
+                scientistsData.forEach((scientist, index) => {
+                    if (!uniqueScientists[scientist.name]) {
+                        uniqueScientists[scientist.name] = {
+                            index: index,
+                            field: scientist.field,
+                            birthplace: scientist.birthplace,
+                            country: scientist.country,
+                            article: scientist.article,
+                            image: scientist.image,
+                            wikidata: scientist.wikidata,
+                            coordinates: scientist.coordinates
+                        };
+
+                        tableBody.append("tr")
+                            .html(`<td>${index + 1}</td>
+                                   <td>${scientist.article ? `<a href="${scientist.article}" target="_blank">${scientist.name}</a>` : scientist.name} (<a href="${scientist.wikidata}" target="_blank">Wikidata</a>)</td>
+                                   <td>${scientist.field}</td>
+                                   <td>${scientist.birthplace}</td>
+                                   <td>${scientist.country}</td>`);
+                    }
+                });
+
+                const map = L.map('map').setView([20, 100], 4);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                Object.values(uniqueScientists).forEach(scientist => {
+                    let popupContent = `<b>${scientist.article ? `<a href="${scientist.article}" target="_blank">${scientist.index + 1}. ${scientist.name}</a>` : `${scientist.index + 1}. ${scientist.name}`}</b> (<a href="${scientist.wikidata}" target="_blank">Wikidata</a>)<br>${scientist.field}<br>${scientist.birthplace}, ${scientist.country}`;
+                    if (scientist.image) {
+                        popupContent += `<br><img src="${scientist.image}" alt="${scientist.name}" style="width:50px;height:50px;">`;
+                    }
+                    L.marker(scientist.coordinates)
+                        .addTo(map)
+                        .bindPopup(popupContent);
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function scrollToBottom() {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function sortTable(columnIndex) {
+            const table = document.querySelector("table");
+            const tbody = table.querySelector("tbody");
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+
+            const isAscending = !tbody.dataset.sorted || tbody.dataset.sorted === "desc";
+            tbody.dataset.sorted = isAscending ? "asc" : "desc";
+
+            rows.sort((a, b) => {
+                const aText = a.cells[columnIndex].textContent;
+                const bText = b.cells[columnIndex].textContent;
+                return isAscending ? aText.localeCompare(bText) : bText.localeCompare(aText);
+            });
+
+            tbody.innerHTML = '';
+            rows.forEach(row => tbody.appendChild(row));
+        }
+    </script>
+</body>
+</html>
