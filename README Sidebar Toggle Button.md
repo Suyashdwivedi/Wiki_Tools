@@ -18,6 +18,8 @@ This project adds a toggle button to the **MediaWiki Vector Legacy (2010)** skin
 
 - **MediaWiki** running the **Vector Legacy (2010)** skin.
 - **JavaScript** and **CSS** modifications to enable the toggle button functionality.
+- Use:Sidebar Toggle Button.JS
+- Sidebar Toggle Button.css
 
 ## Setup Instructions
 
