@@ -1,6 +1,6 @@
 # Wikimedia URL Shortener
 
-This project provides a simple web interface to shorten URLs that link to Wikimedia projects (such as Wikipedia, Wikimedia Commons, etc.) using the Wikimedia URL Shortener API.
+This project provides a simple web interface to shorten URLs that link to Wikimedia projects (such as Wikipedia, Wikimedia Commons, etc.) using the Wikimedia URL Shortener API. (It needs to be updated as its not functioning properly)
 
 ## Author
 
