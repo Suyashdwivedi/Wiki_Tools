@@ -1,4 +1,4 @@
-# Scroll to Top and Bottom Buttons with Image Carousel
+# Scroll to Top and Bottom Buttons with Image Carousel - ScrollAndView
 
 This project implements 'Scroll to Top' and 'Scroll to Bottom' buttons on a webpage, with a fade effect after 2 seconds of inactivity. It also includes an image carousel with 'Next' and 'Previous' buttons to cycle through images.
 
