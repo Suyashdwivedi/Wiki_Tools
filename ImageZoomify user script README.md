@@ -21,7 +21,7 @@ To use this script on Wikipedia, you need to add it to your `common.js` file on 
 2. **Edit Your `common.js` Page**:
    - Add the following line to your `common.js` file to load the script:
      ```javascript
-     mw.loader.load('//meta.wikimedia.org/w/index.php?title=User:Suyash.dwivedi/userscripts/ImageZoomify.js&action=raw&ctype=text/javascript');
+    mw.loader.load('//meta.wikimedia.org/w/index.php?title=User:Suyash.dwivedi/userscripts/ImageZoomify.css&action=raw&ctype=text/css', 'text/css');
      ```
 
 3. **Save Your `common.js` Page**:
