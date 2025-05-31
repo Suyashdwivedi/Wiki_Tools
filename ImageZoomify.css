@@ -13,3 +13,14 @@ img:hover {
     transform: scale(2); /* Scale up the image to 2x its size */
     z-index: 1000; /* Bring the zoomed image to the front */
 }
+
+
+/* Smooth transition for content margin toggle Sidebar */
+#content {
+    transition: margin-left 0.3s ease;
+}
+
+/* Button hover effect */
+#toggle-sidebar:hover {
+    background-color: darkorange;
+}
