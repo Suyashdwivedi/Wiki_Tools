@@ -1,8 +1,6 @@
 # Megapixel Hover Userscript for MediaWiki
 
-![Suyash Dwivedi](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Suyash_Dwivedi_01%28cropped%29.jpg/120px-Suyash_Dwivedi_01%28cropped%29.jpg)
-
-![Wiki's Lazy Coders](https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/120px-Wiki%27s_Lazy_Coders.png)
+![Wiki's Lazy Coders](https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/180px-Wiki%27s_Lazy_Coders.png)
 
 This userscript adds a visual overlay when hovering over any image on MediaWiki pages (including Wikimedia Commons, Wikipedia, etc.). The overlay displays the image's resolution in **megapixels (MP)**, which is especially useful when evaluating images for contests like **Wiki Loves Monuments (WLM)**, **Wiki Loves Earth (WLE)**, or **Quality Image nominations**.
 
@@ -10,6 +8,8 @@ This userscript adds a visual overlay when hovering over any image on MediaWiki 
 
 **Suyash Dwivedi**  
 [User:Suyash.dwivedi](https://meta.wikimedia.org/wiki/User:Suyash.dwivedi)
+
+![Suyash Dwivedi](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Suyash_Dwivedi_01%28cropped%29.jpg/120px-Suyash_Dwivedi_01%28cropped%29.jpg)
 
 ## Features
 
