@@ -3,7 +3,14 @@
 ![Wiki's Lazy Coders](https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/180px-Wiki%27s_Lazy_Coders.png)
 
 This userscript adds a visual overlay when hovering over any image on MediaWiki pages (including Wikimedia Commons, Wikipedia, etc.). The overlay displays the image's resolution in **megapixels (MP)**, which is especially useful when evaluating images for contests like **Wiki Loves Monuments (WLM)**, **Wiki Loves Earth (WLE)**, or **Quality Image nominations**.
+## 📖 Read the Full Story
 
+Curious about how image megapixels are calculated and why they really matter for creators, editors, and everyday users?
+
+👉 **Read the full article on Medium:**  
+[**How to Easily Calculate Image Megapixels – and Why It Matters**](https://medium.com/@SuyashWiki/how-to-easily-calculate-image-megapixels-and-why-it-matters-b53777e44594)
+
+This post breaks it down with examples, visuals, and a simple formula you can use in seconds.
 ## Author
 
 **Suyash Dwivedi**  
