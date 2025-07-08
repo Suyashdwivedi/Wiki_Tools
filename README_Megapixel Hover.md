@@ -18,10 +18,11 @@ This userscript adds a visual overlay when hovering over any image on MediaWiki 
 
 ## Installation
 
-Add the following to your `global.js` page:
-
-mw.loader.load("//meta.wikimedia.org/w/index.php?title=User:Suyash.dwivedi/userscripts/mp-hover.js&action=raw&ctype=text/javascript");
 Visit: https://meta.wikimedia.org/wiki/Special:MyPage/global.js
+Add the following to your `global.js` page:
+mw.loader.load("//meta.wikimedia.org/w/index.php?title=User:Suyash.dwivedi/userscripts/mp-hover.js&action=raw&ctype=text/javascript");
+
+
 
 Use Cases
 ✅ Quickly check if an image meets minimum MP requirements (e.g., 2MP for WLM/WLE).
