@@ -10,19 +10,19 @@ This userscript adds a visual overlay when hovering over any image on MediaWiki 
 
 Curious about how image megapixels are calculated and why they really matter for creators, editors, and everyday users?
 
-👉 **Read the full article on Medium:**  
-[**How to Easily Calculate Image Megapixels – and Why It Matters**](https://medium.com/@SuyashWiki/how-to-easily-calculate-image-megapixels-and-why-it-matters-b53777e44594)
+👉 <a href="https://medium.com/@SuyashWiki/how-to-easily-calculate-image-megapixels-and-why-it-matters-b53777e44594" target="_blank"><strong>Read the full article on Medium</strong></a>
 
 This post breaks it down with examples, visuals, and a simple formula you can use in seconds.
+
+---
+
 ## 🌐 Web Tool Also Available
 
 Don't want to install a userscript? You can also check image megapixels directly from your browser using the web tool:
 
-🔍 **Upload an image** or  
-🌐 **Paste an image URL** at:  
-👉 [https://suyashdwivedi.github.io/megapixel-checker.html](https://suyashdwivedi.github.io/megapixel-checker.html)
-
-No install needed. Works instantly on desktop and mobile.
+🔍 <strong>Upload an image</strong> or  
+🌐 <strong>Paste an image URL</strong> at:  
+👉 <a href="https://suyashdwivedi.github.io/megapixel-checker.html" target="_blank">https://suyashdwivedi.github.io/megapixel-checker.html</a>
 ---
 
 ## ✨ Features
@@ -90,7 +90,7 @@ Then switch to:
 
 **This is 8.76 MP Image**
 
-
+---
 
 👨‍💻 Author
 Suyash Dwivedi
