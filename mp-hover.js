@@ -4,7 +4,7 @@
 (function () {
     'use strict';
 
-    // Create CSS animation for pulsing emoji
+    // Add CSS for ⏳ emoji pulsing animation
     const style = document.createElement("style");
     style.innerHTML = `
         @keyframes pulse {
@@ -19,7 +19,7 @@
     `;
     document.head.appendChild(style);
 
-    // Tooltip setup
+    // Create tooltip
     const tooltip = document.createElement("div");
     Object.assign(tooltip.style, {
         position: "fixed",
@@ -67,16 +67,16 @@
             document.addEventListener("mousemove", moveHandler);
             currentImg.addEventListener("mouseleave", outHandler);
 
-            // Show loading animation
+            // Loading animation
             showTooltip('<span class="mp-loading">⏳</span>');
 
-            // 1. Use cached result
+            // Use cached result if present
             if (currentImg.dataset.mp) {
                 showTooltip(currentImg.dataset.mp);
                 return;
             }
 
-            // 2. Use data attributes if available
+            // Use data-file-* if available
             const w = currentImg.getAttribute('data-file-width');
             const h = currentImg.getAttribute('data-file-height');
             if (w && h) {
@@ -86,7 +86,7 @@
                 return;
             }
 
-            // 3. Fallback: load full image once
+            // Load full image to get dimensions
             const src = currentImg.src || currentImg.getAttribute("data-src");
             if (!src) return;
 
@@ -107,35 +107,48 @@
         });
     }
 
-    // Attach to all static images
-    document.querySelectorAll("img").forEach(function (imgNode) {
-        attachHoverHandler(imgNode);
-    });
+    function applyToAllImages() {
+        document.querySelectorAll("img").forEach(function (imgNode) {
+            if (!imgNode.dataset.mpBound) {
+                attachHoverHandler(imgNode);
+                imgNode.dataset.mpBound = "1";
+            }
+        });
+    }
 
-    // Observe dynamic content (popups, galleries)
+    // Initial images
+    applyToAllImages();
+
+    // Dynamic images (AJAX)
     const observer = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
             mutation.addedNodes.forEach(function (node) {
                 if (node.nodeType !== 1) return;
                 const imgs = node.tagName === "IMG" ? [node] : node.querySelectorAll("img");
                 imgs.forEach(function (imgNode) {
-                    attachHoverHandler(imgNode);
+                    if (!imgNode.dataset.mpBound) {
+                        attachHoverHandler(imgNode);
+                        imgNode.dataset.mpBound = "1";
+                    }
                 });
             });
         });
     });
-
     observer.observe(document.body, { childList: true, subtree: true });
 
-    // File pages: Show static MP badge
-    if (mw.config.get("wgNamespaceNumber") === 6) {
-        const fullMediaLink = document.querySelector(".fullMedia a");
-        if (fullMediaLink) {
+    // Static MP badge for File pages
+    mw.hook("wikipage.content").add(function () {
+        if (mw.config.get("wgNamespaceNumber") === 6) {
+            const fullMediaLink = document.querySelector(".fullMedia a");
+            if (!fullMediaLink) return;
+            if (document.querySelector("#mp-badge")) return;
+
             const tempImg = new Image();
             tempImg.onload = function () {
                 const w = tempImg.naturalWidth;
                 const h = tempImg.naturalHeight;
                 const badge = document.createElement("div");
+                badge.id = "mp-badge";
                 badge.innerHTML = formatMP(w, h);
                 Object.assign(badge.style, {
                     background: "#333",
@@ -155,5 +168,5 @@
             };
             tempImg.src = fullMediaLink.href;
         }
-    }
+    });
 })();
