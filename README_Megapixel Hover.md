@@ -81,6 +81,16 @@ Hovering this image:
 Then switch to:
 
 This is 8.76 MP Image
+## 🌐 Web Tool Also Available
+
+Don't want to install a userscript? You can also check image megapixels directly from your browser using the web tool:
+
+🔍 **Upload an image** or  
+🌐 **Paste an image URL** at:  
+👉 [https://suyashdwivedi.github.io/megapixel-checker.html](https://suyashdwivedi.github.io/megapixel-checker.html)
+
+No install needed. Works instantly on desktop and mobile.
+
 
 👨‍💻 Author
 Suyash Dwivedi
