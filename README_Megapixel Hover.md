@@ -18,13 +18,12 @@ This post breaks it down with examples, visuals, and a simple formula you can us
 
 ## 🌐 Web Tool Also Available
 
-Don't want to install a userscript? You can also check image megapixels directly from your browser using the web tool:
+Don’t want to install a userscript? You can also check image megapixels directly from your browser using the web tool:
 
 🔍 <strong>Upload an image</strong> or  
 🌐 <strong>Paste an image URL</strong> at:  
 👉 <a href="https://suyashdwivedi.github.io/megapixel-checker.html" target="_blank">https://suyashdwivedi.github.io/megapixel-checker.html</a>
 ---
-
 ## ✨ Features
 
 - 🖱️ **Hover-based MP Tooltip**  
@@ -69,16 +68,20 @@ Don't want to install a userscript? You can also check image megapixels directly
    mw.loader.load('//meta.wikimedia.org/w/index.php?title=User:Suyash.dwivedi/userscripts/mp-hover.js&action=raw&ctype=text/javascript');
 Save the page, then refresh any Commons or Wikipedia page.
 
-🔍 Example
+## 🔍 Example
+
 Hovering this image:
+
 <p align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/A_basket_of_fruits.jpg/500px-A_basket_of_fruits.jpg" target="_blank alt="A basket of fruits" />
+  <a href="https://commons.wikimedia.org/wiki/File:A_basket_of_fruits.jpg" target="_blank">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/A_basket_of_fruits.jpg/500px-A_basket_of_fruits.jpg" alt="A basket of fruits" />
+  </a>
   <br>
   <em>A basket of fruits</em><br>
   <small>
-    Image by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi">Suyash Dwivedi</a>,
+    Image by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi">Suyash Dwivedi</a>, 
     <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>, via 
-    <a href="https://commons.wikimedia.org/wiki/File:A_basket_of_fruits.jpg">Wikimedia Commons</a>
+    <a href="https://commons.wikimedia.org/wiki/File:A_basket_of_fruits.jpg" target="_blank">Wikimedia Commons</a>
   </small>
 </p>
 
