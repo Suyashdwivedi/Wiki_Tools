@@ -14,7 +14,15 @@ Curious about how image megapixels are calculated and why they really matter for
 [**How to Easily Calculate Image Megapixels – and Why It Matters**](https://medium.com/@SuyashWiki/how-to-easily-calculate-image-megapixels-and-why-it-matters-b53777e44594)
 
 This post breaks it down with examples, visuals, and a simple formula you can use in seconds.
+## 🌐 Web Tool Also Available
 
+Don't want to install a userscript? You can also check image megapixels directly from your browser using the web tool:
+
+🔍 **Upload an image** or  
+🌐 **Paste an image URL** at:  
+👉 [https://suyashdwivedi.github.io/megapixel-checker.html](https://suyashdwivedi.github.io/megapixel-checker.html)
+
+No install needed. Works instantly on desktop and mobile.
 ---
 
 ## ✨ Features
@@ -80,16 +88,8 @@ Hovering this image:
 
 Then switch to:
 
-This is 8.76 MP Image
-## 🌐 Web Tool Also Available
+**This is 8.76 MP Image**
 
-Don't want to install a userscript? You can also check image megapixels directly from your browser using the web tool:
-
-🔍 **Upload an image** or  
-🌐 **Paste an image URL** at:  
-👉 [https://suyashdwivedi.github.io/megapixel-checker.html](https://suyashdwivedi.github.io/megapixel-checker.html)
-
-No install needed. Works instantly on desktop and mobile.
 
 
 👨‍💻 Author
