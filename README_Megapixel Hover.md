@@ -63,7 +63,16 @@ Save the page, then refresh any Commons or Wikipedia page.
 
 🔍 Example
 Hovering this image:
-
+<p align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Geeta_Chandran_during_a_performance_at_Bharat_Bhavan_Bhopal_in_June_2025_%285%29.jpg/320px-Geeta_Chandran_during_a_performance_at_Bharat_Bhavan_Bhopal_in_June_2025_%285%29.jpg" alt="Geeta Chandran performing at Bharat Bhavan, Bhopal – June 2025" />
+  <br>
+  <em>Geeta Chandran performing at Bharat Bhavan, Bhopal – June 2025</em><br>
+  <small>
+    Image by <a href="https://commons.wikimedia.org/wiki/User:Suyash.dwivedi">Suyash Dwivedi</a>, 
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>, via 
+    <a href="https://commons.wikimedia.org/wiki/File:Geeta_Chandran_during_a_performance_at_Bharat_Bhavan_Bhopal_in_June_2025_%285%29.jpg">Wikimedia Commons</a>
+  </small>
+</p>
 
 
 💡 Will first show:
