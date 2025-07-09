@@ -3,6 +3,9 @@
 ![Wiki's Lazy Coders](https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/180px-Wiki%27s_Lazy_Coders.png)
 
 This userscript adds a visual overlay when hovering over any image on MediaWiki pages (including Wikimedia Commons, Wikipedia, etc.). The overlay displays the image's resolution in **megapixels (MP)**, which is especially useful when evaluating images for contests like **Wiki Loves Monuments (WLM)**, **Wiki Loves Earth (WLE)**, or **Quality Image nominations**.
+
+---
+
 ## 📖 Read the Full Story
 
 Curious about how image megapixels are calculated and why they really matter for creators, editors, and everyday users?
@@ -11,43 +14,71 @@ Curious about how image megapixels are calculated and why they really matter for
 [**How to Easily Calculate Image Megapixels – and Why It Matters**](https://medium.com/@SuyashWiki/how-to-easily-calculate-image-megapixels-and-why-it-matters-b53777e44594)
 
 This post breaks it down with examples, visuals, and a simple formula you can use in seconds.
-## Author
 
-**Suyash Dwivedi**  
-[User:Suyash.dwivedi](https://meta.wikimedia.org/wiki/User:Suyash.dwivedi)
+---
 
-![Suyash Dwivedi](https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Suyash_Dwivedi_01%28cropped%29.jpg/120px-Suyash_Dwivedi_01%28cropped%29.jpg)
+## ✨ Features
 
-## Features
+- 🖱️ **Hover-based MP Tooltip**  
+  Instantly shows megapixel value when you hover over any image.
 
-- 📸 **Image Resolution Display**: Shows megapixel count on hover using natural image dimensions.
-- ⚡ **Lightweight & Fast**: Runs only when hovering over `<img>` elements.
-- 🖼️ **Useful for Wikimedia Work**: Ideal for Commons reviewers, contest organizers, and uploaders.
-- 🧩 **Easy to Install**: Add a single line to your `global.js` or `common.js`.
+- ⏳ **Emoji Loading Animation**  
+  Displays a pulsing ⏳ emoji while calculating image dimensions.
 
-## Installation
+- 🧠 **Smart Caching**  
+  Each image is fetched and calculated **only once**, even on repeated hover.
 
-**Visit**: https://meta.wikimedia.org/wiki/Special:MyPage/global.js
+- ⚡ **Metadata Optimization**  
+  Uses `data-file-width` and `data-file-height` (when available) to avoid full image loading.
 
-**Add** the following to your `global.js` page:
+- 📄 **Static Badge on File Pages**  
+  Displays permanent MP info below full-resolution images on file description pages.
 
-mw.loader.load("//meta.wikimedia.org/w/index.php?title=User:Suyash.dwivedi/userscripts/mp-hover.js&action=raw&ctype=text/javascript");
+- 📍 **Follows Mouse Pointer**  
+  Tooltip follows your cursor for intuitive viewing.
+
+- 🧩 **Supports All Pages**  
+  Works in:
+  - File pages
+  - Categories
+  - Popups (MediaViewer, PagePreviews)
+  - Special:ListFiles
+  - Galleries & dynamic content
+
+- 🌓 **Dark Tooltip Design**  
+  Dark translucent background ensures visibility on all page types.
+
+---
+
+## 🔧 Installation Instructions
+
+1. Visit your global JavaScript page:  
+   [`meta:Special:MyPage/global.js`](https://meta.wikimedia.org/wiki/Special:MyPage/global.js)
+
+2. Add this line:
+
+   ```js
+   mw.loader.load('//meta.wikimedia.org/w/index.php?title=User:Suyash.dwivedi/userscripts/mp-hover.js&action=raw&ctype=text/javascript');
+Save the page, then refresh any Commons or Wikipedia page.
+
+🔍 Example
+Hovering this image:
 
 
-## Use Cases
 
-✅ Quickly check if an image meets minimum MP requirements (e.g., 2MP for WLM/WLE).
+💡 Will first show:
 
-✅ Helps identify low-resolution uploads.
+⏳ (emoji pulse)
 
-✅ No need to right-click or open file pages.
+Then switch to:
 
-**Compatibility**
-✅ Works on MediaWiki projects (Commons, Wikipedia, Meta, etc.)
+This is 17.26 MP Image
 
-🖥️ Best for desktop; mobile support in future versions.
+👨‍💻 Author
+Suyash Dwivedi
+User:Suyash.dwivedi
 
-**License**
-This userscript is licensed under the
-Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) license.
-Read more: https://creativecommons.org/licenses/by-sa/4.0
+
+
+🪪 License
+This script is licensed under Creative Commons Attribution-ShareAlike 4.0
