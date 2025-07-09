@@ -72,7 +72,7 @@ Save the page, then refresh any Commons or Wikipedia page.
 🔍 Example
 Hovering this image:
 <p align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/A_basket_of_fruits.jpg/500px-A_basket_of_fruits.jpg" alt="A basket of fruits" />
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/A_basket_of_fruits.jpg/500px-A_basket_of_fruits.jpg" target="_blank alt="A basket of fruits" />
   <br>
   <em>A basket of fruits</em><br>
   <small>
@@ -94,8 +94,7 @@ Then switch to:
 
 👨‍💻 Author
 Suyash Dwivedi
-User:Suyash.dwivedi
-
+<a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi">User:Suyash.dwivedi</a>
 
 
 🪪 License
