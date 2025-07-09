@@ -1,10 +1,25 @@
 // [[User:Suyash.dwivedi/userscripts/mp-hover.js]]
-// Author: Suyash Dwivedi — CC BY-SA 4.0
 // https://meta.wikimedia.org/wiki/User:Suyash.dwivedi
 
 (function () {
     'use strict';
 
+    // Create CSS animation for pulsing emoji
+    const style = document.createElement("style");
+    style.innerHTML = `
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.7; }
+        }
+        .mp-loading {
+            font-size: 16px;
+            animation: pulse 1s infinite;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Tooltip setup
     const tooltip = document.createElement("div");
     Object.assign(tooltip.style, {
         position: "fixed",
@@ -18,130 +33,110 @@
         display: "none",
         maxWidth: "240px",
         fontFamily: "system-ui, sans-serif",
-        whiteSpace: "nowrap"
+        whiteSpace: "nowrap",
+        transition: "top 0.05s, left 0.05s"
     });
     document.body.appendChild(tooltip);
 
-    // Main hover for static images
-    document.addEventListener("mouseover", function (e) {
-        const img = e.target.closest("img");
-        if (!img || img.dataset.mpTooltip === "1") return;
+    function formatMP(w, h) {
+        return 'This is <b style="color:#FFD700;">' + (w * h / 1000000).toFixed(2) + ' MP</b> Image';
+    }
 
-        const src = img.src || img.getAttribute("data-src");
-        if (!src) return;
-        img.dataset.mpTooltip = "1";
+    function showTooltip(html) {
+        tooltip.innerHTML = html;
+        tooltip.style.display = "block";
+    }
 
-        function formatMP(w, h) {
-            return 'This is <b style="color:#FFD700;">' + (w * h / 1000000).toFixed(2) + ' MP</b> Image';
-        }
+    function attachHoverHandler(img) {
+        let moveHandler, outHandler;
 
-        function showTooltip(w, h, pageX, pageY) {
-            tooltip.innerHTML = formatMP(w, h);
-            tooltip.style.left = pageX + 12 + "px";
-            tooltip.style.top = pageY + 12 + "px";
-            tooltip.style.display = "block";
-        }
+        img.addEventListener("mouseenter", function () {
+            const currentImg = this;
 
-        function moveHandler(ev) {
-            tooltip.style.left = ev.pageX + 12 + "px";
-            tooltip.style.top = ev.pageY + 12 + "px";
-        }
-
-        function outHandler() {
-            tooltip.style.display = "none";
-            document.removeEventListener("mousemove", moveHandler);
-            img.removeEventListener("mouseout", outHandler);
-        }
-
-        document.addEventListener("mousemove", moveHandler);
-        img.addEventListener("mouseout", outHandler);
-
-        if (src.includes("/thumb/")) {
-            const originalUrl = src.replace(/\/thumb\/(.*)\/[^/]+$/, "/$1");
-            const fullImg = new Image();
-            fullImg.onload = function () {
-                showTooltip(fullImg.naturalWidth, fullImg.naturalHeight, e.pageX, e.pageY);
+            moveHandler = function (ev) {
+                tooltip.style.left = ev.clientX + 15 + "px";
+                tooltip.style.top = ev.clientY + 15 + "px";
             };
-            fullImg.src = originalUrl;
-        } else if (img.naturalWidth && img.naturalHeight) {
-            showTooltip(img.naturalWidth, img.naturalHeight, e.pageX, e.pageY);
-        }
-    });
 
-    // Handle lazy-loaded or dynamically added images
-    const observer = new MutationObserver(function (mutations) {
-        for (let i = 0; i < mutations.length; i++) {
-            const mutation = mutations[i];
-            for (let j = 0; j < mutation.addedNodes.length; j++) {
-                const node = mutation.addedNodes[j];
-                if (node.nodeType !== 1) continue;
+            outHandler = function () {
+                tooltip.style.display = "none";
+                document.removeEventListener("mousemove", moveHandler);
+                currentImg.removeEventListener("mouseleave", outHandler);
+            };
 
-                const imgs = node.querySelectorAll?.("img");
-                if (imgs) {
-                    imgs.forEach(function (imgNode) {
-                        imgNode.addEventListener("mouseover", function (e) {
-                            const img = this;
-                            if (!img || img.dataset.mpTooltip === "1") return;
+            document.addEventListener("mousemove", moveHandler);
+            currentImg.addEventListener("mouseleave", outHandler);
 
-                            const src = img.src || img.getAttribute("data-src");
-                            if (!src) return;
-                            img.dataset.mpTooltip = "1";
+            // Show loading animation
+            showTooltip('<span class="mp-loading">⏳</span>');
 
-                            function formatMP(w, h) {
-                                return 'This is <b style="color:#FFD700;">' + (w * h / 1000000).toFixed(2) + ' MP</b> Image';
-                            }
-
-                            function showTooltip(w, h, pageX, pageY) {
-                                tooltip.innerHTML = formatMP(w, h);
-                                tooltip.style.left = pageX + 12 + "px";
-                                tooltip.style.top = pageY + 12 + "px";
-                                tooltip.style.display = "block";
-                            }
-
-                            function moveHandler(ev) {
-                                tooltip.style.left = ev.pageX + 12 + "px";
-                                tooltip.style.top = ev.pageY + 12 + "px";
-                            }
-
-                            function outHandler() {
-                                tooltip.style.display = "none";
-                                document.removeEventListener("mousemove", moveHandler);
-                                img.removeEventListener("mouseout", outHandler);
-                            }
-
-                            document.addEventListener("mousemove", moveHandler);
-                            img.addEventListener("mouseout", outHandler);
-
-                            if (src.includes("/thumb/")) {
-                                const originalUrl = src.replace(/\/thumb\/(.*)\/[^/]+$/, "/$1");
-                                const fullImg = new Image();
-                                fullImg.onload = function () {
-                                    showTooltip(fullImg.naturalWidth, fullImg.naturalHeight, e.pageX, e.pageY);
-                                };
-                                fullImg.src = originalUrl;
-                            } else if (img.naturalWidth && img.naturalHeight) {
-                                showTooltip(img.naturalWidth, img.naturalHeight, e.pageX, e.pageY);
-                            }
-                        });
-                    });
-                }
+            // 1. Use cached result
+            if (currentImg.dataset.mp) {
+                showTooltip(currentImg.dataset.mp);
+                return;
             }
-        }
+
+            // 2. Use data attributes if available
+            const w = currentImg.getAttribute('data-file-width');
+            const h = currentImg.getAttribute('data-file-height');
+            if (w && h) {
+                const msg = formatMP(w, h);
+                currentImg.dataset.mp = msg;
+                showTooltip(msg);
+                return;
+            }
+
+            // 3. Fallback: load full image once
+            const src = currentImg.src || currentImg.getAttribute("data-src");
+            if (!src) return;
+
+            if (src.includes("/thumb/")) {
+                const originalUrl = src.replace(/\/thumb\/(.*)\/[^/]+$/, "/$1");
+                const fullImg = new Image();
+                fullImg.onload = function () {
+                    const msg = formatMP(fullImg.naturalWidth, fullImg.naturalHeight);
+                    currentImg.dataset.mp = msg;
+                    showTooltip(msg);
+                };
+                fullImg.src = originalUrl;
+            } else if (currentImg.naturalWidth && currentImg.naturalHeight) {
+                const msg = formatMP(currentImg.naturalWidth, currentImg.naturalHeight);
+                currentImg.dataset.mp = msg;
+                showTooltip(msg);
+            }
+        });
+    }
+
+    // Attach to all static images
+    document.querySelectorAll("img").forEach(function (imgNode) {
+        attachHoverHandler(imgNode);
     });
+
+    // Observe dynamic content (popups, galleries)
+    const observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+            mutation.addedNodes.forEach(function (node) {
+                if (node.nodeType !== 1) return;
+                const imgs = node.tagName === "IMG" ? [node] : node.querySelectorAll("img");
+                imgs.forEach(function (imgNode) {
+                    attachHoverHandler(imgNode);
+                });
+            });
+        });
+    });
+
     observer.observe(document.body, { childList: true, subtree: true });
 
-    // Show static badge on File: pages
+    // File pages: Show static MP badge
     if (mw.config.get("wgNamespaceNumber") === 6) {
         const fullMediaLink = document.querySelector(".fullMedia a");
         if (fullMediaLink) {
-            const fullImageURL = fullMediaLink.href;
             const tempImg = new Image();
             tempImg.onload = function () {
                 const w = tempImg.naturalWidth;
                 const h = tempImg.naturalHeight;
-
                 const badge = document.createElement("div");
-                badge.innerHTML = 'This is <b style="color:#FFD700;">' + (w * h / 1000000).toFixed(2) + ' MP</b> Image';
+                badge.innerHTML = formatMP(w, h);
                 Object.assign(badge.style, {
                     background: "#333",
                     color: "#fff",
@@ -158,7 +153,7 @@
                     container.parentNode.insertBefore(badge, container.nextSibling);
                 }
             };
-            tempImg.src = fullImageURL;
+            tempImg.src = fullMediaLink.href;
         }
     }
 })();
