@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki Anniversary</title>
+    <meta name="description" content="A tool to check a user's Wiki anniversary, contributions, and wish them well.">
+    <meta name="keywords" content="Wiki, MediaWiki, anniversary, user, contributions, birthday">
+    <meta name="author" content="Suyash Dwivedi">
+    <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html">
+    <meta property="og:title" content="Wiki Anniversary">
+    <meta property="og:description" content="A tool to check a user's Wiki anniversary, contributions, and wish them well.">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Wiki Anniversary">
+    <meta name="twitter:description" content="A tool to check a user's Wiki anniversary, contributions, and wish them well.">
+    <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/32px-Wiki%27s_Lazy_Coders.png">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #343a40; text-align: center; overflow-x: hidden; }
+        header { background-color: #007bff; color: white; padding: 1em; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
+        header img { height: 75px; margin-right: 15px; }
+        .columns { display: flex; width: 100%; flex-wrap: wrap; justify-content: center; }
+        .column { flex: 1; padding: 10px; min-width: 200px; }
+        main { max-width: 700px; margin: 20px auto; background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); animation: fadeIn 0.5s ease-in-out; }
+        form { display: flex; flex-direction: column; align-items: center; }
+        label { margin-bottom: 10px; color: #007bff; }
+        input { padding: 10px; margin-bottom: 20px; width: 60%; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 5px; }
+        button { background-color: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; transition: 0.3s ease; }
+        button:hover { background-color: #0056b3; }
+        #wishAnniversaryButton { display: none; margin-top: 15px; }
+        #userDetails { margin-top: 20px; animation: fadeIn 0.5s ease-in-out; display: flex; flex-wrap: wrap; text-align: center; justify-content: center; }
+        #userDetails h2 { color: #007bff; text-align: center; margin-bottom: 10px; }
+        img.user-image { border-radius: 50%; max-width: 200px; margin-bottom: 10px; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        .night-mode-button { position: absolute; top: 10px; right: 10px; background-color: #007bff; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
+        .night-mode { background-color: #121212; color: #f8f9fa; }
+        .night-mode header { background-color: #1f1f1f; }
+        .night-mode main { background-color: #2c2c2c; color: #f8f9fa; }
+        .night-mode label { color: #8ab4f8; }
+        .night-mode input { background-color: #3e3e3e; color: #f8f9fa; border: 1px solid #555; }
+        .night-mode button { background-color: #8ab4f8; color: black; }
+        .night-mode h2 { color: #8ab4f8; }
+        .night-mode a { color: #8ab4f8; }
+        footer { margin-top: 20px; padding: 10px; font-size: 0.9em; color: #6c757d; }
+        .copied-message {
+            color: green;
+            font-weight: bold;
+            margin-left: 10px;
+            animation: fadeOut 2s forwards;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        #messagePreview {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-left: 5px solid #007bff;
+            text-align: left;
+            white-space: pre-wrap; /* Ensures line breaks are respected */
+            overflow-x: auto; /* Allows horizontal scrolling if content is too wide */
+            max-width: 100%; /* Prevents content from overflowing the container */
+            box-sizing: border-box; /* Include padding in the element's total width */
+            display: none;
+        }
+        .night-mode #messagePreview {
+            background-color: #3e3e3e;
+            border-left: 5px solid #8ab4f8;
+            color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo">
+    <h1>Wish Wiki Anniversary</h1>
+</header>
+
+<button class="night-mode-button" onclick="toggleNightMode()">Night Mode</button>
+
+<main>
+    <div id="usernameInput">
+        <form id="userForm">
+            <label for="username">Enter Username:</label>
+            <input type="text" id="username" placeholder="Wiki Username" required onkeypress="handleKeyPress(event)">
+            <button type="button" onclick="getUserDetails()">Get User Details</button>
+        </form>
+    </div>
+    <div id="usernameHeader"></div>
+    <div id="userDetails" class="columns"></div>
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <button id="wishAnniversaryButton" onclick="handleWishAnniversary()">Wish Anniversary (Message Copied & Talk Page Opens)</button>
+        <span id="copiedConfirmation" class="copied-message" style="display: none;">Copied!</span>
+    </div>
+    <div id="daysToAnniversary"></div>
+    <div id="messagePreview">
+        <h3>How Your Message Will Look (Wikitext Format)</h3>
+        <pre id="messageText"></pre>
+    </div>
+</main>
+
+<footer>
+    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 6 September 2025<br>
+    Idea from <a href="https://gnoeee.github.io/Wiki-Anniversary/" target="_blank">Wiki Anniversary</a>
+</footer>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GC8PGC89NB');
+</script>
+<script src="https://cdn.counter.dev/script.js"
+    data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+    data-utcoffset="6">
+</script>
+
+<script>
+let homewikiUrl = "";
+let storedUser = null;
+let daysToAnniversaryGlobal = 0;
+
+// Set canonical link for the page
+document.querySelector('link[rel="canonical"]').setAttribute('href', 'https://suyashdwivedi.github.io/Wiki_Anniversary.html');
+document.querySelector('meta[property="og:url"]').setAttribute('content', 'https://suyashdwivedi.github.io/Wiki_Anniversary.html');
+
+// This code runs immediately when the page loads
+const usernameFromURL = new URLSearchParams(window.location.search).get('username');
+if(usernameFromURL){
+    document.getElementById('username').value = usernameFromURL;
+    getUserDetails();
+}
+
+async function getUserDetails(){
+    const username = document.getElementById('username').value;
+    try{
+        const response = await fetch(`https://www.mediawiki.org/w/api.php?action=query&format=json&meta=globaluserinfo&utf8=1&formatversion=2&guiuser=${username}&guiprop=editcount|rights|merged|groups|unattached&origin=*`);
+        const data = await response.json();
+        storedUser = data.query.globaluserinfo;
+        displayUserDetails(storedUser);
+        displayDaysToAnniversary(storedUser.registration);
+        showButtons();
+        displayMessagePreview();
+    }catch(e){
+        console.error(e);
+        document.getElementById('usernameHeader').innerHTML = `<h2 style="color:red;">User not found or API error.</h2>`;
+        document.getElementById('userDetails').innerHTML = "";
+        document.getElementById('daysToAnniversary').innerHTML = "";
+        document.getElementById('wishAnniversaryButton').style.display = 'none';
+        document.getElementById('messagePreview').style.display = 'none';
+    }
+}
+
+async function displayUserDetails(user){
+    const div = document.getElementById('userDetails');
+    const headerDiv = document.getElementById('usernameHeader');
+    div.innerHTML = ""; headerDiv.innerHTML = "";
+    if(user.name){
+        headerDiv.innerHTML = `<h2>${user.name}</h2>`;
+
+        const leftCol = document.createElement('div'); leftCol.classList.add('column');
+        leftCol.innerHTML = `<p><strong>Registration Date:</strong></p><p>${new Date(user.registration).toLocaleDateString()}</p>
+                             <p><strong>Total Edit Count:</strong></p><p>${user.editcount}</p>`;
+        if(user.groups && user.groups.length > 0) leftCol.innerHTML += `<p><strong>Groups:</strong></p><p>${user.groups.join(', ')}</p>`;
+
+        const rightCol = document.createElement('div'); rightCol.classList.add('column');
+        try{
+            homewikiUrl = await fetchHomewikiUrl(user.home, user.merged);
+            rightCol.innerHTML = `<p><strong>Home Wiki:</strong></p><p><a href="${homewikiUrl}" target="_blank">${user.home}</a></p>
+                                  <p><strong>ID:</strong></p><p>${user.id}</p>`;
+        }catch(e){
+            console.error(e); rightCol.innerHTML = `<p><strong>Home Wiki:</strong></p><p>Not available</p><p>ID: ${user.id}</p>`;
+        }
+        if(user.rights && user.rights.length > 0) rightCol.innerHTML += `<p><strong>Rights:</strong></p><p>${user.rights.join(', ')}</p>`;
+        div.appendChild(leftCol); div.appendChild(rightCol);
+
+        fetchUserImage(user.name);
+    } else { headerDiv.innerHTML = `<h2 style="color:red;">User not found</h2>`; }
+}
+
+async function fetchHomewikiUrl(homeWiki, mergedEntries){
+    const match = mergedEntries.find(e => e.wiki === homeWiki);
+    return match ? match.url : "Not available";
+}
+
+async function fetchUserImage(username){
+    try{
+        const response = await fetch(`https://meta.wikimedia.org/w/api.php?action=parse&page=User:${username}&prop=wikitext&format=json&origin=*`);
+        const data = await response.json();
+        const wikitext = data.parse.wikitext['*'];
+        let imageName = null;
+
+        // Primary search: Look for the 'image name' parameter within any template or on the page.
+        const templateMatch = wikitext.match(/\| *image name *= *([^\|\}]+)/i);
+        if (templateMatch && templateMatch[1]) {
+            imageName = templateMatch[1].trim();
+        }
+
+        // Fallback search: Look for a direct file link
+        if (!imageName) {
+            const fileMatch = wikitext.match(/\[\[File:([^|\]]+)\.(png|jpg|jpeg|gif|svg)/i);
+            if (fileMatch && fileMatch[1]) {
+                imageName = fileMatch[1].trim() + "." + fileMatch[2].trim();
+            }
+        }
+
+        if(imageName){
+            const imageUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(imageName)}`;
+            const imgTag = document.createElement('img'); imgTag.src = imageUrl; imgTag.className="user-image";
+            document.getElementById('usernameHeader').appendChild(imgTag);
+        }
+    }catch(e){
+        console.log("No image found or API error on Meta-Wiki", e);
+    }
+}
+
+function displayDaysToAnniversary(registrationDate){
+    const anniversary = new Date(registrationDate);
+    const today = new Date();
+    const copy = new Date(anniversary);
+    copy.setFullYear(today.getFullYear());
+    if(today >= copy) copy.setFullYear(today.getFullYear()+1);
+    const diff = Math.ceil((copy - today)/(1000*60*60*24));
+    daysToAnniversaryGlobal = diff;
+    document.getElementById('daysToAnniversary').innerHTML = `<strong>Days to next Anniversary:</strong> ${diff}`;
+}
+
+function showButtons(){
+    const button = document.getElementById('wishAnniversaryButton');
+    if(storedUser && (daysToAnniversaryGlobal < 11 || daysToAnniversaryGlobal > 355)) {
+        button.style.display='inline-block';
+    } else {
+        button.style.display='none';
+    }
+}
+
+function getAnniversaryMessage(){
+    if (!storedUser) return "";
+    const username = storedUser.name;
+    const edits = storedUser.editcount;
+    const totalEditsFormatted = edits.toLocaleString();
+    const anniversaryDate = new Date(storedUser.registration);
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const yearsOfService = currentYear - anniversaryDate.getFullYear();
+    const daysSinceRegistration = Math.floor((today - anniversaryDate) / (1000 * 60 * 60 * 24));
+    const isTodayAnniversary = (today.getMonth() === anniversaryDate.getMonth() && today.getDate() === anniversaryDate.getDate());
+    
+    let message = "";
+    const imageWikitext = `[[File:Bouquet-of-Red-Roses.png|200px|right|Happy Wiki Anniversary]]`;
+
+    if (isTodayAnniversary) {
+        message = `== Happy Wiki Anniversary 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nWishing you a very happy wiki anniversary today, celebrating ${yearsOfService} years of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!\r\n\r\n-- ~~~~`;
+    } else if(daysToAnniversaryGlobal > 0 && daysToAnniversaryGlobal < 11){
+        message = `== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary is just around the corner, in ${daysToAnniversaryGlobal} days! What a wonderful milestone of '''${yearsOfService} years''' on Wiki. Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!\r\n\r\n-- ~~~~`;
+    } else if(daysSinceRegistration > 365 && daysSinceRegistration % 365 > 0 && daysSinceRegistration % 365 < 31) {
+        const daysBelated = daysSinceRegistration % 365;
+        message = `== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary was ${daysBelated} days ago, marking ${yearsOfService} years of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!\r\n\r\n-- ~~~~`;
+    } else {
+        return "";
+    }
+    return message;
+}
+
+async function handleWishAnniversary(){
+    if (!storedUser) {
+        alert("Please enter a username and get details first.");
+        return;
+    }
+    const username = storedUser.name;
+    const message = getAnniversaryMessage();
+    
+    try {
+        await navigator.clipboard.writeText(message);
+        const confirmation = document.getElementById('copiedConfirmation');
+        confirmation.style.display = 'inline';
+        setTimeout(() => confirmation.style.display = 'none', 2000);
+    } catch (err) {
+        console.error('Failed to copy text: ', err);
+    }
+    
+    const url = `${homewikiUrl}/w/index.php?title=User_talk:${username}&action=edit`;
+    window.open(url,'_blank');
+}
+
+function displayMessagePreview(){
+    const previewDiv = document.getElementById('messagePreview');
+    const messageText = document.getElementById('messageText');
+    if (storedUser) {
+        const message = getAnniversaryMessage();
+        messageText.innerText = message;
+        previewDiv.style.display = 'block';
+    } else {
+        previewDiv.style.display = 'none';
+    }
+}
+
+function handleKeyPress(event){
+    if(event.key==='Enter') {
+        event.preventDefault();
+        getUserDetails();
+    }
+}
+
+function toggleNightMode() {
+    document.body.classList.toggle('night-mode');
+}
+</script>
+</body>
+</html>
