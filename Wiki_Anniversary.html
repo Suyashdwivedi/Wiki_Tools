@@ -133,7 +133,6 @@ if(usernameFromURL){
 
 async function getUserDetails(){
     const username = document.getElementById('username').value;
-    // Encode the username for the API call to handle special characters
     const encodedUsername = encodeURIComponent(username);
     try{
         const response = await fetch(`https://www.mediawiki.org/w/api.php?action=query&format=json&meta=globaluserinfo&utf8=1&formatversion=2&guiuser=${encodedUsername}&guiprop=editcount|rights|merged|groups|unattached&origin=*`);
@@ -170,8 +169,7 @@ async function displayUserDetails(user){
     const leftCol = document.createElement('div'); leftCol.classList.add('column');
     leftCol.innerHTML = `<p><strong>Registration Date:</strong></p><p>${new Date(user.registration).toLocaleDateString()}</p>
                             <p><strong>Total Edit Count:</strong></p><p>${user.editcount}</p>`;
-    if(user.groups && user.groups.length > 0) leftCol.innerHTML += `<p><strong>Groups:</strong></p><p>${user.groups.join(', ')}</p>`;
-
+    
     const rightCol = document.createElement('div'); rightCol.classList.add('column');
     try{
         homewikiUrl = await fetchHomewikiUrl(user.home, user.merged);
@@ -180,10 +178,54 @@ async function displayUserDetails(user){
     }catch(e){
         console.error(e); rightCol.innerHTML = `<p><strong>Home Wiki:</strong></p><p>Not available</p><p>ID: ${user.id}</p>`;
     }
-    if(user.rights && user.rights.length > 0) rightCol.innerHTML += `<p><strong>Rights:</strong></p><p>${user.rights.join(', ')}</p>`;
-    div.appendChild(leftCol); div.appendChild(rightCol);
+    
+    // Fetch and display global groups
+    if(user.groups && user.groups.length > 0) {
+        leftCol.innerHTML += `<p><strong>Global Groups:</strong></p><p>${user.groups.join(', ')}</p>`;
+    }
+
+    // Fetch and display global rights
+    if(user.rights && user.rights.length > 0) {
+        rightCol.innerHTML += `<p><strong>Global Rights:</strong></p><p>${user.rights.join(', ')}</p>`;
+    }
+    
+    // Add new placeholders for local groups/rights
+    leftCol.innerHTML += `<p><strong>Local Groups:</strong></p><p id="localGroups">Fetching...</p>`;
+    rightCol.innerHTML += `<p><strong>Local Rights:</strong></p><p id="localRights">Fetching...</p>`;
+    
+    div.appendChild(leftCol);
+    div.appendChild(rightCol);
+
+    // Fetch and display local groups/rights
+    if(user.home && homewikiUrl) {
+        const localInfo = await fetchLocalRightsAndGroups(user.name, homewikiUrl);
+        document.getElementById('localGroups').textContent = localInfo.groups.length > 0 ? localInfo.groups.join(', ') : 'None';
+        document.getElementById('localRights').textContent = localInfo.rights.length > 0 ? localInfo.rights.join(', ') : 'None';
+    } else {
+        document.getElementById('localGroups').textContent = 'Not available';
+        document.getElementById('localRights').textContent = 'Not available';
+    }
 
     fetchUserImage(user.name);
+}
+
+// ⭐ NEW FUNCTION to fetch local rights and groups ⭐
+async function fetchLocalRightsAndGroups(username, wikiUrl) {
+    const encodedUsername = encodeURIComponent(username);
+    try {
+        const response = await fetch(`${wikiUrl}/w/api.php?action=query&list=users&ususers=${encodedUsername}&usprop=rights|groups&format=json&origin=*`);
+        const data = await response.json();
+        const user = data.query.users[0];
+        if (user) {
+            return {
+                rights: user.rights || [],
+                groups: user.groups || []
+            };
+        }
+    } catch (e) {
+        console.error("Error fetching local rights and groups:", e);
+    }
+    return { rights: [], groups: [] };
 }
 
 async function fetchHomewikiUrl(homeWiki, mergedEntries){
