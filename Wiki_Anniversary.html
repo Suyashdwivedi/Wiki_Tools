@@ -10,12 +10,12 @@
     <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html">
     <meta property="og:title" content="Wiki Anniversary">
     <meta property="og:description" content="A tool to check a user's Wiki anniversary, contributions, and wish them well.">
-    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_lazy_coders_logo_small_transparent.png">
     <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Wiki Anniversary">
     <meta name="twitter:description" content="A tool to check a user's Wiki anniversary, contributions, and wish them well.">
-    <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_lazy_coders_logo_small_transparent.png">
     <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/32px-Wiki%27s_Lazy_Coders.png">
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #343a40; text-align: center; overflow-x: hidden; }
@@ -253,19 +253,22 @@ function getAnniversaryMessage(){
     
     let message = "";
     const imageWikitext = `[[File:Bouquet-of-Red-Roses.png|200px|right|Happy Wiki Anniversary]]`;
+	const toolLine = `Use this [https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html '''Tool'''] to send wiki anniversary wishes to other amazing Wikimedians.`;
+	const editSummary = 'Wiki Anniversary Wishes';
 
-    if (isTodayAnniversary) {
-        message = `== Happy Wiki Anniversary 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nWishing you a very happy wiki anniversary today, celebrating ${yearsOfService} years of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!\r\n\r\n-- ~~~~`;
-    } else if(daysToAnniversaryGlobal > 0 && daysToAnniversaryGlobal < 11){
-        message = `== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary is just around the corner, in ${daysToAnniversaryGlobal} days! What a wonderful milestone of '''${yearsOfService} years''' on Wiki. Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!\r\n\r\n-- ~~~~`;
-    } else if(daysSinceRegistration > 365 && daysSinceRegistration % 365 > 0 && daysSinceRegistration % 365 < 31) {
-        const daysBelated = daysSinceRegistration % 365;
-        message = `== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary was ${daysBelated} days ago, marking ${yearsOfService} years of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!\r\n\r\n-- ~~~~`;
-    } else {
-        return "";
-    }
-    return message;
+    if (isTodayAnniversary) {
+        message = `== Happy Wiki Anniversary 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nWishing you a very happy wiki anniversary today, celebrating ${yearsOfService} years of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
+    } else if(daysToAnniversaryGlobal > 0 && daysToAnniversaryGlobal < 11){
+        message = `== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary is just around the corner, in ${daysToAnniversaryGlobal} days! What a wonderful milestone of '''${yearsOfService} years''' on Wiki. Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
+    } else if(daysSinceRegistration > 365 && daysSinceRegistration % 365 > 0 && daysSinceRegistration % 365 < 31) {
+        const daysBelated = daysSinceRegistration % 365;
+        message = `== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary was '''${daysBelated} days''' ago, marking ${yearsOfService} years of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
+    } else {
+        return "";
+    }
+    return message;
 }
+
 
 async function handleWishAnniversary(){
     if (!storedUser) {
@@ -284,7 +287,7 @@ async function handleWishAnniversary(){
         console.error('Failed to copy text: ', err);
     }
     
-    const url = `${homewikiUrl}/w/index.php?title=User_talk:${username}&action=edit`;
+    const url = `${homewikiUrl}/w/index.php?title=User_talk:${username}&action=edit&summary=Wiki Anniversary Wishes`;
     window.open(url,'_blank');
 }
 
