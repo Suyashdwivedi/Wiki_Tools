@@ -253,22 +253,22 @@ function getAnniversaryMessage(){
     
     let message = "";
     const imageWikitext = `[[File:Bouquet-of-Red-Roses.png|200px|right|Happy Wiki Anniversary]]`;
-	const toolLine = `''Use this [https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html '''Tool'''] to send wiki anniversary wishes to other amazing Wikimedians.''`;
-	const editSummary = 'Wiki Anniversary Wishes';
+    const toolLine = `''Use this [https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html '''Tool'''] to send wiki anniversary wishes to other amazing Wikimedians.''`;
+    const editSummary = 'Wiki Anniversary Wishes';
 
-    if (isTodayAnniversary) {
-        message = `== Happy Wiki Anniversary 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nWishing you a very happy wiki anniversary today, celebrating ${yearsOfService} years of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
-    } else if(daysToAnniversaryGlobal > 0 && daysToAnniversaryGlobal < 11){
-        message = `== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary is just around the corner, in ${daysToAnniversaryGlobal} days! What a wonderful milestone of '''${yearsOfService} years''' on Wiki. Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
-    } else if(daysSinceRegistration > 365 && daysSinceRegistration % 365 > 0 && daysSinceRegistration % 365 < 31) {
-        const daysBelated = daysSinceRegistration % 365;
-        message = `== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary was '''${daysBelated} days''' ago, marking ${yearsOfService} years of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
-    } else {
-        return "";
-    }
-    return message;
+    if (isTodayAnniversary) {
+        message = `== Happy Wiki Anniversary 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nWishing you a very happy wiki anniversary today, celebrating '''${yearsOfService} years''' of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
+    } else if(daysToAnniversaryGlobal > 0 && daysToAnniversaryGlobal < 11){
+        message = `== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary is just around the corner, in '''${daysToAnniversaryGlobal} days!''' What a wonderful milestone of '''${yearsOfService} years''' on Wiki. Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
+    } else if(daysSinceRegistration > 365 && daysSinceRegistration % 365 > 0 && daysSinceRegistration % 365 < 31) {
+        const years = Math.floor(daysSinceRegistration / 365);
+        const daysBelated = daysSinceRegistration % 365;
+        message = `== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary was '''${daysBelated} days''' ago, marking '''${years} years''' of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
+    } else {
+        return "";
+    }
+    return message;
 }
-
 
 async function handleWishAnniversary(){
     if (!storedUser) {
