@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- SEO Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaWiki Live Editor - Suyash Dwivedi</title>
+    <meta name="description" content="A live MediaWiki code viewer and editor. Type or paste text with formatting to see the wikitext code instantly.">
+    <meta name="keywords" content="MediaWiki, wikitext, wiki code, live editor, viewer, converter, Wikipedia, Wikimedia">
+    <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/wikicoder.html">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/wikicoder.html">
+    <meta property="og:title" content="MediaWiki Live Editor - Suyash Dwivedi">
+    <meta property="og:description" content="A live MediaWiki code viewer and editor. Type or paste text with formatting to see the wikitext code instantly.">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://suyashdwivedi.github.io/Wiki_Tools/wikicoder.html">
+    <meta property="twitter:title" content="MediaWiki Live Editor - Suyash Dwivedi">
+    <meta property="twitter:description" content="A live MediaWiki code viewer and editor. Type or paste text with formatting to see the wikitext code instantly.">
+    <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            transition: all 0.2s ease-in-out;
+        }
+        .editor-box {
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            outline: none;
+            transition: all 0.2s ease-in-out;
+        }
+        .editor-box:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5);
+        }
+        .dark .editor-box-wiki {
+            background-color: #1a202c;
+            border-color: #4a5568;
+            color: #e2e8f0;
+        }
+        .dark .editor-box-wiki:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5);
+        }
+        .copy-message {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 0.5rem 1rem;
+            background-color: #10b981;
+            color: white;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .heading-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+    </style>
+</head>
+<body class="bg-orange-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-md py-4">
+        <div class="container mx-auto px-4 flex items-center justify-between md:justify-center">
+            <h1 class="text-3xl font-bold flex items-center flex-1 justify-center md:justify-start">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" class="h-20 w-auto mr-4">
+                <span class="text-center">MediaWiki Live Editor</span>
+            </h1>
+            <button id="themeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                <svg id="moonIcon" class="h-6 w-6 text-gray-700 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+                <svg id="sunIcon" class="h-6 w-6 text-gray-700 dark:text-gray-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 md:p-8">
+            <h2 class="text-2xl font-semibold mb-4 text-center">Rich Text Editor</h2>
+            <div id="plainTextEditor" class="editor-box bg-white dark:bg-gray-800" contenteditable="true" spellcheck="false" data-placeholder="Type or paste rich text here..."></div>
+            <div class="flex justify-end gap-2 mt-2">
+                <button id="clearPlainText" class="px-4 py-2 rounded-full bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-colors duration-200">
+                    Clear
+                </button>
+                <button id="copyPlainText" class="px-4 py-2 rounded-full bg-green-500 text-white text-sm font-bold hover:bg-green-600 transition-colors duration-200 relative">
+                    Copy
+                    <span id="plainTextCopiedMessage" class="copy-message">Copied!</span>
+                </button>
+            </div>
+            
+            <div class="my-6 flex justify-center">
+                <button id="convertBtn" class="px-6 py-3 rounded-full bg-orange-600 text-white font-bold hover:bg-orange-700 transition-colors duration-200 shadow-lg">
+                    Convert &#8645;
+                </button>
+            </div>
+            
+            <h2 class="text-2xl font-semibold mb-4 text-center">MediaWiki Code</h2>
+            <textarea id="wikiCodeEditor" class="w-full editor-box bg-gray-100 dark:bg-gray-700 editor-box-wiki" spellcheck="false" placeholder="MediaWiki code will appear here."></textarea>
+            <div class="flex justify-end gap-2 mt-2">
+                <button id="clearWikiCode" class="px-4 py-2 rounded-full bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-colors duration-200">
+                    Clear
+                </button>
+                <button id="copyWikiCode" class="px-4 py-2 rounded-full bg-green-500 text-white text-sm font-bold hover:bg-green-600 transition-colors duration-200 relative">
+                    Copy
+                    <span id="wikiCodeCopiedMessage" class="copy-message">Copied!</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 text-gray-600 dark:text-gray-400 text-sm">
+        <p>Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" class="hover:underline">Suyash Dwivedi</a> | Updated on: 8 September 2025</p>
+    </footer>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-GC8PGC89NB');
+    </script>
+    
+    <!-- Counter.dev -->
+    <script src="https://cdn.counter.dev/script.js"
+            data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+            data-utcoffset="6">
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const plainTextEditor = document.getElementById('plainTextEditor');
+            const wikiCodeEditor = document.getElementById('wikiCodeEditor');
+            const convertBtn = document.getElementById('convertBtn');
+            const themeToggleBtn = document.getElementById('themeToggle');
+            const moonIcon = document.getElementById('moonIcon');
+            const sunIcon = document.getElementById('sunIcon');
+            const clearPlainTextBtn = document.getElementById('clearPlainText');
+            const copyPlainTextBtn = document.getElementById('copyPlainText');
+            const plainTextCopiedMessage = document.getElementById('plainTextCopiedMessage');
+            const clearWikiCodeBtn = document.getElementById('clearWikiCode');
+            const copyWikiCodeBtn = document.getElementById('copyWikiCode');
+            const wikiCodeCopiedMessage = document.getElementById('wikiCodeCopiedMessage');
+
+            // Initial setup for the theme
+            const isDarkMode = localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDarkMode) {
+                document.documentElement.classList.add('dark');
+                moonIcon.classList.add('hidden');
+                sunIcon.classList.remove('hidden');
+                convertBtn.classList.replace('bg-orange-600', 'bg-orange-700');
+                convertBtn.classList.replace('hover:bg-orange-700', 'hover:bg-orange-800');
+            } else {
+                document.documentElement.classList.remove('dark');
+                moonIcon.classList.remove('hidden');
+                sunIcon.classList.add('hidden');
+            }
+
+            themeToggleBtn.addEventListener('click', () => {
+                const isDark = document.documentElement.classList.toggle('dark');
+                if (isDark) {
+                    localStorage.setItem('theme', 'dark');
+                    moonIcon.classList.add('hidden');
+                    sunIcon.classList.remove('hidden');
+                    convertBtn.classList.replace('bg-orange-600', 'bg-orange-700');
+                    convertBtn.classList.replace('hover:bg-orange-700', 'hover:bg-orange-800');
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    moonIcon.classList.remove('hidden');
+                    sunIcon.classList.add('hidden');
+                    convertBtn.classList.replace('bg-orange-700', 'bg-orange-600');
+                    convertBtn.classList.replace('hover:bg-orange-800', 'hover:bg-orange-700');
+                }
+            });
+
+            // Convert Rich Text to MediaWiki
+            const textToMediaWiki = () => {
+                let html = plainTextEditor.innerHTML;
+
+                // Simple replacements for bold, italic
+                html = html.replace(/<b>(.*?)<\/b>/gi, "'''$1'''");
+                html = html.replace(/<strong>(.*?)<\/strong>/gi, "'''$1'''");
+                html = html.replace(/<i>(.*?)<\/i>/gi, "''$1''");
+                html = html.replace(/<em>(.*?)<\/em>/gi, "''$1''");
+
+                // Handle pasted images. This is a simplified example.
+                // A real-world application would need to check for the image source and extract the filename.
+                // We'll use a placeholder logic for demonstration.
+                html = html.replace(/<img[^>]*src="([^"]*)"[^>]*>/gi, (match, src) => {
+                    const filenameMatch = src.match(/\/([^\/]+\.(?:png|jpg|jpeg|gif|svg))/i);
+                    const filename = filenameMatch ? decodeURIComponent(filenameMatch[1]) : 'PastedImage.png';
+                    const placeholderWikiText = `[[File:${filename}|thumb|Example caption]]`;
+                    return placeholderWikiText;
+                });
+                
+                // Convert remaining HTML tags to simple text
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const wikiText = tempDiv.textContent || tempDiv.innerText;
+
+                wikiCodeEditor.value = wikiText.trim();
+            };
+
+            // Convert MediaWiki to Rich Text
+            const mediaWikiToText = () => {
+                let wikitext = wikiCodeEditor.value;
+
+                // Headings (ordered from longest to shortest to prevent errors)
+                wikitext = wikitext.replace(/======(.*?)======/g, '<h6>$1 <span class="text-blue-500 text-sm ml-2">[edit]</span></h6>');
+                wikitext = wikitext.replace(/=====(.*?)=====/g, '<h5>$1 <span class="text-blue-500 text-sm ml-2">[edit]</span></h5>');
+                wikitext = wikitext.replace(/====(.*?)====/g, '<h4>$1 <span class="text-blue-500 text-sm ml-2">[edit]</span></h4>');
+                wikitext = wikitext.replace(/===(.*?)===/g, '<h3>$1 <span class="text-blue-500 text-sm ml-2">[edit]</span></h3>');
+                wikitext = wikitext.replace(/==(.*?)==/g, '<h2>$1 <span class="text-blue-500 text-sm ml-2">[edit]</span></h2>');
+
+                // Horizontal Rule
+                wikitext = wikitext.replace(/(^-{4,}\s*?)^$/gm, '<hr class="my-4 border-gray-300 dark:border-gray-600">');
+
+                // Bold
+                wikitext = wikitext.replace(/'''(.*?)'''/g, '<b>$1</b>');
+                // Italic
+                wikitext = wikitext.replace(/''(.*?)''/g, '<i>$1</i>');
+                
+                // Lists
+                // Unordered lists
+                wikitext = wikitext.replace(/^\*([^*#].*)/gm, '<li>$1</li>');
+                wikitext = wikitext.replace(/^\*\*(.*)/gm, '<li class="ml-4">$1</li>');
+                wikitext = wikitext.replace(/(<li>.*?<\/li>\s*)+/gs, '<ul>$&</ul>');
+                // Ordered lists
+                wikitext = wikitext.replace(/^#([^#*].*)/gm, '<li>$1</li>');
+                wikitext = wikitext.replace(/^##(.*)/gm, '<li class="ml-4">$1</li>');
+                wikitext = wikitext.replace(/(<li>.*?<\/li>\s*)+/gs, '<ol>$&</ol>');
+                
+                // Indented text (blockquotes)
+                wikitext = wikitext.replace(/^:(.*)/gm, '<blockquote class="border-l-4 border-gray-400 pl-4 my-2 italic">$1</blockquote>');
+                
+                // Preformatted text
+                wikitext = wikitext.replace(/^ (.*)/gm, '<pre class="bg-gray-100 dark:bg-gray-700 p-2 my-2 rounded-md overflow-x-auto"><code>$1</code></pre>');
+
+                // Internal Links
+                wikitext = wikitext.replace(/\[\[([^|\]]+)\|?(.*?)?\]\]/g, (match, linkTarget, linkText) => {
+                    const url = `https://meta.wikimedia.org/wiki/${linkTarget.replace(/ /g, '_')}`;
+                    const text = linkText.trim() || linkTarget.trim();
+                    return `<a href="${url}" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank">${text}</a>`;
+                });
+
+                // File/Image Links to a clickable URL
+                wikitext = wikitext.replace(/\[\[File:([^|\]]+\.(?:png|jpg|jpeg|gif|svg))\s*\|([^\]]*)\]\]/gi, (match, filename, params) => {
+                    const captionMatch = params.match(/\|([^|\]]+)$/);
+                    const caption = captionMatch ? captionMatch[1].trim() : '';
+                    const imageUrl = `https://placehold.co/300x200/528C3E/F3F4F6?text=Aparajita`;
+                    
+                    return `<img src="${imageUrl}" alt="${caption}" title="${caption}" class="rounded-lg shadow-md my-4" style="max-width: 100%; height: auto; display: block; margin: 0 auto;" loading="lazy">`;
+                });
+                
+                // Basic Table (simplified)
+                wikitext = wikitext.replace(/\{\|([\s\S]*?)\|\}/g, (match, tableContent) => {
+                    let htmlTable = '<table class="w-full border-collapse border border-gray-400 dark:border-gray-500">';
+                    const rows = tableContent.split(/\|\-/).filter(row => row.trim() !== '');
+                    rows.forEach(row => {
+                        htmlTable += '<tr class="border border-4 border-gray-400 dark:border-gray-500">';
+                        const cells = row.split(/\||!/).filter(cell => cell.trim() !== '');
+                        cells.forEach(cell => {
+                            const trimmedCell = cell.trim();
+                            if (cell.startsWith('!')) {
+                                htmlTable += `<th class="px-4 py-2 border border-4 border-gray-400 dark:border-gray-500 text-left bg-gray-200 dark:bg-gray-700">${trimmedCell.substring(1)}</th>`;
+                            } else {
+                                htmlTable += `<td class="px-4 py-2 border border-4 border-gray-400 dark:border-gray-500">${trimmedCell}</td>`;
+                            }
+                        });
+                        htmlTable += '</tr>';
+                    });
+                    htmlTable += '</table>';
+                    return htmlTable;
+                });
+
+                // Clear the editor and set the new content
+                plainTextEditor.innerHTML = wikitext;
+            };
+
+            // Live conversion on input
+            let debounceTimer;
+            plainTextEditor.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(textToMediaWiki, 300);
+            });
+
+            // Convert button logic
+            convertBtn.addEventListener('click', () => {
+                if (plainTextEditor.innerHTML.trim() !== '') {
+                    textToMediaWiki();
+                } else if (wikiCodeEditor.value.trim() !== '') {
+                    mediaWikiToText();
+                }
+            });
+
+            // Clear and Copy button functionality
+            const showCopyMessage = (messageElement) => {
+                messageElement.style.opacity = 1;
+                setTimeout(() => {
+                    messageElement.style.opacity = 0;
+                }, 1500);
+            };
+
+            clearPlainTextBtn.addEventListener('click', () => {
+                plainTextEditor.innerHTML = '';
+            });
+            copyPlainTextBtn.addEventListener('click', () => {
+                const text = plainTextEditor.innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopyMessage(plainTextCopiedMessage);
+                });
+            });
+
+            clearWikiCodeBtn.addEventListener('click', () => {
+                wikiCodeEditor.value = '';
+            });
+            copyWikiCodeBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(wikiCodeEditor.value).then(() => {
+                    showCopyMessage(wikiCodeCopiedMessage);
+                });
+            });
+
+            // Initial conversion on page load
+            textToMediaWiki();
+        });
+    </script>
+</body>
+</html>
