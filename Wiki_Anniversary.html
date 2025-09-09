@@ -16,19 +16,20 @@
     <meta name="twitter:title" content="Wiki Anniversary">
     <meta name="twitter:description" content="A tool to check a user's Wiki anniversary, contributions, and wish them well.">
     <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
-    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/250px-Wiki%27s_Lazy_Coders.png">
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-GC8PGC89NB');
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GC8PGC89NB');
+</script>
     </script>
     <script src="https://cdn.counter.dev/script.js"
         data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
         data-utcoffset="6">
-    </script>
-   <style>
+</script>
+    <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #343a40; text-align: center; overflow-x: hidden; }
     header { background-color: #007bff; color: white; padding: 1em; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; flex-direction: column; }
     header h1, header h3 { margin: 0; }
@@ -83,12 +84,31 @@
         border-left: 5px solid #8ab4f8;
         color: #f8f9fa;
     }
+    #addToCalendarButton {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: 0.3s ease;
+        margin-left: 10px;
+    }
+    #addToCalendarButton:hover {
+        background-color: #218838;
+    }
+    .night-mode #addToCalendarButton {
+        background-color: #2e8b57;
+    }
+    .night-mode #addToCalendarButton:hover {
+        background-color: #267349;
+    }
 </style>
 </head>
 <body>
 
 <header>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" style="height: 75px; float: left; margin-right: 15px;">
     <div>
         <h1>Wish Wiki Anniversary</h1>
         <h3>(As per SUL)</h3>
@@ -111,6 +131,8 @@
         <button id="wishAnniversaryButton" onclick="handleWishAnniversary()">Wish Anniversary (Message Copied & Talk Page Opens)</button>
         <span id="copiedConfirmation" class="copied-message" style="display: none;">Copied!</span>
     </div>
+    <button id="addToCalendarButton" onclick="addToCalendar()" style="display: none; margin-top: 10px;">
+        Add Reminder to Google Calendar</button>
     <div id="daysToAnniversary"></div>
     <div id="messagePreview">
         <h3>How Your Message Will Look (Wikitext Format)</h3>
@@ -119,7 +141,7 @@
 </main>
 
 <footer>
-    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 6 September 2025<br>
+    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 09 September 2025<br>
     Idea from <a href="https://gnoeee.github.io/Wiki-Anniversary/" target="_blank">Wiki Anniversary</a>
 </footer>
 
@@ -152,6 +174,7 @@ async function getUserDetails(){
             document.getElementById('userDetails').innerHTML = "";
             document.getElementById('daysToAnniversary').innerHTML = "";
             document.getElementById('wishAnniversaryButton').style.display = 'none';
+            document.getElementById('addToCalendarButton').style.display = 'none';
             document.getElementById('messagePreview').style.display = 'none';
         }
     }catch(e){
@@ -160,6 +183,7 @@ async function getUserDetails(){
         document.getElementById('userDetails').innerHTML = "";
         document.getElementById('daysToAnniversary').innerHTML = "";
         document.getElementById('wishAnniversaryButton').style.display = 'none';
+        document.getElementById('addToCalendarButton').style.display = 'none';
         document.getElementById('messagePreview').style.display = 'none';
     }
 }
@@ -279,15 +303,23 @@ function displayDaysToAnniversary(registrationDate){
 }
 
 function showButtons(){
-    const button = document.getElementById('wishAnniversaryButton');
+    const wishButton = document.getElementById('wishAnniversaryButton');
+    const calendarButton = document.getElementById('addToCalendarButton');
     const today = new Date();
     const anniversaryDate = new Date(storedUser.registration);
     const isTodayAnniversary = (today.getMonth() === anniversaryDate.getMonth() && today.getDate() === anniversaryDate.getDate());
-    
+
     if(storedUser && (isTodayAnniversary || daysToAnniversaryGlobal <= 10 || daysToAnniversaryGlobal >= 355)) {
-        button.style.display='inline-block';
+        wishButton.style.display='inline-block';
     } else {
-        button.style.display='none';
+        wishButton.style.display='none';
+    }
+
+    // Always show calendar button if we have user data
+    if(storedUser) {
+        calendarButton.style.display='inline-block';
+    } else {
+        calendarButton.style.display='none';
     }
 }
 
@@ -364,6 +396,28 @@ function handleKeyPress(event){
 function toggleNightMode() {
     document.body.classList.toggle('night-mode');
 }
+
+function addToCalendar() {
+    if (!storedUser) return;
+    const anniversaryDate = new Date(storedUser.registration);
+    const today = new Date();
+    const nextAnniversary = new Date(anniversaryDate);
+    // Set to next anniversary
+    nextAnniversary.setFullYear(today.getFullYear());
+    if (today > nextAnniversary) {
+        nextAnniversary.setFullYear(today.getFullYear() + 1);
+    }
+    // Format date for Google Calendar (YYYYMMDD)
+    const formattedDate = nextAnniversary.toISOString().slice(0, 10).replace(/-/g, '');
+    // Create event details
+    const eventTitle = `Wiki Anniversary of ${storedUser.name}`;
+    const eventDetails = `It's the wiki anniversary of ${storedUser.name} who joined on ${new Date(storedUser.registration).toLocaleDateString()} and has made ${storedUser.editcount} edits.`;
+    // Create Google Calendar URL
+    const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${formattedDate}/${formattedDate}&details=${encodeURIComponent(eventDetails)}&sf=true&output=xml`;
+    // Open in new tab
+    window.open(calendarUrl, '_blank');
+}
 </script>
 </body>
 </html>
+
