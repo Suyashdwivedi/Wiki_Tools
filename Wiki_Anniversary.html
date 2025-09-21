@@ -141,7 +141,7 @@
 </main>
 
 <footer>
-    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 09 September 2025<br>
+    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 22 September 2025<br>
     Idea from <a href="https://gnoeee.github.io/Wiki-Anniversary/" target="_blank">Wiki Anniversary</a>
 </footer>
 
@@ -216,14 +216,32 @@ async function displayUserDetails(user){
     if(user.rights && user.rights.length > 0) {
         rightCol.innerHTML += `<p><strong>Global Rights:</strong></p><p>${user.rights.join(', ')}</p>`;
     }
-    
-    // Add new placeholders for local groups/rights
-    leftCol.innerHTML += `<p><strong>Local Groups:</strong></p><p id="localGroups">Fetching...</p>`;
-    rightCol.innerHTML += `<p><strong>Local Rights:</strong></p><p id="localRights">Fetching...</p>`;
-    
     div.appendChild(leftCol);
     div.appendChild(rightCol);
 
+    // Add new placeholders for local groups/rights
+   // leftCol.innerHTML += `<p><strong>Local Groups:</strong></p><p id="localGroups">Fetching...</p>`;
+   // rightCol.innerHTML += `<p><strong>Local Rights:</strong></p><p id="localRights">Fetching...</p>`;
+   // This section creates the table for Local Groups and Local Rights
+    const tableDiv = document.createElement('div');
+    tableDiv.style.cssText = "width: 100%; text-align: left; margin-top: 20px;";
+    tableDiv.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse;">
+            <tbody>
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Local Groups:</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Local Rights:</td>
+                </tr>
+                <tr>
+                    <td id="localGroups" style="padding: 8px; border: 1px solid #ddd;">Fetching...</td>
+                    <td id="localRights" style="padding: 8px; border: 1px solid #ddd;">Fetching...</td>
+                </tr>
+            </tbody>
+        </table>
+    `;
+    div.appendChild(tableDiv);
+    
+    
     // Fetch and display local groups/rights
     if(user.home && homewikiUrl) {
         const localInfo = await fetchLocalRightsAndGroups(user.name, homewikiUrl);
@@ -420,4 +438,3 @@ function addToCalendar() {
 </script>
 </body>
 </html>
-
