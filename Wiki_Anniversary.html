@@ -7,16 +7,16 @@
     <meta name="description" content="A tool to check a user's Wiki anniversary, contributions, and wish them well.">
     <meta name="keywords" content="Wiki, MediaWiki, anniversary, user, contributions, birthday">
     <meta name="author" content="Suyash Dwivedi">
-    <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html">
+    <link rel="canonical" href="https://suyashdwivedi.github.io/zonestamper.html">
     <meta property="og:title" content="Wiki Anniversary">
     <meta property="og:description" content="A tool to check a user's Wiki anniversary, contributions, and wish them well.">
     <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
-    <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html">
+    <meta property="og:url" content="https://suyashdwivedi.github.io/zonestamper.html">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Wiki Anniversary">
     <meta name="twitter:description" content="A tool to check a user's Wiki anniversary, contributions, and wish them well.">
     <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
-    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/250px-Wiki%27s_Lazy_Coders.png">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
@@ -24,7 +24,6 @@
     gtag('js', new Date());
     gtag('config', 'G-GC8PGC89NB');
 </script>
-    </script>
     <script src="https://cdn.counter.dev/script.js"
         data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
         data-utcoffset="6">
@@ -207,25 +206,32 @@ async function displayUserDetails(user){
         console.error(e); rightCol.innerHTML = `<p><strong>Home Wiki:</strong></p><p>Not available</p><p>ID: ${user.id}</p>`;
     }
     
-    // Fetch and display global groups
-    if(user.groups && user.groups.length > 0) {
-        leftCol.innerHTML += `<p><strong>Global Groups:</strong></p><p>${user.groups.join(', ')}</p>`;
-    }
-
-    // Fetch and display global rights
-    if(user.rights && user.rights.length > 0) {
-        rightCol.innerHTML += `<p><strong>Global Rights:</strong></p><p>${user.rights.join(', ')}</p>`;
-    }
     div.appendChild(leftCol);
     div.appendChild(rightCol);
 
-    // Add new placeholders for local groups/rights
-   // leftCol.innerHTML += `<p><strong>Local Groups:</strong></p><p id="localGroups">Fetching...</p>`;
-   // rightCol.innerHTML += `<p><strong>Local Rights:</strong></p><p id="localRights">Fetching...</p>`;
-   // This section creates the table for Local Groups and Local Rights
-    const tableDiv = document.createElement('div');
-    tableDiv.style.cssText = "width: 100%; text-align: left; margin-top: 20px;";
-    tableDiv.innerHTML = `
+    // This section creates the table for Global Groups and Global Rights
+    const globalTableDiv = document.createElement('div');
+    globalTableDiv.style.cssText = "width: 100%; text-align: left; margin-top: 20px;";
+    globalTableDiv.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse;">
+            <tbody>
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Global Groups:</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Global Rights:</td>
+                </tr>
+                <tr>
+                    <td id="globalGroups" style="padding: 8px; border: 1px solid #ddd;">${user.groups && user.groups.length > 0 ? user.groups.join(', ') : 'None'}</td>
+                    <td id="globalRights" style="padding: 8px; border: 1px solid #ddd;">${user.rights && user.rights.length > 0 ? user.rights.join(', ') : 'None'}</td>
+                </tr>
+            </tbody>
+        </table>
+    `;
+    div.appendChild(globalTableDiv);
+
+    // This section creates the table for Local Groups and Local Rights
+    const localTableDiv = document.createElement('div');
+    localTableDiv.style.cssText = "width: 100%; text-align: left; margin-top: 20px;";
+    localTableDiv.innerHTML = `
         <table style="width: 100%; border-collapse: collapse;">
             <tbody>
                 <tr>
@@ -239,8 +245,7 @@ async function displayUserDetails(user){
             </tbody>
         </table>
     `;
-    div.appendChild(tableDiv);
-    
+    div.appendChild(localTableDiv);
     
     // Fetch and display local groups/rights
     if(user.home && homewikiUrl) {
@@ -364,7 +369,7 @@ function getAnniversaryMessage(){
     } else if(daysSinceRegistration > 365 && daysSinceRegistration % 365 > 0 && daysSinceRegistration % 365 < 31) {
         const years = Math.floor(daysSinceRegistration / 365);
         const daysBelated = daysSinceRegistration % 365;
-        message = `== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear  [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary was '''${daysBelated} days''' ago, marking '''${years} years''' of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
+        message = `== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear  [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary was '''${daysBelated} days''' ago, marking '''${years} years''' of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
     } else {
         return "";
     }
