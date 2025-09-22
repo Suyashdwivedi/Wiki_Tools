@@ -16,119 +16,106 @@
     <meta name="twitter:title" content="Wiki Anniversary">
     <meta name="twitter:description" content="A tool to check a user's Wiki anniversary, contributions, and wish them well.">
     <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
-    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/250px-Wiki%27s_Lazy_Coders.png">
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
     <style>
-	
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #343a40; text-align: center; overflow-x: hidden; }
-    header { background-color: #007bff; color: white; padding: 1em; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; flex-direction: column; }
-    header h1, header h3 { margin: 0; }
-    header img { height: 75px; margin-right: 15px; }
-    .columns { display: flex; width: 100%; flex-wrap: wrap; justify-content: center; }
-    .column { flex: 1; padding: 10px; min-width: 200px; }
-    main { max-width: 700px; margin: 20px auto; background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); animation: fadeIn 0.5s ease-in-out; }
-    form { display: flex; flex-direction: column; align-items: center; }
-    label { margin-bottom: 10px; color: #007bff; }
-    input { padding: 10px; margin-bottom: 20px; width: 60%; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 5px; }
-    button { background-color: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; transition: 0.3s ease; }
-    button:hover { background-color: #0056b3; }
-    #wishAnniversaryButton { display: none; margin-top: 15px; }
-    #userDetails { margin-top: 20px; animation: fadeIn 0.5s ease-in-out; display: flex; flex-wrap: wrap; text-align: center; justify-content: center; }
-    #userDetails h2 { color: #007bff; text-align: center; margin-bottom: 10px; }
-    img.user-image { border-radius: 50%; max-width: 200px; margin-bottom: 10px; }
-    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-    .night-mode-button { position: absolute; top: 10px; right: 10px; background-color: #007bff; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
-    .night-mode { background-color: #121212; color: #f8f9fa; }
-    .night-mode header { background-color: #1f1f1f; }
-    .night-mode main { background-color: #2c2c2c; color: #f8f9fa; }
-    .night-mode label { color: #8ab4f8; }
-    .night-mode input { background-color: #3e3e3e; color: #f8f9fa; border: 1px solid #555; }
-    .night-mode button { background-color: #8ab4f8; color: black; }
-    .night-mode h2 { color: #8ab4f8; }
-    .night-mode a { color: #8ab4f8; }
-    footer { margin-top: 20px; padding: 10px; font-size: 0.9em; color: #6c757d; }
-    .copied-message {
-        color: green;
-        font-weight: bold;
-        margin-left: 10px;
-        animation: fadeOut 2s forwards;
-    }
-    @keyframes fadeOut {
-        0% { opacity: 1; }
-        100% { opacity: 0; }
-    }
-    #messagePreview {
-        margin-top: 30px;
-        padding: 20px;
-        background-color: #e9ecef;
-        border-left: 5px solid #007bff;
-        text-align: left;
-        white-space: pre-wrap; /* Ensures line breaks are respected */
-        overflow-x: auto; /* Allows horizontal scrolling if content is too wide */
-        max-width: 100%; /* Prevents content from overflowing the container */
-        box-sizing: border-box; /* Include padding in the element's total width */
-        display: none;
-    }
-    .night-mode #messagePreview {
-        background-color: #3e3e3e;
-        border-left: 5px solid #8ab4f8;
-        color: #f8f9fa;
-    }
-    #addToCalendarButton {
-        background-color: #28a745;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-        transition: 0.3s ease;
-        margin-left: 10px;
-    }
-    #addToCalendarButton:hover {
-        background-color: #218838;
-    }
-    .night-mode #addToCalendarButton {
-        background-color: #2e8b57;
-    }
-    .night-mode #addToCalendarButton:hover {
-        background-color: #267349;
-    }
-      /* New styles for scroll buttons */
-    .scroll-buttons {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        z-index: 999;
-    }
-    .scroll-button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        font-size: 24px;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        transition: background-color 0.3s;
-    }
-    .scroll-button:hover {
-        background-color: #0056b3;
-    }
-</style>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-GC8PGC89NB');
-    </script>
-    <script src="https://cdn.counter.dev/script.js"
-        data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
-        data-utcoffset="6">
-    </script>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #343a40; text-align: center; overflow-x: hidden; }
+        header { background-color: #007bff; color: white; padding: 1em; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        header h1, header h3 { margin: 0; }
+        header img { height: 75px; margin-right: 15px; }
+        .columns { display: flex; width: 100%; flex-wrap: wrap; justify-content: center; }
+        .column { flex: 1; padding: 10px; min-width: 200px; }
+        main { max-width: 700px; margin: 20px auto; background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); animation: fadeIn 0.5s ease-in-out; }
+        form { display: flex; flex-direction: column; align-items: center; }
+        label { margin-bottom: 10px; color: #007bff; }
+        input { padding: 10px; margin-bottom: 20px; width: 60%; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 5px; }
+        button { background-color: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; transition: 0.3s ease; }
+        button:hover { background-color: #0056b3; }
+        #wishAnniversaryButton { display: none; margin-top: 15px; }
+        #userDetails { margin-top: 20px; animation: fadeIn 0.5s ease-in-out; display: flex; flex-wrap: wrap; text-align: center; justify-content: center; }
+        #userDetails h2 { color: #007bff; text-align: center; margin-bottom: 10px; }
+        img.user-image { border-radius: 50%; max-width: 200px; margin-bottom: 10px; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        .night-mode-button { position: absolute; top: 10px; right: 10px; background-color: #007bff; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
+        .night-mode { background-color: #121212; color: #f8f9fa; }
+        .night-mode header { background-color: #1f1f1f; }
+        .night-mode main { background-color: #2c2c2c; color: #f8f9fa; }
+        .night-mode label { color: #8ab4f8; }
+        .night-mode input { background-color: #3e3e3e; color: #f8f9fa; border: 1px solid #555; }
+        .night-mode button { background-color: #8ab4f8; color: black; }
+        .night-mode h2 { color: #8ab4f8; }
+        .night-mode a { color: #8ab4f8; }
+        footer { margin-top: 20px; padding: 10px; font-size: 0.9em; color: #6c757d; }
+        .copied-message {
+            color: green;
+            font-weight: bold;
+            margin-left: 10px;
+            animation: fadeOut 2s forwards;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        #messagePreview {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-left: 5px solid #007bff;
+            text-align: left;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-width: 100%;
+            box-sizing: border-box;
+            display: none;
+        }
+        .night-mode #messagePreview {
+            background-color: #3e3e3e;
+            border-left: 5px solid #8ab4f8;
+            color: #f8f9fa;
+        }
+        #addToCalendarButton {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s ease;
+            margin-left: 10px;
+        }
+        #addToCalendarButton:hover {
+            background-color: #218838;
+        }
+        .night-mode #addToCalendarButton {
+            background-color: #2e8b57;
+        }
+        .night-mode #addToCalendarButton:hover {
+            background-color: #267349;
+        }
+        .scroll-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
+        }
+        .scroll-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background-color 0.3s;
+        }
+        .scroll-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
 
@@ -175,6 +162,17 @@
     <button class="scroll-button" onclick="goToBottom()">⬇</button>
 </div>
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GC8PGC89NB');
+</script>
+<script src="https://cdn.counter.dev/script.js"
+    data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+    data-utcoffset="6">
+</script>
 <script>
 let homewikiUrl = "";
 let storedUser = null;
@@ -232,7 +230,7 @@ async function displayUserDetails(user){
     try{
         homewikiUrl = await fetchHomewikiUrl(user.home, user.merged);
         rightCol.innerHTML = `<p><strong>Home Wiki:</strong></p><p><a href="${homewikiUrl}" target="_blank">${user.home}</a></p>
-                                    <p><strong>ID:</strong></p><p>${user.id}</p>`;
+                                        <p><strong>ID:</strong></p><p>${user.id}</p>`;
     }catch(e){
         console.error(e); rightCol.innerHTML = `<p><strong>Home Wiki:</strong></p><p>Not available</p><p>ID: ${user.id}</p>`;
     }
