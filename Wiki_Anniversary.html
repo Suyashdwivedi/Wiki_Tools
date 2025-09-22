@@ -18,16 +18,16 @@
     <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
     <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/250px-Wiki%27s_Lazy_Coders.png">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-GC8PGC89NB');
-</script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-GC8PGC89NB');
+    </script>
     <script src="https://cdn.counter.dev/script.js"
         data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
         data-utcoffset="6">
-</script>
+    </script>
     <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #343a40; text-align: center; overflow-x: hidden; }
     header { background-color: #007bff; color: white; padding: 1em; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; flex-direction: column; }
@@ -102,7 +102,7 @@
     .night-mode #addToCalendarButton:hover {
         background-color: #267349;
     }
-     /* New styles for scroll buttons */
+      /* New styles for scroll buttons */
     .scroll-buttons {
         position: fixed;
         bottom: 20px;
@@ -169,7 +169,6 @@
     Idea from <a href="https://gnoeee.github.io/Wiki-Anniversary/" target="_blank">Wiki Anniversary</a>
 </footer>
 
-<!-- Scroll Buttons Floating Bottom Right -->
 <div class="scroll-buttons">
     <button class="scroll-button" onclick="goToTop()">⬆</button>
     <button class="scroll-button" onclick="goToBottom()">⬇</button>
@@ -178,9 +177,7 @@
 <script>
 let homewikiUrl = "";
 let storedUser = null;
-let daysToAnniversaryGlobal = 0;
 
-// This code runs immediately when the page loads
 const usernameFromURL = new URLSearchParams(window.location.search).get('username');
 if(usernameFromURL){
     document.getElementById('username').value = usernameFromURL;
@@ -196,7 +193,7 @@ async function getUserDetails(){
         storedUser = data.query.globaluserinfo;
         if (storedUser) {
             displayUserDetails(storedUser);
-            displayDaysToAnniversary(storedUser.registration);
+            displayDaysAndYears(storedUser.registration);
             showButtons();
             displayMessagePreview();
         } else {
@@ -224,8 +221,10 @@ async function displayUserDetails(user){
     div.innerHTML = ""; headerDiv.innerHTML = "";
     headerDiv.innerHTML = `<h2>${user.name}</h2>`;
 
+    const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+
     const leftCol = document.createElement('div'); leftCol.classList.add('column');
-    leftCol.innerHTML = `<p><strong>Registration Date:</strong></p><p>${new Date(user.registration).toLocaleDateString()}</p>
+    leftCol.innerHTML = `<p><strong>Registration Date:</strong></p><p>${new Date(user.registration).toLocaleDateString('en-US', dateOptions)}</p>
                             <p><strong>Total Edit Count:</strong></p><p>${user.editcount}</p>`;
     
     const rightCol = document.createElement('div'); rightCol.classList.add('column');
@@ -240,7 +239,6 @@ async function displayUserDetails(user){
     div.appendChild(leftCol);
     div.appendChild(rightCol);
 
-    // This section creates the table for Global Groups and Global Rights
     const globalTableDiv = document.createElement('div');
     globalTableDiv.style.cssText = "width: 100%; text-align: left; margin-top: 20px;";
     globalTableDiv.innerHTML = `
@@ -259,7 +257,6 @@ async function displayUserDetails(user){
     `;
     div.appendChild(globalTableDiv);
 
-    // This section creates the table for Local Groups and Local Rights
     const localTableDiv = document.createElement('div');
     localTableDiv.style.cssText = "width: 100%; text-align: left; margin-top: 20px;";
     localTableDiv.innerHTML = `
@@ -278,7 +275,6 @@ async function displayUserDetails(user){
     `;
     div.appendChild(localTableDiv);
     
-    // Fetch and display local groups/rights
     if(user.home && homewikiUrl) {
         const localInfo = await fetchLocalRightsAndGroups(user.name, homewikiUrl);
         document.getElementById('localGroups').textContent = localInfo.groups.length > 0 ? localInfo.groups.join(', ') : 'None';
@@ -291,7 +287,6 @@ async function displayUserDetails(user){
     fetchUserImage(user.name);
 }
 
-// ⭐ NEW FUNCTION to fetch local rights and groups ⭐
 async function fetchLocalRightsAndGroups(username, wikiUrl) {
     const encodedUsername = encodeURIComponent(username);
     try {
@@ -345,31 +340,51 @@ async function fetchUserImage(username){
     }
 }
 
-function displayDaysToAnniversary(registrationDate){
-    const anniversary = new Date(registrationDate);
+function calculateAnniversaryData(registrationDate) {
+    const regDate = new Date(registrationDate);
     const today = new Date();
-    const copy = new Date(anniversary);
-    copy.setFullYear(today.getFullYear());
-    if(today > copy) copy.setFullYear(today.getFullYear()+1);
-    const diff = Math.ceil((copy - today)/(1000*60*60*24));
-    daysToAnniversaryGlobal = diff;
-    document.getElementById('daysToAnniversary').innerHTML = `<strong>Days to next Anniversary:</strong> ${diff}`;
+    
+    let anniversaryThisYear = new Date(regDate);
+    anniversaryThisYear.setFullYear(today.getFullYear());
+
+    let yearsCompleted;
+    let daysToNext;
+    let daysSinceLast;
+    
+    if (today >= anniversaryThisYear) {
+        yearsCompleted = today.getFullYear() - regDate.getFullYear();
+        daysSinceLast = Math.floor((today - anniversaryThisYear) / (1000 * 60 * 60 * 24));
+        
+        let nextAnniversary = new Date(anniversaryThisYear);
+        nextAnniversary.setFullYear(today.getFullYear() + 1);
+        daysToNext = Math.ceil((nextAnniversary - today) / (1000 * 60 * 60 * 24));
+    } else {
+        yearsCompleted = today.getFullYear() - regDate.getFullYear() - 1;
+        daysToNext = Math.ceil((anniversaryThisYear - today) / (1000 * 60 * 60 * 24));
+        daysSinceLast = 0;
+    }
+    
+    const isToday = today.getMonth() === regDate.getMonth() && today.getDate() === regDate.getDate();
+
+    return { daysToNext, yearsCompleted, isToday, daysSinceLast};
+}
+
+function displayDaysAndYears(registrationDate) {
+    const { daysToNext, yearsCompleted } = calculateAnniversaryData(registrationDate);
+    document.getElementById('daysToAnniversary').innerHTML = `<strong>Years of Contribution:</strong> ${yearsCompleted}<br><strong>Days to next Anniversary:</strong> ${daysToNext}`;
 }
 
 function showButtons(){
     const wishButton = document.getElementById('wishAnniversaryButton');
     const calendarButton = document.getElementById('addToCalendarButton');
-    const today = new Date();
-    const anniversaryDate = new Date(storedUser.registration);
-    const isTodayAnniversary = (today.getMonth() === anniversaryDate.getMonth() && today.getDate() === anniversaryDate.getDate());
-
-    if(storedUser && (isTodayAnniversary || daysToAnniversaryGlobal <= 10 || daysToAnniversaryGlobal >= 355)) {
+    const { isToday, daysToNext, daysSinceLast } = calculateAnniversaryData(storedUser.registration);
+    
+    if(storedUser && (isToday || daysToNext <= 10 || (daysSinceLast > 0 && daysSinceLast <= 30))) {
         wishButton.style.display='inline-block';
     } else {
         wishButton.style.display='none';
     }
 
-    // Always show calendar button if we have user data
     if(storedUser) {
         calendarButton.style.display='inline-block';
     } else {
@@ -382,25 +397,20 @@ function getAnniversaryMessage(){
     const username = storedUser.name;
     const edits = storedUser.editcount;
     const totalEditsFormatted = edits.toLocaleString();
-    const anniversaryDate = new Date(storedUser.registration);
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const yearsOfService = currentYear - anniversaryDate.getFullYear();
-    const daysSinceRegistration = Math.floor((today - anniversaryDate) / (1000 * 60 * 60 * 24));
-    const isTodayAnniversary = (today.getMonth() === anniversaryDate.getMonth() && today.getDate() === anniversaryDate.getDate());
+    const { daysToNext, yearsCompleted, isToday, daysSinceLast } = calculateAnniversaryData(storedUser.registration);
     
     let message = "";
     const imageWikitext = `[[File:Rose and Carnation Flower Bouquet 02.png|200px|right|Happy Wiki Anniversary]]`;
     const toolLine = `''Use this [https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html '''Tool'''] to send wiki anniversary wishes to other amazing Wikimedians.''`;
 
-    if (isTodayAnniversary) {
-        message = `== Happy Wiki Anniversary 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nWishing you a very happy wiki anniversary today, celebrating '''${yearsOfService} years''' of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
-    } else if(daysToAnniversaryGlobal > 0 && daysToAnniversaryGlobal <= 10){
-        message = `== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary is just around the corner, in '''${daysToAnniversaryGlobal} days!''' What a wonderful milestone of '''${yearsOfService} years''' on Wiki. Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
-    } else if(daysSinceRegistration > 365 && daysSinceRegistration % 365 > 0 && daysSinceRegistration % 365 < 31) {
-        const years = Math.floor(daysSinceRegistration / 365);
-        const daysBelated = daysSinceRegistration % 365;
-        message = `== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear  [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary was '''${daysBelated} days''' ago, marking '''${years} years''' of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
+    if (isToday) {
+        message = `== Happy Wiki Anniversary 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nWishing you a very happy wiki anniversary today, celebrating '''${yearsCompleted} years''' of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
+    } else if(daysToNext > 0 && daysToNext <= 10){
+        message = `== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary is just around the corner, in '''${daysToNext} days!''' What a wonderful milestone of '''${yearsCompleted} years''' on Wiki. Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
+    } else if(daysSinceLast > 0 && daysSinceLast <= 30) {
+        const years = yearsCompleted;
+        const daysBelated = daysSinceLast;
+        message = `== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear  [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary was '''${daysBelated} days''' ago, marking '''${years} years''' of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
     } else {
         return "";
     }
@@ -456,22 +466,18 @@ function addToCalendar() {
     const anniversaryDate = new Date(storedUser.registration);
     const today = new Date();
     const nextAnniversary = new Date(anniversaryDate);
-    // Set to next anniversary
     nextAnniversary.setFullYear(today.getFullYear());
     if (today > nextAnniversary) {
         nextAnniversary.setFullYear(today.getFullYear() + 1);
     }
-    // Format date for Google Calendar (YYYYMMDD)
     const formattedDate = nextAnniversary.toISOString().slice(0, 10).replace(/-/g, '');
-    // Create event details
+    const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
     const eventTitle = `Wiki Anniversary of ${storedUser.name}`;
-    const eventDetails = `It's the wiki anniversary of ${storedUser.name} who joined on ${new Date(storedUser.registration).toLocaleDateString()} and has made ${storedUser.editcount} edits.`;
-    // Create Google Calendar URL
+    const eventDetails = `It's the wiki anniversary of ${storedUser.name} who joined on ${new Date(storedUser.registration).toLocaleDateString('en-US', dateOptions)} and has made ${storedUser.editcount} edits.`;
     const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${formattedDate}/${formattedDate}&details=${encodeURIComponent(eventDetails)}&sf=true&output=xml`;
-    // Open in new tab
     window.open(calendarUrl, '_blank');
 }
-// ⭐ NEW FUNCTIONS for Go to Top/Bottom buttons ⭐
+
 function goToTop() {
     window.scrollTo({
         top: 0,
