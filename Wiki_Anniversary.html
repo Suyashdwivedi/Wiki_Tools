@@ -330,7 +330,7 @@ async function fetchUserImage(username){
         }
 
         if(imageName){
-            const imageUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(imageName)}?width=1024`;
+            const imageUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(imageName)}?width=512`;
             const imgTag = document.createElement('img'); imgTag.src = imageUrl; imgTag.className="user-image";
             document.getElementById('usernameHeader').appendChild(imgTag);
         }
