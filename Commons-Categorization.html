@@ -313,7 +313,6 @@
             border-color: #6b7280;
             color: #f9fafb;
         }
-
     </style>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
@@ -325,8 +324,8 @@
     </script>
 
     <script src="https://cdn.counter.dev/script.js"
-            data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
-            data-utcoffset="6"></script>
+                data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+                data-utcoffset="6"></script>
 </head>
 <body>
     <button id="night-mode-toggle" class="night-mode-button">Night mode</button>
@@ -472,6 +471,10 @@
             "people": { id: "people", title: "Category:People", parents: ["photography"] },
             "buildings": { id: "buildings", title: "Category:Buildings", parents: [] },
         };
+        
+        // A new global map to store fetched categories with their proper casing.
+        // This is necessary because the pre-defined ALL_CATEGORIES object doesn't contain the fetched ones.
+        let fetchedCategories = {};
 
         const DEFAULT_FILE = {
             filename: "Sanchi_Stupa_TORANAS_Entry_Gate3.jpg",
@@ -527,8 +530,14 @@
 
         function generateWikitext() {
             const lines = assignedCategories.map(id => {
-                const cat = ALL_CATEGORIES[id] || { title: `Category:${id.replace(/_/g, ' ')}` };
-                return `[[${cat.title}]]`;
+                // Use the fetchedCategories map first, then fall back to the predefined ones.
+                const cat = fetchedCategories[id] || ALL_CATEGORIES[id];
+                if (cat && cat.title) {
+                    return `[[${cat.title}]]`;
+                }
+                // Fallback for categories not found in either map, using the stored ID.
+                const fallbackTitle = `Category:${id.replace(/_/g, ' ')}`;
+                return `[[${fallbackTitle}]]`;
             }).filter(Boolean);
             return `== Summary ==\nFile: ${currentFile.title}\n\n` + (lines.length ? lines.join("\n") : '');
         }
@@ -577,8 +586,18 @@
                 const data = await response.json();
                 const page = Object.values(data.query.pages)[0];
                 if (page && page.categories) {
-                    const categories = page.categories.map(cat => cat.title.replace('Category:', ''));
-                    assignedCategories = categories.map(title => title.toLowerCase().replace(/ /g, '_'));
+                    const categories = page.categories.map(cat => {
+                        const title = cat.title;
+                        const id = title.replace('Category:', '').toLowerCase().replace(/ /g, '_');
+                        return { id, title }; // Store both the unique ID and the original title
+                    });
+                    // Update the global state with correct IDs and titles
+                    assignedCategories = categories.map(c => c.id);
+                    categories.forEach(c => {
+                        // Save the original title using the new map
+                        fetchedCategories[c.id] = { title: c.title, id: c.id };
+                    });
+                    
                     statusMessageEl.textContent = 'Existing categories loaded.';
                     statusMessageEl.style.color = '#10b981';
                 } else {
@@ -652,6 +671,8 @@
             const catId = catTitle.replace('Category:', '').toLowerCase().replace(/ /g, '_');
             if (!assignedCategories.includes(catId)) {
                 assignedCategories.push(catId);
+                // Store the original title in the fetchedCategories map
+                fetchedCategories[catId] = { title: catTitle, id: catId };
                 renderAll();
             }
         }
@@ -662,7 +683,7 @@
         }
 
         function openCategory(catId) {
-            const cat = ALL_CATEGORIES[catId] || { title: `Category:${catId.replace(/_/g, ' ')}` };
+            const cat = fetchedCategories[catId] || ALL_CATEGORIES[catId] || { title: `Category:${catId.replace(/_/g, ' ')}` };
             const nameForUrl = encodeURIComponent(cat.title.replace(/^Category:/, "").replace(/ /g, '_'));
             window.open(`https://commons.wikimedia.org/wiki/Category:${nameForUrl}`, "_blank");
         }
@@ -712,7 +733,7 @@
                 return;
             }
             assignedCategories.forEach(id => {
-                const cat = ALL_CATEGORIES[id] || { title: `Category:${id.replace(/_/g, ' ')}`, parents: [] };
+                const cat = fetchedCategories[id] || ALL_CATEGORIES[id] || { title: `Category:${id.replace(/_/g, ' ')}`, parents: [] };
                 const parentIds = getParents(id);
                 const parentTitles = parentIds.map(p => {
                     const parentCat = ALL_CATEGORIES[p];
