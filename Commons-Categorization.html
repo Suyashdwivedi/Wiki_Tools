@@ -6,15 +6,15 @@
     <title>Commons Category Demo - Dynamic File Loading</title>
     <meta name="description" content="Interactive demo showing how categories and wikitext work for images on Wikimedia Commons. Load any file, drag and drop to assign categories, and see the resulting wikitext." />
     <meta name="keywords" content="Wikimedia Commons, Categories, Wikitext, HTML, JavaScript, Dynamic Demo, File Categorization" />
-    <link rel="canonical" href="https://suyashdwivedi.github.io/Commons-Categorization.html" />
+    <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Tools/Commons-Categorization.html" />
     <meta property="og:title" content="Commons Category Demo - Dynamic File Loading" />
     <meta property="og:description" content="Interactive demo showing how categories and wikitext work for images on Wikimedia Commons. Load any file, drag and drop to assign categories, and see the resulting wikitext." />
-    <meta property="og:url" content="https://suyashdwivedi.github.io/Commons-Categorization.html" />
+    <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Tools/Commons-Categorization.html" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta property="twitter:title" content="Commons Category Demo - Dynamic File Loading" />
     <meta property="twitter:description" content="Interactive demo showing how categories and wikitext work for images on Wikimedia Commons. Load any file, drag and drop to assign categories, and see the resulting wikitext." />
-    <meta property="twitter:url" content="https://suyashdwivedi.github.io/Commons-Categorization.html" />
+    <meta property="twitter:url" content="https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Tools/Commons-Categorization.html" />
     <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
     <style>
         /* Simple CSS styling to mimic the look of the original Tailwind design */
@@ -132,8 +132,6 @@
             font-size: 0.75rem;
             color: #10b981;
         }
-
-
         /* Assigned Categories List */
         #assigned-categories-list li {
             display: flex;
@@ -198,6 +196,22 @@
             font-size: 0.75rem;
             color: #9ca3af;
         }
+        /* New styling for text-based graph */
+        .category-list {
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 16px;
+            line-height: 1.5;
+            font-size: 0.875rem;
+        }
+        .category-list ul {
+            list-style: none;
+            padding-left: 15px;
+            margin: 0;
+        }
+        .category-list li {
+            padding: 2px 0;
+        }
 
         /* Wikitext Section */
         textarea {
@@ -241,6 +255,7 @@
             padding-top: 12px;
             border-top: 1px solid #e5e7eb;
             color: var(--text-secondary);
+            text-align: center; /* Centered footer */
         }
 
         /* Night Mode Button Styling */
@@ -318,7 +333,7 @@
 
     <header class="container">
         <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" class="header-logo" />
-        <h1>How Wikimedia Commons photo categories work — interactive demo</h1>
+        <h1>How Wikimedia Commons photo categories work, an interactive demo</h1>
         <p class="text-sm text-gray-600 mt-2">
             Load any Wikimedia Commons file (URL or wikitext title), then drag the preview image onto categories to assign it. This simulates how you categorize a file on Commons.
         </p>
@@ -381,33 +396,8 @@
 
             <div class="mt-4">
                 <h3>Category relationships (visual)</h3>
-                <div class="mt-2" style="border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px;">
-                    <svg width="100%" height="140" viewBox="0 0 600 140" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="20" y="10" width="160" height="28" rx="10" fill="#f3f4f6" stroke="#e5e7eb" />
-                        <text x="100" y="30" text-anchor="middle" font-size="12">Photography by subject</text>
-
-                        <rect x="220" y="10" width="130" height="28" rx="10" fill="#f3f4f6" stroke="#e5e7eb" />
-                        <text x="285" y="30" text-anchor="middle" font-size="12">Nature</text>
-
-                        <rect x="220" y="55" width="150" height="28" rx="10" fill="#eef2ff" stroke="#e0e7ff" />
-                        <text x="295" y="75" text-anchor="middle" font-size="12">Landscape photographs</text>
-
-                        <rect x="420" y="55" width="80" height="28" rx="10" fill="#fef3c7" stroke="#fde68a" />
-                        <text x="460" y="75" text-anchor="middle" font-size="12">Rivers</text>
-
-                        <rect x="20" y="55" width="110" height="28" rx="10" fill="#f3f4f6" stroke="#e5e7eb" />
-                        <text x="75" y="75" text-anchor="middle" font-size="12">India</text>
-
-                        <line x1="180" y1="24" x2="220" y2="24" stroke="#c7c7c7" stroke-width="1" marker-end="url(#arrow)" />
-                        <line x1="295" y1="38" x2="295" y2="55" stroke="#c7c7c7" stroke-width="1" marker-end="url(#arrow)" />
-                        <line x1="315" y1="69" x2="420" y2="69" stroke="#c7c7c7" stroke-width="1" marker-end="url(#arrow)" />
-
-                        <defs>
-                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="4" orient="auto">
-                                <path d="M0,0 L0,8 L8,4 z" fill="#9ca3af" />
-                            </marker>
-                        </defs>
-                    </svg>
+                <div class="category-list">
+                    <img src="https://suyashdwivedi.github.io/Wiki_Tools/Category_explanation.png" alt="Category Hierarchy Explanation" style="width: 100%; height: auto; border-radius: 6px;">
                 </div>
             </div>
         </section>
@@ -470,30 +460,30 @@
 
     <script>
         // --- GLOBAL DATA ---
-        const ALL_CATEGORIES = [
-            { id: "nature", title: "Category:Nature", parents: ["photography"] },
-            { id: "landscape", title: "Category:Landscape photographs", parents: ["nature"] },
-            { id: "river", title: "Category:Rivers", parents: ["nature"] },
-            { id: "india", title: "Category:India", parents: [] },
-            { id: "varanasi", title: "Category:Varanasi", parents: ["india"] },
-            { id: "photography", title: "Category:Photography by subject", parents: [] },
-            { id: "historic", title: "Category:Historic sites", parents: ["landscape"] },
-            { id: "people", title: "Category:People", parents: ["photography"] },
-            { id: "buildings", title: "Category:Buildings", parents: [] },
-        ];
+        // This is now a lookup table for parent relationships, not the source for the browser
+        const ALL_CATEGORIES = {
+            "nature": { id: "nature", title: "Category:Nature", parents: ["photography"] },
+            "landscape": { id: "landscape", title: "Category:Landscape photographs", parents: ["nature"] },
+            "river": { id: "river", title: "Category:Rivers", parents: ["nature"] },
+            "india": { id: "india", title: "Category:India", parents: [] },
+            "varanasi": { id: "varanasi", title: "Category:Varanasi", parents: ["india"] },
+            "photography": { id: "photography", title: "Category:Photography by subject", parents: [] },
+            "historic": { id: "historic", title: "Category:Historic sites", parents: ["landscape"] },
+            "people": { id: "people", title: "Category:People", parents: ["photography"] },
+            "buildings": { id: "buildings", title: "Category:Buildings", parents: [] },
+        };
 
-        // Setting the new default file as requested, using the correct, known MD5 path for a guaranteed preview.
         const DEFAULT_FILE = {
             filename: "Sanchi_Stupa_TORANAS_Entry_Gate3.jpg",
             title: "Sanchi Stupa TORANAS Entry Gate3",
             commonsPage: "https://commons.wikimedia.org/wiki/File:Sanchi_Stupa_TORANAS_Entry_Gate3.jpg",
-            // The previewUrl is deliberately omitted here, as we rely entirely on the placeholder for reliability.
         };
 
         // --- STATE VARIABLES ---
         let assignedCategories = [];
         let searchFilter = "";
         let currentFile = DEFAULT_FILE;
+        let debouncedSearch;
 
         // --- DOM ELEMENTS ---
         const assignedListEl = document.getElementById('assigned-categories-list');
@@ -508,78 +498,43 @@
         const nightModeToggle = document.getElementById('night-mode-toggle');
 
         // --- GLOBAL HELPER FUNCTIONS ---
-
-        /**
-         * Parses the user input (URL or filename) and returns a clean, URL-encoded filename.
-         * Handles:
-         * - "File:Name.jpg"
-         * - full Commons page links (https://commons.wikimedia.org/wiki/File:Name.jpg)
-         * - upload.wikimedia.org direct file URLs
-         * - plain filenames like "Name.jpg" or "Name with spaces.jpg"
-         * @param {string} input - The raw input string.
-         * @returns {string|null} The clean filename (e.g., 'Loga_nathan.jpg') or null if invalid.
-         */
         function parseFileName(input) {
             if (!input) return null;
-            let cleanInput = input.trim();
-
-            // Replace spaces with underscores (Commons standard)
-            cleanInput = cleanInput.replace(/\s+/g, '_');
-
-            // If it's a full Commons page URL containing /wiki/File:
+            let cleanInput = input.trim().replace(/\s+/g, '_');
             const wikiFileMatch = cleanInput.match(/\/wiki\/File:([^#?]+)/i);
             if (wikiFileMatch && wikiFileMatch[1]) {
                 cleanInput = wikiFileMatch[1];
             } else {
-                // If it's a mobile wiki link or other wiki link pattern
                 const wikiFileMatch2 = cleanInput.match(/File:([^#?]+)/i);
                 if (wikiFileMatch2 && wikiFileMatch2[1]) {
                     cleanInput = wikiFileMatch2[1];
                 } else {
-                    // If it's an upload.wikimedia.org direct URL, take the last path segment
                     const uploadMatch = cleanInput.match(/upload\.wikimedia\.org\/.*\/([^\/?#]+)$/i);
                     if (uploadMatch && uploadMatch[1]) {
                         cleanInput = uploadMatch[1];
                     }
                 }
             }
-
-            // Remove any query/hash remnants
             cleanInput = cleanInput.split(/[?#]/)[0];
-
-            // If still has a "File:" prefix, strip it
             if (cleanInput.toLowerCase().startsWith('file:')) {
                 cleanInput = cleanInput.substring(5);
             }
-
-            // Validate: must contain an extension (dot) and reasonable length
             if (cleanInput.length > 3 && cleanInput.includes('.')) {
                 return cleanInput;
             }
-
             return null;
         }
 
-        /**
-         * Generates the Wikitext content based on the current assigned categories.
-         * @returns {string} The generated Wikitext.
-         */
         function generateWikitext() {
             const lines = assignedCategories.map(id => {
-                const cat = ALL_CATEGORIES.find(c => c.id === id);
-                return cat ? `[[${cat.title}]]` : "";
+                const cat = ALL_CATEGORIES[id] || { title: `Category:${id.replace(/_/g, ' ')}` };
+                return `[[${cat.title}]]`;
             }).filter(Boolean);
             return `== Summary ==\nFile: ${currentFile.title}\n\n` + (lines.length ? lines.join("\n") : '');
         }
 
-        /**
-         * Recursively finds all unique parent IDs for a given category.
-         * @param {string} catId - The ID of the category.
-         * @param {Set<string>} visited - Set of visited category IDs to prevent infinite loops.
-         * @returns {string[]} An array of unique parent category IDs, ordered from closest parent outward.
-         */
         function getParents(catId, visited = new Set()) {
-            const cat = ALL_CATEGORIES.find(c => c.id === catId);
+            const cat = ALL_CATEGORIES[catId];
             if (!cat) return [];
             const res = [];
             for (const p of cat.parents) {
@@ -595,135 +550,158 @@
             return res;
         }
 
-        // --- GLOBAL STATE MODIFICATION FUNCTIONS ---
-        // These need to be globally accessible for onclick attributes.
+        async function getCommonsImageUrl(filename, width = 400) {
+            const encodedFilename = encodeURIComponent(filename);
+            const url = `https://commons.wikimedia.org/w/api.php?action=query&titles=File:${encodedFilename}&prop=imageinfo&iiprop=url&iiurlwidth=${width}&format=json&origin=*`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const page = Object.values(data.query.pages)[0];
+                if (page && page.imageinfo && page.imageinfo.length > 0) {
+                    return page.imageinfo[0].thumburl;
+                }
+            } catch (e) {
+                console.error("Error fetching image info from Wikimedia API:", e);
+            }
+            return null;
+        }
 
-        /**
-         * Loads the file based on the input field value.
-         */
-        function loadFile() {
+        // Fetches existing categories for a file
+        async function fetchImageCategories(filename) {
+            statusMessageEl.textContent = 'Fetching existing categories...';
+            statusMessageEl.style.color = '#f59e0b';
+            const encodedFilename = encodeURIComponent(filename);
+            const url = `https://commons.wikimedia.org/w/api.php?action=query&titles=File:${encodedFilename}&prop=categories&clshow=!hidden&cllimit=10&format=json&origin=*`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const page = Object.values(data.query.pages)[0];
+                if (page && page.categories) {
+                    const categories = page.categories.map(cat => cat.title.replace('Category:', ''));
+                    assignedCategories = categories.map(title => title.toLowerCase().replace(/ /g, '_'));
+                    statusMessageEl.textContent = 'Existing categories loaded.';
+                    statusMessageEl.style.color = '#10b981';
+                } else {
+                    statusMessageEl.textContent = 'No existing categories found.';
+                    statusMessageEl.style.color = '#f59e0b';
+                }
+            } catch (e) {
+                statusMessageEl.textContent = 'Failed to fetch existing categories.';
+                statusMessageEl.style.color = '#ef4444';
+                console.error("Error fetching categories:", e);
+            }
+        }
+
+        // Performs a live search for categories
+        async function searchCommonsCategories(query) {
+            if (!query || query.length < 2) {
+                browserListEl.innerHTML = `<div style="padding:8px; font-size:0.875rem; color:var(--text-secondary);">Type at least 2 characters to search.</div>`;
+                return;
+            }
+            browserListEl.innerHTML = `<div style="padding:8px; font-size:0.875rem; color:var(--text-secondary);">Searching...</div>`;
+            const encodedQuery = encodeURIComponent(query);
+            const url = `https://commons.wikimedia.org/w/api.php?action=query&list=allcategories&acfrom=${encodedQuery}&aclimit=10&format=json&origin=*`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const categories = data.query.allcategories || [];
+                const categoryTitles = categories.map(c => `Category:${c['*']}`);
+                renderCategoryBrowser(categoryTitles);
+            } catch (e) {
+                browserListEl.innerHTML = `<div style="padding:8px; font-size:0.875rem; color:var(--danger-color);">Error searching categories.</div>`;
+                console.error("Error searching categories:", e);
+            }
+        }
+
+        // --- GLOBAL STATE MODIFICATION FUNCTIONS ---
+        async function loadFile() {
             const input = fileInputEl.value.trim();
             statusMessageEl.textContent = 'Loading...';
-            statusMessageEl.style.color = '#f59e0b'; // Amber
+            statusMessageEl.style.color = '#f59e0b';
 
             const cleanFilename = parseFileName(input);
 
             if (!cleanFilename) {
                 statusMessageEl.textContent = 'Error: Invalid link or filename format.';
-                statusMessageEl.style.color = '#ef4444'; // Red
+                statusMessageEl.style.color = '#ef4444';
                 return;
             }
 
-            // Update global state for the new file
             currentFile.filename = cleanFilename;
             currentFile.title = cleanFilename.replace(/_/g, ' ');
             currentFile.commonsPage = `https://commons.wikimedia.org/wiki/File:${encodeURIComponent(cleanFilename)}`;
 
-            // Reset category state (Simulates fetching a fresh file that needs categorization)
-            assignedCategories = [];
-
-            // Update the UI
+            const imageUrl = await getCommonsImageUrl(currentFile.filename);
+            if (imageUrl) {
+                fileImageEl.src = imageUrl;
+                fileImageEl.alt = `Preview for ${currentFile.title}`;
+            } else {
+                const placeholderText = encodeURIComponent(`${currentFile.title} (Preview Not Available)`);
+                fileImageEl.src = `https://placehold.co/400x160/cccccc/333333?text=${placeholderText}`;
+                fileImageEl.alt = `Placeholder for ${currentFile.title}`;
+            }
             renderFileDetails();
-            renderAll();
 
-            statusMessageEl.textContent = 'File loaded successfully. Start categorizing!';
-            statusMessageEl.style.color = '#10b981'; // Green
+            // Fetch and set existing categories
+            await fetchImageCategories(currentFile.filename);
+
+            renderAll();
         }
 
-        /**
-         * Adds a category to the assigned list and re-renders the UI.
-         * @param {string} catId - The ID of the category to add.
-         */
-        function addCategory(catId) {
+        function addCategory(catTitle) {
+            const catId = catTitle.replace('Category:', '').toLowerCase().replace(/ /g, '_');
             if (!assignedCategories.includes(catId)) {
                 assignedCategories.push(catId);
                 renderAll();
             }
         }
 
-        /**
-         * Removes a category from the assigned list and re-renders the UI.
-         * @param {string} catId - The ID of the category to remove.
-         */
         function removeCategory(catId) {
             assignedCategories = assignedCategories.filter(c => c !== catId);
             renderAll();
         }
 
-        /**
-         * Opens the Commons page for a specific category in a new tab.
-         * @param {string} catId - The ID of the category.
-         */
         function openCategory(catId) {
-            const cat = ALL_CATEGORIES.find(c => c.id === catId);
-            if (!cat) return;
+            const cat = ALL_CATEGORIES[catId] || { title: `Category:${catId.replace(/_/g, ' ')}` };
             const nameForUrl = encodeURIComponent(cat.title.replace(/^Category:/, "").replace(/ /g, '_'));
             window.open(`https://commons.wikimedia.org/wiki/Category:${nameForUrl}`, "_blank");
         }
 
-        /**
-         * Copies the generated wikitext to the clipboard.
-         */
         async function copyWikitext() {
             const textToCopy = wikitextOutputEl.value;
             try {
-                // Using document.execCommand for better compatibility in some sandboxed/canvas environments
-                if (document.execCommand) {
+                if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(textToCopy);
+                    statusMessageEl.textContent = 'Wikitext copied!';
+                } else if (document.execCommand) {
                     const tempInput = document.createElement('textarea');
                     tempInput.value = textToCopy;
                     document.body.appendChild(tempInput);
                     tempInput.select();
                     document.execCommand('copy');
                     document.body.removeChild(tempInput);
-                    console.log("Wikitext copied to clipboard. You can paste this into a Commons file description.");
-                    statusMessageEl.textContent = 'Wikitext copied to clipboard.';
-                    statusMessageEl.style.color = '#10b981';
-                    setTimeout(() => statusMessageEl.textContent = '', 3000);
-                } else if (navigator.clipboard) {
-                    await navigator.clipboard.writeText(textToCopy);
-                    console.log("Wikitext copied to clipboard. You can paste this into a Commons file description.");
-                    statusMessageEl.textContent = 'Wikitext copied to clipboard.';
-                    statusMessageEl.style.color = '#10b981';
-                    setTimeout(() => statusMessageEl.textContent = '', 3000);
+                    statusMessageEl.textContent = 'Wikitext copied!';
                 } else {
-                    console.error("Clipboard access denied. Please manually copy the text from the box.");
                     statusMessageEl.textContent = 'Clipboard access denied. Please manually copy.';
                     statusMessageEl.style.color = '#ef4444';
                 }
+                setTimeout(() => statusMessageEl.textContent = '', 3000);
             } catch (err) {
-                console.error('Failed to copy text: ', err);
-                statusMessageEl.textContent = 'Failed to copy Wikitext to clipboard.';
+                statusMessageEl.textContent = 'Failed to copy Wikitext.';
                 statusMessageEl.style.color = '#ef4444';
             }
         }
 
         // --- RENDER FUNCTIONS ---
-
-        /**
-         * Updates the file information panel.
-         * Uses placeholder (reliable when cross-site image loads are blocked).
-         */
         function renderFileDetails() {
             const displayName = currentFile.filename ? currentFile.filename.replace(/_/g, ' ') : currentFile.title || 'Unknown file';
-
             fileTitleEl.textContent = currentFile.title || displayName;
             fileCommonsLinkEl.href = currentFile.commonsPage || '#';
             fileCommonsLinkEl.style.display = 'inline';
-
-            // Set a reliable placeholder image immediately. Use the filename in the text.
-            const placeholderText = encodeURIComponent(`${displayName} (Preview Blocked)`);
-            const reliablePlaceholderUrl = `https://placehold.co/400x160/cccccc/333333?text=${placeholderText}`;
-
-            fileImageEl.src = reliablePlaceholderUrl;
-            fileImageEl.alt = `Placeholder for ${currentFile.title}`;
         }
 
-        /**
-         * Renders the list of currently assigned categories.
-         */
         function renderAssignedCategories() {
             assignedListEl.innerHTML = '';
-
             if (assignedCategories.length === 0) {
                 const li = document.createElement('li');
                 li.style.backgroundColor = 'transparent';
@@ -733,14 +711,13 @@
                 assignedListEl.appendChild(li);
                 return;
             }
-
             assignedCategories.forEach(id => {
-                const cat = ALL_CATEGORIES.find(c => c.id === id);
-                if (!cat) return;
-
+                const cat = ALL_CATEGORIES[id] || { title: `Category:${id.replace(/_/g, ' ')}`, parents: [] };
                 const parentIds = getParents(id);
-                const parentTitles = parentIds.map(p => ALL_CATEGORIES.find(c => c.id === p)?.title.replace('Category:', '')).filter(Boolean);
-
+                const parentTitles = parentIds.map(p => {
+                    const parentCat = ALL_CATEGORIES[p];
+                    return parentCat ? parentCat.title.replace('Category:', '') : p.replace(/_/g, ' ');
+                }).filter(Boolean);
                 const li = document.createElement('li');
                 li.innerHTML = `
                     <div>
@@ -756,64 +733,56 @@
             });
         }
 
-        /**
-         * Renders the list of categories in the browser, filtered by the search term.
-         */
-        function renderCategoryBrowser() {
+        function renderCategoryBrowser(categories) {
             browserListEl.innerHTML = '';
-            const filtered = ALL_CATEGORIES.filter(c =>
-                c.title.toLowerCase().includes(searchFilter.toLowerCase()) || c.id.toLowerCase().includes(searchFilter.toLowerCase())
-            );
-
-            if (filtered.length === 0) {
+            if (categories.length === 0) {
                 const div = document.createElement('div');
-                div.textContent = 'No categories match your search.';
+                div.textContent = 'No categories found. Try a different search.';
                 div.style.padding = '8px';
+                div.style.fontSize = '0.875rem';
+                div.style.color = 'var(--text-secondary)';
                 browserListEl.appendChild(div);
                 return;
             }
-
-            filtered.forEach(c => {
+            categories.forEach(title => {
+                const id = title.replace('Category:', '').toLowerCase().replace(/ /g, '_');
                 const div = document.createElement('div');
                 div.className = 'category-item';
-                div.setAttribute('data-category-id', c.id);
-                div.onclick = () => addCategory(c.id);
-                // Drag and Drop Listeners for adding
+                div.setAttribute('data-category-id', id);
+                div.onclick = () => addCategory(title);
                 div.ondragover = allowDrop;
-                div.ondrop = (e) => onDropAdd(e, c.id);
-
+                div.ondrop = (e) => onDropAdd(e, title);
                 div.innerHTML = `
                     <div>
-                        <div class="text-sm" style="font-weight: 500;">${c.title}</div>
-                        <div class="text-xs text-gray-600">Parents: ${c.parents.length ? c.parents.join(", ") : "—"}</div>
+                        <div class="text-sm" style="font-weight: 500;">${title}</div>
+                        <div class="category-item-drop-text">Drop image here</div>
                     </div>
-                    <div class="category-item-drop-text">Drop image here</div>
                 `;
                 browserListEl.appendChild(div);
             });
         }
 
-        /**
-         * Updates the Wikitext output textarea.
-         */
         function updateWikitextOutput() {
             wikitextOutputEl.value = generateWikitext();
         }
 
-        /**
-         * Calls all rendering functions to update the UI.
-         */
         function renderAll() {
             renderAssignedCategories();
-            renderCategoryBrowser();
             updateWikitextOutput();
         }
 
         // --- EVENT HANDLERS / ACTIONS ---
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), delay);
+            };
+        }
 
         searchInputEl.oninput = (e) => {
-            searchFilter = e.target.value;
-            renderCategoryBrowser();
+            debouncedSearch(e.target.value);
         };
 
         fileInputEl.onkeydown = (e) => {
@@ -831,22 +800,18 @@
                 e.dataTransfer.setData("text/plain", "image-file");
                 e.dataTransfer.effectAllowed = "copy";
             } catch (err) {
-                // some environments restrict dataTransfer usage
-                console.warn("dragstart dataTransfer may be restricted in this environment", err);
+                console.warn("dragstart dataTransfer may be restricted", err);
             }
         };
 
-        function onDropAdd(e, catId) {
+        function onDropAdd(e, catTitle) {
             e.preventDefault();
             const data = e.dataTransfer.getData("text/plain");
             if (data === "image-file") {
-                addCategory(catId);
-            } else {
-                // fallback: always add if drop occurs (useful for restricted envs)
-                addCategory(catId);
+                addCategory(catTitle);
             }
         }
-        
+
         function toggleNightMode() {
             document.body.classList.toggle('night-mode');
             const isNightMode = document.body.classList.contains('night-mode');
@@ -855,19 +820,17 @@
         nightModeToggle.onclick = toggleNightMode;
 
         // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            // Load the new default example file on startup
+        document.addEventListener('DOMContentLoaded', async () => {
+            debouncedSearch = debounce(searchCommonsCategories, 500);
+            
             fileInputEl.value = DEFAULT_FILE.commonsPage;
-
-            // Manually set the default image details
             currentFile = DEFAULT_FILE;
 
-            // Call renderFileDetails to set the reliable placeholder
-            renderFileDetails();
-            renderAll();
-
-            statusMessageEl.textContent = 'Default file loaded. Start categorizing!';
-            statusMessageEl.style.color = '#10b981';
+            // Load the default image and fetch its existing categories
+            await loadFile();
+            
+            // Render the initial category browser list (show nothing until search)
+            renderCategoryBrowser([]);
         });
     </script>
 </body>
