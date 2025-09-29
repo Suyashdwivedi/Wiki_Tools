@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Commons Category Demo - Dynamic File Loading</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Interactive demo showing how categories and wikitext work for images on Wikimedia Commons. Load any file, drag and drop to assign categories, and see the resulting wikitext." />
+    <meta name="keywords" content="Wikimedia Commons, Categories, Wikitext, HTML, JavaScript, Dynamic Demo, File Categorization" />
+    <link rel="canonical" href="https://suyashdwivedi.github.io/Commons-Categorization.html" />
+    <meta property="og:title" content="Commons Category Demo - Dynamic File Loading" />
+    <meta property="og:description" content="Interactive demo showing how categories and wikitext work for images on Wikimedia Commons. Load any file, drag and drop to assign categories, and see the resulting wikitext." />
+    <meta property="og:url" content="https://suyashdwivedi.github.io/Commons-Categorization.html" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="Commons Category Demo - Dynamic File Loading" />
+    <meta property="twitter:description" content="Interactive demo showing how categories and wikitext work for images on Wikimedia Commons. Load any file, drag and drop to assign categories, and see the resulting wikitext." />
+    <meta property="twitter:url" content="https://suyashdwivedi.github.io/Commons-Categorization.html" />
+    <!-- Favicon and Logo -->
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
+    <style>
+        /* Simple CSS styling to mimic the look of the original Tailwind design */
+        :root {
+            --primary-color: #4f46e5;
+            --primary-light: #eef2ff;
+            --primary-dark: #3730a3;
+            --danger-color: #ef4444;
+            --danger-light: #fef2f2;
+            --text-color: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-light: #f9fafb;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --border-color: #d1d5db;
+        }
+        body {
+            font-family: sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-color);
+            margin: 0;
+            padding: 24px;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        header {
+            margin-bottom: 24px;
+            overflow: auto; /* To contain the floated logo */
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0;
+            padding-top: 10px;
+        }
+        .header-logo {
+            float: left;
+            margin-right: 15px;
+            max-width: 75px;
+        }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-gray-600 { color: var(--text-secondary); }
+        .text-indigo-600 { color: var(--primary-color); }
+        a { color: var(--primary-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        section {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 16px;
+        }
+        h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+        }
+        h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin: 0 0 8px 0;
+        }
+        .image-box img {
+            max-width: 400px; /* Enforcing 400px max preview width */
+            width: 100%;
+            height: auto;
+            max-height: 160px;
+            object-fit: contain;
+            border-radius: 8px;
+            cursor: grab;
+            margin: 8px 0;
+            background-color: #f0f0f0;
+            border: 1px solid var(--border-color);
+        }
+        .image-container {
+            text-align: center;
+        }
+        #file-input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        #file-input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+        .btn-load {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.875rem;
+        }
+        .btn-load:hover { background-color: var(--primary-dark); }
+        .status-message {
+            margin-top: 5px;
+            font-size: 0.75rem;
+            color: #10b981;
+        }
+
+
+        /* Assigned Categories List */
+        #assigned-categories-list li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f7f7f7;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+        .parent-chain {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        .btn {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: 1px solid #ccc;
+        }
+        .btn-open {
+            background-color: white;
+            border-color: #d1d5db;
+        }
+        .btn-open:hover { background-color: #f3f4f6; }
+        .btn-remove {
+            background-color: #fee2e2;
+            border-color: #fca5a5;
+            color: #b91c1c;
+        }
+        .btn-remove:hover { background-color: #fecaca; }
+
+        /* Category Browser */
+        #category-search {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 0.875rem;
+            box-sizing: border-box;
+        }
+        #category-browser-list {
+            margin-top: 12px;
+            max-height: 224px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .category-item:hover { background-color: #f9fafb; }
+        .category-item-drop-text {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        /* Wikitext Section */
+        textarea {
+            width: 100%;
+            height: 144px;
+            margin-top: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 8px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            resize: none;
+        }
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        .btn-secondary {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        .btn-primary:hover, .btn-secondary:hover { opacity: 0.9; }
+
+        /* Footer */
+        footer {
+            margin-top: 24px;
+            padding-top: 12px;
+            border-top: 1px solid #e5e7eb;
+            color: var(--text-secondary);
+        }
+
+        /* Night Mode Button Styling */
+        .night-mode-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        /* Night Mode Styles */
+        body.night-mode {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        body.night-mode section {
+            background-color: #374151;
+            color: #f9fafb;
+        }
+        body.night-mode h1, body.night-mode h2, body.night-mode h3 {
+            color: #f9fafb;
+        }
+        body.night-mode .text-gray-600, body.night-mode .text-secondary {
+            color: #d1d5db;
+        }
+        body.night-mode a {
+            color: #93c5fd;
+        }
+        body.night-mode #assigned-categories-list li {
+            background-color: #4b5563;
+        }
+        body.night-mode .btn-open {
+            background-color: #4b5563;
+            border-color: #6b7280;
+            color: #f9fafb;
+        }
+        body.night-mode .category-item {
+            border-color: #4b5563;
+        }
+        body.night-mode .category-item:hover {
+            background-color: #4b5563;
+        }
+        body.night-mode #category-search,
+        body.night-mode #file-input {
+            background-color: #374151;
+            border-color: #6b7280;
+            color: #f9fafb;
+        }
+        body.night-mode textarea {
+            background-color: #374151;
+            border-color: #6b7280;
+            color: #f9fafb;
+        }
+
+    </style>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-GC8PGC89NB');
+    </script>
+
+    <!-- counter.dev (properly closed) -->
+    <script src="https://cdn.counter.dev/script.js"
+            data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+            data-utcoffset="6"></script>
+</head>
+<body>
+    <button id="night-mode-toggle" class="night-mode-button">Night mode</button>
+
+    <header class="container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" class="header-logo" />
+        <h1>How Wikimedia Commons photo categories work — interactive demo</h1>
+        <p class="text-sm text-gray-600 mt-2">
+            Load any Wikimedia Commons file (URL or wikitext title), then drag the preview image onto categories to assign it. This simulates how you categorize a file on Commons.
+        </p>
+    </header>
+
+    <main class="container grid">
+        <!-- Left column: image and assigned categories -->
+        <section>
+            <h2>Example File & Categorization</h2>
+
+            <div id="file-input-group">
+                <input
+                    id="file-input"
+                    type="text"
+                    placeholder="Enter file link or title (e.g., File:Loga_nathan.jpg)"
+                />
+                <button class="btn-load" onclick="loadFile()">Load File</button>
+            </div>
+            <div id="status-message" class="status-message"></div>
+
+            <div class="image-box mt-3">
+                <div class="image-container">
+                    <!-- The image source is set dynamically by JavaScript to a placeholder -->
+                    <img
+                        id="file-image"
+                        src="https://placehold.co/400x160/cccccc/333333?text=Image+Preview+(Max+400px)"
+                        alt="File Preview"
+                        draggable="true"
+                        style="max-width: 400px;"
+                    />
+                </div>
+                <div id="file-title" class="mt-2 text-xs text-gray-600">File not loaded.</div>
+                <a id="file-commons-link" href="#" target="_blank" rel="noreferrer" class="text-sm text-indigo-600" style="display: none;">
+                    View on Commons
+                </a>
+            </div>
+
+            <div class="mt-4">
+                <h3 class="text-sm">Assigned categories (drag image onto a category to add)</h3>
+                <ul id="assigned-categories-list" style="list-style: none; padding: 0;" class="mt-2 space-y-2">
+                    <!-- Assigned categories will be rendered here by JavaScript -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- Middle column: category browser + graph explanation -->
+        <section>
+            <h2>Category Browser</h2>
+            <div class="mt-3">
+                <input
+                    id="category-search"
+                    placeholder="Search categories (e.g. 'river', 'photography')"
+                    type="text"
+                />
+
+                <div id="category-browser-list">
+                    <!-- Filtered categories will be rendered here by JavaScript -->
+                </div>
+
+                <div class="mt-4 text-xs text-gray-600">
+                    Tip: on Commons you add categories by adding lines like <code>[[Category:Landscape photographs]]</code> inside
+                    the file description.
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h3>Category relationships (visual)</h3>
+                <div class="mt-2" style="border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px;">
+                    <!-- Simple SVG graph to show parent-child relationships -->
+                    <svg width="100%" height="140" viewBox="0 0 600 140" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Photography -->
+                        <rect x="20" y="10" width="160" height="28" rx="10" fill="#f3f4f6" stroke="#e5e7eb" />
+                        <text x="100" y="30" text-anchor="middle" font-size="12">Photography by subject</text>
+
+                        <!-- Nature -->
+                        <rect x="220" y="10" width="130" height="28" rx="10" fill="#f3f4f6" stroke="#e5e7eb" />
+                        <text x="285" y="30" text-anchor="middle" font-size="12">Nature</text>
+
+                        <!-- Landscape -->
+                        <rect x="220" y="55" width="150" height="28" rx="10" fill="#eef2ff" stroke="#e0e7ff" />
+                        <text x="295" y="75" text-anchor="middle" font-size="12">Landscape photographs</text>
+
+                        <!-- River -->
+                        <rect x="420" y="55" width="80" height="28" rx="10" fill="#fef3c7" stroke="#fde68a" />
+                        <text x="460" y="75" text-anchor="middle" font-size="12">Rivers</text>
+
+                        <!-- India -->
+                        <rect x="20" y="55" width="110" height="28" rx="10" fill="#f3f4f6" stroke="#e5e7eb" />
+                        <text x="75" y="75" text-anchor="middle" font-size="12">India</text>
+
+                        <!-- arrows -->
+                        <line x1="180" y1="24" x2="220" y2="24" stroke="#c7c7c7" stroke-width="1" marker-end="url(#arrow)" />
+                        <line x1="295" y1="38" x2="295" y2="55" stroke="#c7c7c7" stroke-width="1" marker-end="url(#arrow)" />
+                        <line x1="315" y1="69" x2="420" y2="69" stroke="#c7c7c7" stroke-width="1" marker-end="url(#arrow)" />
+
+                        <defs>
+                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="4" orient="auto">
+                                <path d="M0,0 L0,8 L8,4 z" fill="#9ca3af" />
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right column: wikitext and explanation -->
+        <section>
+            <h2>Wikitext & Explanation</h2>
+            <div class="mt-3 text-sm">
+                <p>
+                    The generated wikitext below is what you would copy and paste into the "File description" or "Source" section of the file's Commons page to apply the categories.
+                </p>
+
+                <div class="mt-4">
+                    <label class="block text-xs font-medium text-gray-700">Generated file description wikitext</label>
+                    <textarea
+                        id="wikitext-output"
+                        readonly
+                        class="w-full h-36 mt-2 border rounded p-2 text-xs font-mono"
+                    ></textarea>
+
+                    <div class="btn-group mt-2">
+                        <button
+                            class="btn-primary"
+                            onclick="copyWikitext()"
+                        >
+                            Copy Wikitext
+                        </button>
+
+                        <button
+                            class="btn-secondary"
+                            onclick="window.open(document.getElementById('file-commons-link').href, '_blank')"
+                        >
+                            Open file on Commons
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-xs text-gray-600">
+                    Notes:
+                    <ul style="list-style: disc; margin-left: 20px; padding-left: 0;" class="mt-2">
+                        <li>
+                            The hierarchy shown on the left (e.g., Landscape → Nature → Photography) is important for navigation, but you usually only need to add the most specific category line (e.g., <code>[[Category:Landscape photographs]]</code>).
+                        </li>
+                        <li>
+                            <strong>Avoid over-categorization.</strong> Only add categories that are directly relevant and specific to the image content.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="container">
+        This demo is educational — it shows how categories are assigned to files on Wikimedia Commons. For real uploads and
+        edits use your Wikimedia account on the Commons website and follow the <a href="https://commons.wikimedia.org/wiki/Commons:Categorization" target="_blank" rel="noreferrer" class="text-indigo-600">Commons categorization guidelines</a>.
+        <br />
+        <span class="text-xs">
+            <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" rel="noopener noreferrer" class="text-xs text-gray-600">Created by Suyash Dwivedi</a> | Updated on: 29 September 2025
+        </span>
+    </footer>
+
+    <script>
+        // --- GLOBAL DATA ---
+        const ALL_CATEGORIES = [
+            { id: "nature", title: "Category:Nature", parents: ["photography"] },
+            { id: "landscape", title: "Category:Landscape photographs", parents: ["nature"] },
+            { id: "river", title: "Category:Rivers", parents: ["nature"] },
+            { id: "india", title: "Category:India", parents: [] },
+            { id: "varanasi", title: "Category:Varanasi", parents: ["india"] },
+            { id: "photography", title: "Category:Photography by subject", parents: [] },
+            { id: "historic", title: "Category:Historic sites", parents: ["landscape"] },
+            { id: "people", title: "Category:People", parents: ["photography"] },
+            { id: "buildings", title: "Category:Buildings", parents: [] },
+        ];
+
+        // Setting the new default file as requested, using the correct, known MD5 path for a guaranteed preview.
+        const DEFAULT_FILE = {
+            filename: "Sanchi_Stupa_TORANAS_Entry_Gate3.jpg",
+            title: "Sanchi Stupa TORANAS Entry Gate3",
+            commonsPage: "https://commons.wikimedia.org/wiki/File:Sanchi_Stupa_TORANAS_Entry_Gate3.jpg",
+            // The previewUrl is deliberately omitted here, as we rely entirely on the placeholder for reliability.
+        };
+
+        // --- STATE VARIABLES ---
+        let assignedCategories = [];
+        let searchFilter = "";
+        let currentFile = DEFAULT_FILE;
+
+        // --- DOM ELEMENTS ---
+        const assignedListEl = document.getElementById('assigned-categories-list');
+        const browserListEl = document.getElementById('category-browser-list');
+        const searchInputEl = document.getElementById('category-search');
+        const wikitextOutputEl = document.getElementById('wikitext-output');
+        const fileImageEl = document.getElementById('file-image');
+        const fileTitleEl = document.getElementById('file-title');
+        const fileCommonsLinkEl = document.getElementById('file-commons-link');
+        const fileInputEl = document.getElementById('file-input');
+        const statusMessageEl = document.getElementById('status-message');
+        const nightModeToggle = document.getElementById('night-mode-toggle');
+
+        // --- HELPER FUNCTIONS ---
+
+        /**
+         * Parses the user input (URL or filename) and returns a clean, URL-encoded filename.
+         * Handles:
+         *  - "File:Name.jpg"
+         *  - full Commons page links (https://commons.wikimedia.org/wiki/File:Name.jpg)
+         *  - upload.wikimedia.org direct file URLs
+         *  - plain filenames like "Name.jpg" or "Name with spaces.jpg"
+         * @param {string} input - The raw input string.
+         * @returns {string|null} The clean filename (e.g., 'Loga_nathan.jpg') or null if invalid.
+         */
+        function parseFileName(input) {
+            if (!input) return null;
+            let cleanInput = input.trim();
+
+            // Replace spaces with underscores (Commons standard)
+            cleanInput = cleanInput.replace(/\s+/g, '_');
+
+            // If it's a full Commons page URL containing /wiki/File:
+            const wikiFileMatch = cleanInput.match(/\/wiki\/File:([^#?]+)/i);
+            if (wikiFileMatch && wikiFileMatch[1]) {
+                cleanInput = wikiFileMatch[1];
+            } else {
+                // If it's a mobile wiki link or other wiki link pattern
+                const wikiFileMatch2 = cleanInput.match(/File:([^#?]+)/i);
+                if (wikiFileMatch2 && wikiFileMatch2[1]) {
+                    cleanInput = wikiFileMatch2[1];
+                } else {
+                    // If it's an upload.wikimedia.org direct URL, take the last path segment
+                    const uploadMatch = cleanInput.match(/upload\.wikimedia\.org\/.*\/([^\/?#]+)$/i);
+                    if (uploadMatch && uploadMatch[1]) {
+                        cleanInput = uploadMatch[1];
+                    }
+                }
+            }
+
+            // Remove any query/hash remnants
+            cleanInput = cleanInput.split(/[?#]/)[0];
+
+            // If still has a "File:" prefix, strip it
+            if (cleanInput.toLowerCase().startsWith('file:')) {
+                cleanInput = cleanInput.substring(5);
+            }
+
+            // Validate: must contain an extension (dot) and reasonable length
+            if (cleanInput.length > 3 && cleanInput.includes('.')) {
+                return cleanInput;
+            }
+
+            return null;
+        }
+
+        /**
+         * Generates the Wikitext content based on the current assigned categories.
+         * @returns {string} The generated Wikitext.
+         */
+        function generateWikitext() {
+            const lines = assignedCategories.map(id => {
+                const cat = ALL_CATEGORIES.find(c => c.id === id);
+                return cat ? `[[${cat.title}]]` : "";
+            }).filter(Boolean);
+            return `== Summary ==\nFile: ${currentFile.title}\n\n` + (lines.length ? lines.join("\n") : '');
+        }
+
+        /**
+         * Recursively finds all unique parent IDs for a given category.
+         * @param {string} catId - The ID of the category.
+         * @param {Set<string>} visited - Set of visited category IDs to prevent infinite loops.
+         * @returns {string[]} An array of unique parent category IDs, ordered from closest parent outward.
+         */
+        function getParents(catId, visited = new Set()) {
+            const cat = ALL_CATEGORIES.find(c => c.id === catId);
+            if (!cat) return [];
+            const res = [];
+            for (const p of cat.parents) {
+                if (!visited.has(p)) {
+                    visited.add(p);
+                    res.push(p);
+                    const grandparents = getParents(p, visited);
+                    for (const gp of grandparents) {
+                        if (!res.includes(gp)) res.push(gp);
+                    }
+                }
+            }
+            return res;
+        }
+
+        // --- STATE MODIFICATION FUNCTIONS ---
+
+        /**
+         * Loads the file based on the input field value.
+         */
+        function loadFile() {
+            const input = fileInputEl.value.trim();
+            statusMessageEl.textContent = 'Loading...';
+            statusMessageEl.style.color = '#f59e0b'; // Amber
+
+            const cleanFilename = parseFileName(input);
+
+            if (!cleanFilename) {
+                statusMessageEl.textContent = 'Error: Invalid link or filename format.';
+                statusMessageEl.style.color = '#ef4444'; // Red
+                return;
+            }
+
+            // Update global state for the new file
+            currentFile.filename = cleanFilename;
+            currentFile.title = cleanFilename.replace(/_/g, ' ');
+            currentFile.commonsPage = `https://commons.wikimedia.org/wiki/File:${encodeURIComponent(cleanFilename)}`;
+
+            // Reset category state (Simulates fetching a fresh file that needs categorization)
+            assignedCategories = [];
+
+            // Update the UI
+            renderFileDetails();
+            renderAll();
+
+            statusMessageEl.textContent = 'File loaded successfully. Start categorizing!';
+            statusMessageEl.style.color = '#10b981'; // Green
+        }
+
+        /**
+         * Updates the file information panel.
+         * Uses placeholder (reliable when cross-site image loads are blocked).
+         */
+        function renderFileDetails() {
+            const displayName = currentFile.filename ? currentFile.filename.replace(/_/g, ' ') : currentFile.title || 'Unknown file';
+
+            fileTitleEl.textContent = currentFile.title || displayName;
+            fileCommonsLinkEl.href = currentFile.commonsPage || '#';
+            fileCommonsLinkEl.style.display = 'inline';
+
+            // Set a reliable placeholder image immediately. Use the filename in the text.
+            const placeholderText = encodeURIComponent(`${displayName} (Preview Blocked)`);
+            const reliablePlaceholderUrl = `https://placehold.co/400x160/cccccc/333333?text=${placeholderText}`;
+
+            fileImageEl.src = reliablePlaceholderUrl;
+            fileImageEl.alt = `Placeholder for ${currentFile.title}`;
+        }
+
+        /**
+         * Adds a category to the assigned list and re-renders the UI.
+         * @param {string} catId - The ID of the category to add.
+         */
+        function addCategory(catId) {
+            if (!assignedCategories.includes(catId)) {
+                assignedCategories.push(catId);
+                renderAll();
+            }
+        }
+
+        /**
+         * Removes a category from the assigned list and re-renders the UI.
+         * @param {string} catId - The ID of the category to remove.
+         */
+        function removeCategory(catId) {
+            assignedCategories = assignedCategories.filter(c => c !== catId);
+            renderAll();
+        }
+
+        // --- RENDER FUNCTIONS ---
+
+        /**
+         * Renders the list of currently assigned categories.
+         */
+        function renderAssignedCategories() {
+            assignedListEl.innerHTML = '';
+
+            if (assignedCategories.length === 0) {
+                 const li = document.createElement('li');
+                 li.style.backgroundColor = 'transparent';
+                 li.style.justifyContent = 'flex-start';
+                 li.style.fontSize = '0.875rem';
+                 li.textContent = `No categories assigned to ${currentFile.title}. Drag the image to a category below to start.`;
+                 assignedListEl.appendChild(li);
+                 return;
+            }
+
+            assignedCategories.forEach(id => {
+                const cat = ALL_CATEGORIES.find(c => c.id === id);
+                if (!cat) return;
+
+                const parentIds = getParents(id);
+                const parentTitles = parentIds.map(p => ALL_CATEGORIES.find(c => c.id === p)?.title.replace('Category:', '')).filter(Boolean);
+
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div>
+                        <div class="text-sm" style="font-weight: 500;">${cat.title}</div>
+                        <div class="parent-chain">${parentTitles.length ? 'Parents: ' + parentTitles.join(" → ") : '—'}</div>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button class="btn btn-open" onclick="openCategory('${id}')">Open</button>
+                        <button class="btn btn-remove" onclick="removeCategory('${id}')">Remove</button>
+                    </div>
+                `;
+                assignedListEl.appendChild(li);
+            });
+        }
+
+        /**
+         * Renders the list of categories in the browser, filtered by the search term.
+         */
+        function renderCategoryBrowser() {
+            browserListEl.innerHTML = '';
+            const filtered = ALL_CATEGORIES.filter(c =>
+                c.title.toLowerCase().includes(searchFilter.toLowerCase()) || c.id.toLowerCase().includes(searchFilter.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                 const div = document.createElement('div');
+                 div.textContent = 'No categories match your search.';
+                 div.style.padding = '8px';
+                 browserListEl.appendChild(div);
+                 return;
+            }
+
+            filtered.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'category-item';
+                div.setAttribute('data-category-id', c.id);
+                div.onclick = () => addCategory(c.id);
+                // Drag and Drop Listeners for adding
+                div.ondragover = allowDrop;
+                div.ondrop = (e) => onDropAdd(e, c.id);
+
+                div.innerHTML = `
+                    <div>
+                        <div class="text-sm" style="font-weight: 500;">${c.title}</div>
+                        <div class="text-xs text-gray-600">Parents: ${c.parents.length ? c.parents.join(", ") : "—"}</div>
+                    </div>
+                    <div class="category-item-drop-text">Drop image here</div>
+                `;
+                browserListEl.appendChild(div);
+            });
+        }
+
+        /**
+         * Updates the Wikitext output textarea.
+         */
+        function updateWikitextOutput() {
+            wikitextOutputEl.value = generateWikitext();
+        }
+
+        /**
+         * Calls all rendering functions to update the UI.
+         */
+        function renderAll() {
+            renderAssignedCategories();
+            renderCategoryBrowser();
+            updateWikitextOutput();
+        }
+
+        // --- EVENT HANDLERS / ACTIONS ---
+
+        searchInputEl.oninput = (e) => {
+            searchFilter = e.target.value;
+            renderCategoryBrowser();
+        };
+
+        fileInputEl.onkeydown = (e) => {
+             if (e.key === 'Enter') {
+                loadFile();
+            }
+        };
+
+        function allowDrop(e) {
+            e.preventDefault();
+        }
+
+        fileImageEl.ondragstart = (e) => {
+            try {
+                e.dataTransfer.setData("text/plain", "image-file");
+                e.dataTransfer.effectAllowed = "copy";
+            } catch (err) {
+                // some environments restrict dataTransfer usage
+                console.warn("dragstart dataTransfer may be restricted in this environment", err);
+            }
+        };
+
+        function onDropAdd(e, catId) {
+            e.preventDefault();
+            const data = e.dataTransfer.getData("text/plain");
+            if (data === "image-file") {
+                addCategory(catId);
+            } else {
+                // fallback: always add if drop occurs (useful for restricted envs)
+                addCategory(catId);
+            }
+        }
+
+        function openCategory(catId) {
+            const cat = ALL_CATEGORIES.find(c => c.id === catId);
+            if (!cat) return;
+            const nameForUrl = encodeURIComponent(cat.title.replace(/^Category:/, "").replace(/ /g, '_'));
+            window.open(`https://commons.wikimedia.org/wiki/Category:${nameForUrl}`, "_blank");
+        }
+
+        async function copyWikitext() {
+            const textToCopy = wikitextOutputEl.value;
+            try {
+                // Using document.execCommand for better compatibility in some sandboxed/canvas environments
+                if (document.execCommand) {
+                    const tempInput = document.createElement('textarea');
+                    tempInput.value = textToCopy;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                    console.log("Wikitext copied to clipboard. You can paste this into a Commons file description.");
+                    statusMessageEl.textContent = 'Wikitext copied to clipboard.';
+                    statusMessageEl.style.color = '#10b981';
+                    setTimeout(() => statusMessageEl.textContent = '', 3000);
+                } else if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(textToCopy);
+                    console.log("Wikitext copied to clipboard. You can paste this into a Commons file description.");
+                    statusMessageEl.textContent = 'Wikitext copied to clipboard.';
+                    statusMessageEl.style.color = '#10b981';
+                    setTimeout(() => statusMessageEl.textContent = '', 3000);
+                } else {
+                    console.error("Clipboard access denied. Please manually copy the text from the box.");
+                    statusMessageEl.textContent = 'Clipboard access denied. Please manually copy.';
+                    statusMessageEl.style.color = '#ef4444';
+                }
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                statusMessageEl.textContent = 'Failed to copy Wikitext to clipboard.';
+                statusMessageEl.style.color = '#ef4444';
+            }
+        }
+
+        function toggleNightMode() {
+            document.body.classList.toggle('night-mode');
+            const isNightMode = document.body.classList.contains('night-mode');
+            nightModeToggle.textContent = isNightMode ? 'Day mode' : 'Night mode';
+        }
+        nightModeToggle.onclick = toggleNightMode;
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load the new default example file on startup
+            fileInputEl.value = DEFAULT_FILE.commonsPage;
+
+            // Manually set the default image details
+            currentFile = DEFAULT_FILE;
+
+            // Call renderFileDetails to set the reliable placeholder
+            renderFileDetails();
+            renderAll();
+
+            statusMessageEl.textContent = 'Default file loaded. Start categorizing!';
+            statusMessageEl.style.color = '#10b981';
+        });
+    </script>
+</body>
+</html>
