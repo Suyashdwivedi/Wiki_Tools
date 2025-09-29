@@ -419,16 +419,9 @@
                     <div class="btn-group mt-2">
                         <button
                             class="btn-primary"
-                            onclick="copyWikitext()"
+                            onclick="copyAndOpen()"
                         >
-                            Copy Wikitext
-                        </button>
-
-                        <button
-                            class="btn-secondary"
-                            onclick="window.open(document.getElementById('file-commons-link').href, '_blank')"
-                        >
-                            Open file on Commons
+                            Copy Wikitext & Open on Commons
                         </button>
                     </div>
                 </div>
@@ -453,7 +446,7 @@
         edits use your Wikimedia account on the Commons website and follow the <a href="https://commons.wikimedia.org/wiki/Commons:Categorization" target="_blank" rel="noreferrer" class="text-indigo-600">Commons categorization guidelines</a>.
         <br />
         <span class="text-xs">
-            <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" rel="noopener noreferrer" class="text-xs text-gray-600">Created by Suyash Dwivedi</a> | Updated on: 30 September 2025
+            <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" rel="noopener noreferrer" class="text-xs text-gray-600">Created by Suyash Dwivedi</a> | Updated on: 29 September 2025
         </span>
     </footer>
 
@@ -530,16 +523,14 @@
 
         function generateWikitext() {
             const lines = assignedCategories.map(id => {
-                // Use the fetchedCategories map first, then fall back to the predefined ones.
                 const cat = fetchedCategories[id] || ALL_CATEGORIES[id];
                 if (cat && cat.title) {
                     return `[[${cat.title}]]`;
                 }
-                // Fallback for categories not found in either map, using the stored ID.
                 const fallbackTitle = `Category:${id.replace(/_/g, ' ')}`;
                 return `[[${fallbackTitle}]]`;
             }).filter(Boolean);
-            return `== Summary ==\nFile: ${currentFile.title}\n\n` + (lines.length ? lines.join("\n") : '');
+            return lines.join("\n");
         }
 
         function getParents(catId, visited = new Set()) {
@@ -575,7 +566,6 @@
             return null;
         }
 
-        // Fetches existing categories for a file
         async function fetchImageCategories(filename) {
             statusMessageEl.textContent = 'Fetching existing categories...';
             statusMessageEl.style.color = '#f59e0b';
@@ -589,12 +579,10 @@
                     const categories = page.categories.map(cat => {
                         const title = cat.title;
                         const id = title.replace('Category:', '').toLowerCase().replace(/ /g, '_');
-                        return { id, title }; // Store both the unique ID and the original title
+                        return { id, title };
                     });
-                    // Update the global state with correct IDs and titles
                     assignedCategories = categories.map(c => c.id);
                     categories.forEach(c => {
-                        // Save the original title using the new map
                         fetchedCategories[c.id] = { title: c.title, id: c.id };
                     });
                     
@@ -611,7 +599,6 @@
             }
         }
 
-        // Performs a live search for categories
         async function searchCommonsCategories(query) {
             if (!query || query.length < 2) {
                 browserListEl.innerHTML = `<div style="padding:8px; font-size:0.875rem; color:var(--text-secondary);">Type at least 2 characters to search.</div>`;
@@ -661,9 +648,7 @@
             }
             renderFileDetails();
 
-            // Fetch and set existing categories
             await fetchImageCategories(currentFile.filename);
-
             renderAll();
         }
 
@@ -671,7 +656,6 @@
             const catId = catTitle.replace('Category:', '').toLowerCase().replace(/ /g, '_');
             if (!assignedCategories.includes(catId)) {
                 assignedCategories.push(catId);
-                // Store the original title in the fetchedCategories map
                 fetchedCategories[catId] = { title: catTitle, id: catId };
                 renderAll();
             }
@@ -688,7 +672,7 @@
             window.open(`https://commons.wikimedia.org/wiki/Category:${nameForUrl}`, "_blank");
         }
 
-        async function copyWikitext() {
+        async function copyAndOpen() {
             const textToCopy = wikitextOutputEl.value;
             try {
                 if (navigator.clipboard) {
@@ -705,10 +689,16 @@
                 } else {
                     statusMessageEl.textContent = 'Clipboard access denied. Please manually copy.';
                     statusMessageEl.style.color = '#ef4444';
+                    return;
                 }
+                
+                // Open the file edit page
+                const fileEditUrl = `https://commons.wikimedia.org/w/index.php?title=File:${encodeURIComponent(currentFile.filename)}&action=edit`;
+                window.open(fileEditUrl, '_blank');
+                
                 setTimeout(() => statusMessageEl.textContent = '', 3000);
             } catch (err) {
-                statusMessageEl.textContent = 'Failed to copy Wikitext.';
+                statusMessageEl.textContent = 'Failed to copy Wikitext or open page.';
                 statusMessageEl.style.color = '#ef4444';
             }
         }
@@ -847,10 +837,7 @@
             fileInputEl.value = DEFAULT_FILE.commonsPage;
             currentFile = DEFAULT_FILE;
 
-            // Load the default image and fetch its existing categories
             await loadFile();
-            
-            // Render the initial category browser list (show nothing until search)
             renderCategoryBrowser([]);
         });
     </script>
