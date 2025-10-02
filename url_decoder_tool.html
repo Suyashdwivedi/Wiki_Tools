@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-GC8PGC89NB');
+    </script>
+    <!-- Counter Script -->
+    <script src="https://cdn.counter.dev/script.js"
+        data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+        data-utcoffset="6">
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Decoder Tool</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the Inter font and improved contrast */
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+        .dark .card {
+            background-color: #2d3748;
+        }
+        .dark textarea {
+            background-color: #4a5568;
+            color: #e2e8f0;
+            border-color: #6c7a8f;
+        }
+        textarea {
+            resize: none;
+        }
+    </style>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="A simple, web-based tool to URL decode strings, converting percent-encoding back to readable characters like Hindi (Devanagari) or other Unicode characters.">
+    <link rel="canonical" href="https://suyashdwivedi.github.io/zonestamper.html">
+    <meta name="keywords" content="URL decode, percent decoding, Unicode decoder, query string decoder, Hindi URL decoder">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://suyashdwivedi.github.io/zonestamper.html">
+    <meta property="og:title" content="URL Decoder Tool">
+    <meta property="og:description" content="A simple, web-based tool to URL decode strings, converting percent-encoding back to readable characters like Hindi (Devanagari) or other Unicode characters.">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://suyashdwivedi.github.io/zonestamper.html">
+    <meta property="twitter:title" content="URL Decoder Tool">
+    <meta property="twitter:description" content="A simple, web-based tool to URL decode strings, converting percent-encoding back to readable characters like Hindi (Devanagari) or other Unicode characters.">
+    <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    <!-- Favicon -->
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" type="image/png">
+
+    <!-- Firebase SDK Imports -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables required for Canvas environment
+        let app, db, auth;
+        let userId = 'anonymous';
+
+        const initFirebase = async () => {
+            try {
+                // Mandatory Firebase Config
+                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.error("Firebase config is missing.");
+                    return;
+                }
+
+                setLogLevel('Debug');
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Authentication Setup
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Firebase Auth Ready. User ID:", userId);
+                    } else {
+                        // For anonymous users or sign-out, generate a random ID
+                        userId = crypto.randomUUID();
+                        console.log("Signed in anonymously. Generated User ID:", userId);
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+            }
+        };
+
+        initFirebase();
+    </script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 transition duration-300 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-md p-4 sticky top-0 z-10">
+        <div class="container mx-auto flex justify-between items-center max-w-7xl">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" class="h-12 w-12 sm:h-16 sm:w-16 mr-3">
+                URL Decoder
+            </h1>
+            <!-- Night Mode Button -->
+            <button id="darkModeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition duration-300 shadow-lg hover:shadow-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
+        <div class="card bg-white dark:bg-gray-800 p-6 sm:p-10 rounded-xl shadow-2xl space-y-6">
+            <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100 border-b pb-3 border-gray-200 dark:border-gray-700">
+                URL Decoding Utility
+            </h2>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                Paste your URL-encoded string (e.g., `%E0%A4%AE%E0%A4%BE%E0%A4%A8%E0%A4%B5`) into the input box and click the **Decode & Copy** button. The result will be automatically copied to your clipboard.
+            </p>
+
+            <!-- Input Area -->
+            <div>
+                <label for="inputArea" class="block text-lg font-medium mb-2 text-gray-800 dark:text-gray-200">
+                    Input (Encoded Text or URL)
+                </label>
+                <textarea id="inputArea" rows="6" placeholder="Paste your URL-encoded string here..."
+                    class="w-full p-4 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 transition duration-300"
+                ></textarea>
+            </div>
+
+            <!-- Action Button -->
+            <div class="flex">
+                <button id="decodeButton" onclick="processAndCopy()"
+                    class="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/50 transition duration-300 transform hover:scale-[1.01]"
+                >
+                    🚀 Decode & Copy Result
+                </button>
+            </div>
+
+            <!-- Output Area -->
+            <div>
+                <label for="outputArea" class="block text-lg font-medium mb-2 text-gray-800 dark:text-gray-200">
+                    Output (Decoded Text)
+                </label>
+                <textarea id="outputArea" rows="6" readonly placeholder="Decoded results will appear here..."
+                    class="w-full p-4 border border-gray-300 rounded-lg bg-gray-200 text-gray-900 dark:bg-gray-600 dark:border-gray-600 dark:text-gray-100 transition duration-300"
+                ></textarea>
+            </div>
+
+            <!-- Message/Error Box -->
+            <div id="messageBox" class="hidden p-4 rounded-lg text-sm font-medium" role="alert"></div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-8 p-4 text-center text-sm text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-gray-800 shadow-inner">
+        Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">Suyash Dwivedi</a> | Updated on: 03 October 2025
+    </footer>
+
+    <script>
+        /**
+         * Core logic for URL decoding and copying to clipboard.
+         */
+        function processAndCopy() {
+            const inputArea = document.getElementById('inputArea');
+            const outputArea = document.getElementById('outputArea');
+            const messageBox = document.getElementById('messageBox');
+            const input = inputArea.value.trim();
+
+            outputArea.value = ''; // Clear previous output
+            messageBox.classList.add('hidden'); // Clear previous message
+
+            if (!input) {
+                showMessage("Please enter an encoded URL or text to decode.", 'warning');
+                return;
+            }
+
+            let decoded;
+            try {
+                // 1. Decode the string
+                // Use decodeURIComponent to convert percent-encoding back to original characters.
+                // It also replaces '+' with space, which is common in query string data.
+                decoded = decodeURIComponent(input.replace(/\+/g, ' '));
+                outputArea.value = decoded;
+            } catch (e) {
+                // Catch errors like malformed URI sequences
+                showMessage(`Error during decoding: Invalid URI sequence found. Please check your input for incomplete or incorrect encoding.`, 'error');
+                console.error("Decoding Error:", e);
+                return;
+            }
+
+            // 2. Copy to Clipboard Logic
+            const copyText = decoded;
+
+            // Using the document.execCommand('copy') fallback unconditionally.
+            // This method is required because navigator.clipboard.writeText often fails
+            // in restricted sandbox/iframe environments due to permission policies.
+            try {
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = copyText;
+                // Move off-screen to avoid visual disruption
+                tempTextArea.style.position = 'fixed'; 
+                tempTextArea.style.left = '-9999px'; 
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+                showMessage("Successfully decoded URL and copied to clipboard!", 'success');
+            } catch (err) {
+                showMessage("Decoded successfully, but failed to copy to clipboard. Please copy manually.", 'warning');
+                console.error('Fallback: Could not copy text: ', err);
+            }
+        }
+
+        /**
+         * Displays a message in the message box.
+         * @param {string} message - The message text.
+         * @param {string} type - 'success', 'error, or 'warning'.
+         */
+        function showMessage(message, type) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            // Reset all state classes
+            messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'bg-yellow-100', 'text-yellow-700', 'dark:bg-red-800/50', 'dark:text-red-200', 'dark:bg-green-800/50', 'dark:text-green-200', 'dark:bg-yellow-800/50', 'dark:text-yellow-200');
+
+            if (type === 'success') {
+                messageBox.classList.add('bg-green-100', 'text-green-700', 'dark:bg-green-800/50', 'dark:text-green-200');
+            } else if (type === 'error') {
+                messageBox.classList.add('bg-red-100', 'text-red-700', 'dark:bg-red-800/50', 'dark:text-red-200');
+            } else { // warning or default
+                messageBox.classList.add('bg-yellow-100', 'text-yellow-700', 'dark:bg-yellow-800/50', 'dark:text-yellow-200');
+            }
+        }
+
+        /**
+         * Toggles between light and dark mode.
+         */
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('darkMode', isDark ? 'true' : 'false');
+        }
+
+        // Initialize Dark Mode based on system preference or saved setting
+        window.onload = function() {
+            const savedMode = localStorage.getItem('darkMode');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedMode === 'true' || (!savedMode && prefersDark)) {
+                document.body.classList.add('dark');
+            }
+
+            document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+        };
+    </script>
+</body>
+</html>
