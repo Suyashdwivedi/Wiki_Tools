@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Timeline JSON Splitter - Year Wise Download</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Load your Google Timeline Location History JSON file and automatically split the data into year-wise downloadable JSON files for better organization and analysis.">
+    <meta name="keywords" content="Google Timeline, Location History, JSON Splitter, Data Management, Takeout, Year Split">
+    <link rel="canonical" href="https://suyashdwivedi.github.io/zonestamper.html">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://suyashdwivedi.github.io/zonestamper.html">
+    <meta property="og:title" content="Google Timeline JSON Splitter - Year Wise Download">
+    <meta property="og:description" content="Load your Google Timeline Location History JSON file and automatically split the data into year-wise downloadable JSON files.">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://suyashdwivedi.github.io/zonestamper.html">
+    <meta property="twitter:title" content="Google Timeline JSON Splitter - Year Wise Download">
+    <meta property="twitter:description" content="Load your Google Timeline Location History JSON file and automatically split the data into year-wise downloadable JSON files.">
+    <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+
+    <!-- Favicon -->
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/250px-Wiki%27s_Lazy_Coders.png" type="image/png">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-GC8PGC89NB');
+    </script>
+    <script src="https://cdn.counter.dev/script.js"
+        data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+        data-utcoffset="6">
+    </script>
+
+    <style>
+        /* Custom styles for Inter font and base theme */
+        :root {
+            --color-primary: #f97316; /* Tailwind orange-500 */
+            --color-bg-light: #fff7ed; /* Tailwind orange-50 - NEW Page BG Color */
+            --color-card-light: #ffffff;
+            --color-text-light: #1f2937; /* Tailwind gray-800 */
+            --color-bg-dark: #111827; /* Tailwind gray-900 */
+            --color-card-dark: #1f2937;
+            --color-text-dark: #f3f4f6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+            background-color: var(--color-bg-light); /* Applies light orange tint */
+            color: var(--color-text-light);
+        }
+
+        /* Dark Mode styles */
+        .dark-mode {
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-dark);
+        }
+
+        .dark-mode .card {
+            background-color: var(--color-card-dark);
+        }
+
+        .dark-mode button {
+            background-color: #4f46e5; /* Tailwind indigo-600 - keeping action color distinct */
+            color: white;
+        }
+
+        .card {
+            background-color: var(--color-card-light);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .download-btn {
+            background-color: var(--color-primary);
+            color: white;
+            transition: transform 0.1s, background-color 0.3s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            background-color: #ea580c; /* Tailwind orange-600 */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+    <!-- Header -->
+    <header class="bg-white dark-mode:bg-gray-800 shadow-md p-4 flex justify-between items-center sticky top-0 z-10 transition-colors duration-300">
+        <div class="flex items-center space-x-4">
+            <!-- Logo (Big and Colorful) -->
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" class="h-16 w-auto object-contain rounded-full border-4 border-orange-500 shadow-lg">
+            <h1 class="text-3xl font-extrabold text-gray-900 dark-mode:text-gray-100 transition-colors duration-300">
+                Timeline Data Splitter
+            </h1>
+        </div>
+        <!-- Night Mode Toggle Button -->
+        <button id="themeToggle" class="p-2 rounded-full bg-gray-200 dark-mode:bg-gray-700 hover:bg-gray-300 dark-mode:hover:bg-gray-600 transition-colors duration-300 shadow-md">
+            <svg id="sunIcon" class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            <svg id="moonIcon" class="w-6 h-6 text-gray-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto p-4 md:p-8">
+        <div class="max-w-4xl mx-auto">
+
+            <!-- File Upload Card -->
+            <section id="upload-section" class="card p-6 md:p-10 rounded-xl mb-8 transition-colors duration-300">
+                <h2 class="text-2xl font-semibold mb-4 text-orange-600 dark-mode:text-orange-400">1. Upload Google Location History JSON</h2>
+                <p class="mb-6 opacity-80">Select the main `Location History.json` or similar timeline file from your Google Takeout data. Your file is processed **locally** and is never uploaded.</p>
+                
+                <input type="file" id="jsonFile" accept=".json" class="w-full text-sm text-gray-500 dark-mode:text-gray-400
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-orange-50 file:text-orange-700
+                    hover:file:bg-orange-100 transition-all cursor-pointer"
+                    onchange="handleFileSelect(event)">
+                
+                <p id="file-status" class="mt-4 text-sm text-gray-500 dark-mode:text-gray-400">Awaiting file upload...</p>
+                <div id="loading-indicator" class="mt-4 hidden flex items-center space-x-2 text-orange-600 dark-mode:text-orange-400">
+                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-orange-600"></div>
+                    <span>Processing large file... this may take a moment.</span>
+                </div>
+            </section>
+
+            <!-- Results Card -->
+            <section id="results-section" class="card p-6 md:p-10 rounded-xl hidden transition-colors duration-300">
+                <h2 class="text-2xl font-semibold mb-6 text-orange-600 dark-mode:text-orange-400">2. Download Year-Wise Files</h2>
+                <p id="summary-text" class="mb-4 text-lg font-medium"></p>
+                <div id="download-links" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Download buttons will be injected here -->
+                </div>
+                
+                <!-- Error/Message Box (Custom implementation instead of alert()) -->
+                <div id="message-box" class="mt-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden dark-mode:bg-red-900 dark-mode:border-red-700 dark-mode:text-red-300" role="alert">
+                    <p class="font-bold">Error Processing File</p>
+                    <p id="error-message"></p>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-4 bg-orange-100 dark-mode:bg-gray-800 text-center text-sm text-gray-600 dark-mode:text-gray-400 mt-auto transition-colors duration-300">
+        <p>
+            Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" class="text-orange-600 hover:text-orange-800 dark-mode:text-orange-400 dark-mode:hover:text-orange-200 font-medium rounded-md transition-colors duration-300">Suyash Dwivedi</a> | Updated on: 4 October 2025
+        </p>
+    </footer>
+
+    <script>
+        // --- Core Application Logic ---
+
+        const FILE_NAME_PREFIX = "Google timeline for ";
+        // Prioritize modern timeline data keys, falling back to old format
+        const POTENTIAL_DATA_KEYS = ["timelineObjects", "semanticSegments", "locations"];
+        let PRIMARY_DATA_KEY = null; // Will be set after parsing
+
+        const jsonFile = document.getElementById('jsonFile');
+        const fileStatus = document.getElementById('file-status');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const resultsSection = document.getElementById('results-section');
+        const downloadLinksDiv = document.getElementById('download-links');
+        const summaryText = document.getElementById('summary-text');
+        const messageBox = document.getElementById('message-box');
+        const errorMessage = document.getElementById('error-message');
+
+        /**
+         * Converts a JavaScript object to a downloadable JSON file (Blob).
+         * @param {Object} data - The object to download.
+         * @param {string} filename - The name of the file to save.
+         */
+        function downloadJSON(data, filename) {
+            try {
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+
+                // Create a temporary link element for downloading
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                
+                // Programmatically click the link to trigger download
+                document.body.appendChild(a);
+                a.click();
+                
+                // Clean up the temporary link and URL object
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                showMessage(`Failed to create or trigger download for ${filename}.`, e.message, 'error');
+            }
+        }
+
+        /**
+         * Hides any existing error messages.
+         */
+        function hideMessage() {
+            messageBox.classList.add('hidden');
+        }
+
+        /**
+         * Displays a custom error or status message.
+         * @param {string} title - The title/bold part of the message.
+         * @param {string} detail - The detailed message or status reason.
+         * @param {string} type - 'error', 'success' (green), or 'notice' (yellow).
+         */
+        function showMessage(title, detail, type = 'error') {
+            messageBox.classList.remove('hidden');
+            errorMessage.innerHTML = detail;
+            messageBox.querySelector('p:first-child').textContent = title;
+            
+            // Clear all previous colors
+            messageBox.classList.remove('bg-red-100', 'border-red-400', 'text-red-700', 'dark-mode:bg-red-900', 'dark-mode:border-red-700', 'dark-mode:text-red-300');
+            messageBox.classList.remove('bg-green-100', 'border-green-400', 'text-green-700', 'dark-mode:bg-green-900', 'dark-mode:border-green-700', 'dark-mode:text-green-300');
+            messageBox.classList.remove('bg-yellow-100', 'border-yellow-400', 'text-yellow-700', 'dark-mode:bg-yellow-900', 'dark-mode:border-yellow-700', 'dark-mode:text-yellow-300');
+
+
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700', 'dark-mode:bg-red-900', 'dark-mode:border-red-700', 'dark-mode:text-red-300');
+            } else if (type === 'success') {
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700', 'dark-mode:bg-green-900', 'dark-mode:border-green-700', 'dark-mode:text-green-300');
+            } else if (type === 'notice') {
+                messageBox.classList.add('bg-yellow-100', 'border-yellow-400', 'text-yellow-700', 'dark-mode:bg-yellow-900', 'dark-mode:border-yellow-700', 'dark-mode:text-yellow-300');
+            }
+        }
+
+        /**
+         * Attempts to extract the starting timestamp from a timeline record object, 
+         * accommodating different Google Takeout formats.
+         * @param {Object} segment - A single object from the primary data array.
+         * @returns {{value: string, isMs: boolean} | null} The time value and whether it is milliseconds (isMs).
+         */
+        function getSegmentStartTime(segment) {
+            // 1. Check for the old 'locations' format (timestampMs is a string of milliseconds)
+            if (segment.timestampMs) {
+                return { value: segment.timestampMs, isMs: true }; 
+            }
+
+            // 2. Check for the 'semanticSegments' top-level ISO string
+            if (segment.startTime) {
+                return { value: segment.startTime, isMs: false }; // ISO string
+            }
+
+            // 3. Check for the nested object format (e.g., in 'timelineObjects' or detailed segments)
+            // Each segment object usually has one key: 'activitySegment' or 'placeVisit'
+            const keys = Object.keys(segment);
+            for (const key of keys) {
+                const container = segment[key];
+                
+                // Check if the container is an object and has the 'duration' structure
+                if (container && typeof container === 'object' && container.duration && container.duration.startTimestamp) {
+                    return { value: container.duration.startTimestamp, isMs: false }; // ISO string
+                }
+            }
+
+            return null; // Time not found
+        }
+
+
+        /**
+         * Processes the parsed data, splits it by year, and renders download links.
+         * @param {Object} data - The full JSON object.
+         */
+        function processData(data) {
+            hideMessage();
+            loadingIndicator.classList.add('hidden');
+            resultsSection.classList.remove('hidden');
+            downloadLinksDiv.innerHTML = ''; // Clear previous results
+
+            let segments = null;
+            PRIMARY_DATA_KEY = null;
+            
+            // 1. Find the primary array of segments/records
+            for (const key of POTENTIAL_DATA_KEYS) {
+                if (data[key] && Array.isArray(data[key]) && data[key].length > 0) {
+                    segments = data[key];
+                    PRIMARY_DATA_KEY = key;
+                    break;
+                }
+            }
+            
+            if (!segments) {
+                const keyList = POTENTIAL_DATA_KEYS.map(k => `\`${k}\``).join(', ');
+                showMessage("Invalid Data Format", `The file does not contain a valid array under any expected keys (${keyList}). Please ensure you are uploading the correct Google Timeline JSON.`, 'error');
+                return;
+            }
+            
+            const splitData = {};
+            let invalidTimeRecords = 0;
+            let recordsProcessed = 0;
+
+            // 2. Split data by year
+            segments.forEach(segment => {
+                recordsProcessed++;
+                
+                const timeInfo = getSegmentStartTime(segment);
+
+                if (timeInfo) {
+                    let date;
+                    const timeValue = timeInfo.value;
+
+                    if (timeInfo.isMs) {
+                        // timestampMs is a string of milliseconds since epoch
+                        date = new Date(parseInt(timeValue, 10));
+                    } else { 
+                        // startTime or startTimestamp is an ISO 8601 string
+                        date = new Date(timeValue);
+                    }
+
+                    // Check if the date is valid
+                    if (!isNaN(date.getTime())) {
+                        const year = date.getFullYear();
+
+                        if (!splitData[year]) {
+                            splitData[year] = [];
+                        }
+                        splitData[year].push(segment);
+                    } else {
+                         invalidTimeRecords++;
+                    }
+                } else {
+                    invalidTimeRecords++;
+                }
+            });
+
+            // Handle case where no valid data was found
+            const years = Object.keys(splitData).sort((a, b) => parseInt(b) - parseInt(a));
+            const totalYears = years.length;
+
+            if (totalYears === 0) {
+                let errorDetail = `Found ${recordsProcessed.toLocaleString()} records in the \`${PRIMARY_DATA_KEY}\` array, but could not determine the year for any of them. Ensure the records have a valid time field.`;
+                if (invalidTimeRecords > 0) {
+                     errorDetail = `Found ${recordsProcessed.toLocaleString()} records. ${invalidTimeRecords.toLocaleString()} records were skipped due to missing or invalid time data. No valid years could be extracted.`;
+                }
+                showMessage("No Year Data Found", errorDetail, 'error');
+                return;
+            }
+
+            // 3. Render summary
+            summaryText.textContent = `Successfully processed ${recordsProcessed.toLocaleString()} records across ${totalYears} distinct years from the \`${PRIMARY_DATA_KEY}\` data.`;
+
+            // 4. Render download links
+            years.forEach(year => {
+                const yearData = splitData[year];
+                const count = yearData.length;
+                const filename = `${FILE_NAME_PREFIX}${year}.json`;
+
+                // Wrap the year data back into the original top-level structure
+                const yearDataObject = { [PRIMARY_DATA_KEY]: yearData };
+
+                const button = document.createElement('button');
+                // Updated focus ring classes to orange
+                button.className = 'download-btn p-3 rounded-xl font-bold flex flex-col items-center justify-center transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-orange-300 dark-mode:focus:ring-orange-800';
+                button.innerHTML = `
+                    <span class="text-xl">${year}</span>
+                    <span class="text-xs opacity-80 mt-1">(${count.toLocaleString()} records)</span>
+                `;
+                button.onclick = () => downloadJSON(yearDataObject, filename);
+
+                downloadLinksDiv.appendChild(button);
+            });
+
+            if (invalidTimeRecords > 0) {
+                showMessage("Data Loss Notice", `Successfully split data, but ${invalidTimeRecords.toLocaleString()} records were skipped because they had missing or invalid time values. This might be due to incomplete data segments.`, 'notice');
+            } else {
+                 showMessage("Processing Complete", `All ${recordsProcessed.toLocaleString()} records were successfully organized by year.`, 'success');
+            }
+        }
+
+        /**
+         * Handles the file input event.
+         * @param {Event} event - The file change event.
+         */
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            hideMessage();
+            loadingIndicator.classList.remove('hidden');
+            resultsSection.classList.add('hidden');
+            fileStatus.textContent = `Loading: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)...`;
+
+            const reader = new FileReader();
+
+            // Set up success callback
+            reader.onload = function(e) {
+                fileStatus.textContent = `File loaded: ${file.name}. Parsing and splitting...`;
+                try {
+                    // Start processing in a slight delay to allow UI update
+                    // This is helpful for large files to keep the UI responsive
+                    setTimeout(() => {
+                        const jsonText = e.target.result;
+                        const data = JSON.parse(jsonText);
+                        processData(data);
+                    }, 50);
+
+                } catch (error) {
+                    loadingIndicator.classList.add('hidden');
+                    showMessage("JSON Parse Error", `Could not parse the file content. Ensure it is a valid, well-formed JSON file. Technical detail: ${error.message}`, 'error');
+                }
+            };
+
+            // Set up error callback
+            reader.onerror = function() {
+                loadingIndicator.classList.add('hidden');
+                showMessage("File Read Error", "An error occurred while reading the file from your local disk.", 'error');
+            };
+
+            // Read the file as text
+            reader.readAsText(file);
+        }
+        
+        // --- Night Mode Logic ---
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        const body = document.body;
+
+        // Check for saved theme preference or default to light
+        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+        if (currentTheme === 'dark') {
+            body.classList.add('dark-mode');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        } else {
+            body.classList.remove('dark-mode');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
