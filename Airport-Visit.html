@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Google Timeline Mapper — Global Airport Proximity (20 km)</title>
+    
+    <meta name="description" content="Map your Google Location History (Timeline) data and detect nearby airports using the OpenFlights dataset within a configurable radius. Visualize your travel path and potential flights." />
+    <meta name="keywords" content="Google Timeline, Location History, Airport Proximity, OpenFlights, Data Visualization, Leaflet, JavaScript" />
+    <meta name="author" content="Suyash Dwivedi" />
+    <meta property="og:title" content="Google Timeline Mapper — Global Airport Proximity" />
+    <meta property="og:description" content="Map your Google Location History (Timeline) data and detect nearby airports using the OpenFlights dataset." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-polyline-snake-flow@1.0.0/L.Polyline.SnakeFlow.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <style>
+      #map { height: 75vh; width: 100%; border-radius: 0.75rem; }
+      .airport-icon { background-color: #f97316; border: 3px solid #ffedd5; color: white; border-radius:50%; width:35px; height:35px; line-height:30px; text-align:center; font-weight:700; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
+      .small-badge { font-size:0.8rem; padding:0.2rem 0.4rem; border-radius:0.4rem; background:#eef2ff; color:#4f46e5; }
+    </style>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GC8PGC89NB');
+    </script>
+    <script src="https://cdn.counter.dev/script.js"
+        data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+        data-utcoffset="6">
+    </script>
+	</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50 min-h-screen flex flex-col">
+
+<header class="bg-white dark:bg-gray-800 shadow p-4 sticky top-0 z-10">
+  <div class="container mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="logo" class="w-16">
+      <div>
+        <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-300">Google Timeline Mapper</h1>
+        <div class="text-xs text-gray-500 dark:text-gray-400">Global airport proximity detection (OpenFlights dataset)</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <div id="airports-status" class="text-sm text-gray-500 dark:text-gray-300">Loading airports…</div>
+      <button id="theme-toggle" class="p-2 rounded bg-gray-200 dark:bg-gray-700">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="container mx-auto p-4 flex-grow">
+  <section class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow mb-6">
+    <h2 class="text-xl font-semibold text-indigo-700 dark:text-indigo-300 mb-3">1. Upload Google Timeline JSON</h2>
+    <input id="json-file-input" type="file" accept=".json" class="block w-full file:py-2 file:px-4 file:rounded-full file:bg-indigo-50 file:text-indigo-700 text-gray-900 dark:text-white dark:bg-gray-700 border-gray-300 dark:border-gray-600" />
+    <div id="loading-message" class="mt-3 text-blue-500 hidden">Parsing data and drawing path...</div>
+    <div id="error-message" class="mt-3 text-red-600 hidden p-2 bg-red-100 rounded"></div>
+    <div id="success-message" class="mt-3 text-green-700 hidden p-2 bg-green-100 rounded"></div>
+
+    <div class="mt-3 flex items-center gap-3">
+      <label class="flex items-center gap-2 text-sm">
+        <span class="text-gray-600 dark:text-gray-300">Proximity radius (km)</span>
+        <input id="proximity-radius" type="number" value="20" min="1" max="200" class="w-20 p-1 rounded border text-gray-900 dark:text-white dark:bg-gray-700 border-gray-300 dark:border-gray-600" />
+      </label>
+      <label class="flex items-center gap-2 text-sm">
+        <input id="require-iata" type="checkbox" checked />
+        <span class="text-gray-600 dark:text-gray-300">Only airports with IATA code</span>
+      </label>
+      <button id="refresh-airports" class="ml-auto px-3 py-1 bg-indigo-600 text-white rounded">Reload airport DB</button>
+    </div>
+  </section>
+
+  <section class="mb-6">
+    <h2 class="text-xl font-semibold text-indigo-700 dark:text-indigo-300 mb-3">2. Movement Path & Key Locations</h2>
+    <div id="map" class="shadow-2xl rounded"></div>
+  </section>
+  
+  <section class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow mb-6">
+    <button id="toggle-airport-list" class="flex items-center justify-between w-full p-2 -mx-2 text-left text-xl font-semibold text-indigo-700 dark:text-indigo-300 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none" aria-expanded="true" aria-controls="airport-list-content">
+      <span>3. Possible Airports Visited ✈️</span>
+      <i class="fa-solid fa-chevron-up" id="toggle-icon"></i>
+    </button>
+    <div id="airport-list-content" class="mt-3 space-y-2">
+      <div id="airport-list-container">
+        <p class="text-gray-500 dark:text-gray-400">Upload your JSON file to see detected airports (within configured radius).</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="text-center p-4 text-sm text-gray-600 dark:text-gray-400">
+  Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">Suyash Dwivedi</a> | Updated on: 30 August 2025
+</footer>
+
+<script>
+'use strict';
+
+// --- UI elements
+const fileInput = document.getElementById('json-file-input');
+const loadingMessage = document.getElementById('loading-message');
+const errorMessage = document.getElementById('error-message');
+const successMessage = document.getElementById('success-message');
+const airportListContainer = document.getElementById('airport-list-container');
+const airportsStatus = document.getElementById('airports-status');
+const proximityInput = document.getElementById('proximity-radius');
+const requireIataCheckbox = document.getElementById('require-iata');
+const refreshAirportsBtn = document.getElementById('refresh-airports');
+const toggleAirportListBtn = document.getElementById('toggle-airport-list');
+const airportListContent = document.getElementById('airport-list-content');
+const toggleIcon = document.getElementById('toggle-icon');
+const themeToggle = document.getElementById('theme-toggle');
+
+// --- Map & markers
+let map, currentPolyline = null;
+let airportMarkers = [];
+let mostVisitedMarkers = [];
+let polylineDecorator = null;
+
+// --- Airport DB (loaded at runtime)
+let airportDB = []; // each item: {id, name, city, country, iata, icao, lat, lon, type}
+let airportDBLoaded = false;
+
+// --- Source for global airports (OpenFlights).
+const OPENFLIGHTS_URL = 'https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat';
+
+// --- Utility: Yield control to browser (FIX for Page Unresponsive error)
+const yieldToBrowser = () => new Promise(resolve => setTimeout(resolve, 0));
+const CHUNK_SIZE = 50; // Process 50 unique coordinates before yielding
+
+// --- utility: show/hide
+function showError(msg){ errorMessage.textContent = msg; errorMessage.classList.remove('hidden'); successMessage.classList.add('hidden'); loadingMessage.classList.add('hidden'); }
+function showSuccess(msg){ successMessage.textContent = msg; successMessage.classList.remove('hidden'); errorMessage.classList.add('hidden'); loadingMessage.classList.add('hidden'); }
+function clearMessages(){ errorMessage.classList.add('hidden'); successMessage.classList.add('hidden'); loadingMessage.classList.add('hidden'); }
+
+// --- Haversine distance (km)
+function haversineDistance([lat1, lon1], [lat2, lon2]) {
+    const R = 6371; // km
+    const toRad = x => x * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// --- Parse OpenFlights airports.dat lines
+function parseOpenFlights(text) {
+    const lines = text.split('\n').filter(Boolean);
+    const rows = [];
+    for (const line of lines) {
+        // CSV with quoted fields, simple parse:
+        const parts = [];
+        let cur = '', inQuotes = false;
+        for (let i=0;i<line.length;i++){
+            const ch = line[i];
+            if (ch === '"' && line[i+1] === '"') { cur += '"'; i++; continue; } 
+            if (ch === '"') { inQuotes = !inQuotes; continue; }
+            if (ch === ',' && !inQuotes) { parts.push(cur); cur=''; continue; }
+            cur += ch;
+        }
+        parts.push(cur);
+        if (parts.length >= 8) {
+            const id = parts[0];
+            const name = parts[1];
+            const city = parts[2];
+            const country = parts[3];
+            const iata = parts[4] && parts[4] !== '\\N' ? parts[4] : '';
+            const icao = parts[5] && parts[5] !== '\\N' ? parts[5] : '';
+            const lat = parseFloat(parts[6]);
+            const lon = parseFloat(parts[7]);
+            const type = parts.length >= 13 ? parts[12] : '';
+            if (!isNaN(lat) && !isNaN(lon)) {
+                rows.push({ id, name, city, country, iata, icao, lat, lon, type });
+            }
+        }
+    }
+    return rows;
+}
+
+// --- Extended fallback airport list (kept for robustness)
+const EXTENDED_SAMPLE_AIRPORTS = [
+    { id:'DEL', name:'Indira Gandhi Intl (DEL)', city:'New Delhi', country:'India', iata:'DEL', icao:'VIDP', lat:28.5562, lon:77.1000, type:'airport' },
+    { id:'BOM', name:'Chhatrapati Shivaji Intl (BOM)', city:'Mumbai', country:'India', iata:'BOM', icao:'VABB', lat:19.0896, lon:72.8656, type:'airport' },
+    { id:'MAA', name:'Chennai Intl (MAA)', city:'Chennai', country:'India', iata:'MAA', icao:'VOMM', lat:12.9880, lon:80.1633, type:'airport' },
+    { id:'BLR', name:'Kempegowda Intl (BLR)', city:'Bengaluru', country:'India', iata:'BLR', icao:'VOBL', lat:13.1979, lon:77.7067, type:'airport' },
+    { id:'JFK', name:'John F. Kennedy Intl (JFK)', city:'New York', country:'USA', iata:'JFK', icao:'KJFK', lat:40.6413, lon:-73.7781, type:'airport' },
+];
+
+// --- Load global airport DB (tries OpenFlights, fallback to custom sample)
+async function loadAirportDB() {
+    airportDBLoaded = false;
+    airportsStatus.textContent = 'Loading global airports...';
+    airportDB = [];
+    try {
+        const resp = await fetch(OPENFLIGHTS_URL);
+        if (!resp.ok) throw new Error('Failed to fetch airport DB: ' + resp.status);
+        const txt = await resp.text();
+        const parsed = parseOpenFlights(txt);
+        airportDB = parsed;
+        airportDBLoaded = true;
+        airportsStatus.textContent = `Loaded ${airportDB.length.toLocaleString()} airports (OpenFlights).`;
+    } catch (err) {
+        airportsStatus.textContent = 'Failed to load global DB — using extended fallback sample.';
+        airportDB = EXTENDED_SAMPLE_AIRPORTS;
+        airportDBLoaded = true;
+    }
+}
+
+// Kick off airport DB load on page load
+loadAirportDB();
+
+// --- Map init
+window.addEventListener('load', () => {
+    try {
+        map = L.map('map').setView([22.351114,78.667743], 5);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap © CartoDB',
+            maxZoom: 19
+        }).addTo(map);
+        L.control.scale().addTo(map);
+        // Apply saved theme state
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    } catch (e) {
+        showError('Map load error: ' + e.message);
+    }
+});
+
+// --- Helper to parse various coordinate representations
+function parseLatLngString(coordString) {
+    if (!coordString || typeof coordString !== 'string') return null;
+    const parts = coordString.replace(/°/g,'').split(',').map(s => s.trim());
+    if (parts.length === 2) {
+        const lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
+        if (!isNaN(lat) && !isNaN(lng)) return [lat, lng];
+    }
+    return null;
+}
+
+// --- Marker icons
+const airportIcon = (count) => L.divIcon({ className:'airport-icon', html: count > 1 ? String(count) : '<i class="fa-solid fa-plane"></i>', iconSize:[35,35], iconAnchor:[17,17] });
+
+// --- File input handling
+fileInput.addEventListener('change', (ev) => {
+    const file = ev.target.files?.[0];
+    if (!file) return;
+    clearMessages();
+    loadingMessage.classList.remove('hidden');
+    airportListContainer.innerHTML = `<div class="text-gray-500 dark:text-gray-400">Processing file…</div>`;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const json = JSON.parse(e.target.result);
+            processLocationHistory(json);
+        } catch (err) {
+            showError('Invalid JSON file or structure: ' + err.message);
+            loadingMessage.classList.add('hidden');
+        }
+    };
+    reader.onerror = () => { showError('File read error'); loadingMessage.classList.add('hidden'); };
+    reader.readAsText(file);
+});
+
+// --- Refresh airports
+refreshAirportsBtn.addEventListener('click', () => {
+    loadAirportDB();
+});
+
+// --- Toggle airport list visibility handler
+toggleAirportListBtn.addEventListener('click', () => {
+    const isExpanded = airportListContent.classList.toggle('hidden');
+    toggleAirportListBtn.setAttribute('aria-expanded', String(!isExpanded));
+    toggleIcon.classList.toggle('fa-chevron-up', !isExpanded);
+    toggleIcon.classList.toggle('fa-chevron-down', isExpanded);
+});
+
+// --- Night Mode / Theme Toggle
+themeToggle.addEventListener('click', () => {
+    if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+    } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+    }
+});
+
+// --- Core processing (with ASYNC CHUNKING FIX)
+async function processLocationHistory(data) {
+    if (!map) { showError('Map not ready'); return; }
+    clearMessages();
+    loadingMessage.classList.remove('hidden');
+
+    const allCoordinates = []; 
+    const visitedPlaces = {};  
+    const airportsDetected = {}; 
+
+    let items = [];
+    if (Array.isArray(data.timelineObjects)) items = data.timelineObjects;
+    else if (Array.isArray(data.semanticSegments)) items = data.semanticSegments;
+    else {
+        showError('Unrecognized JSON structure (no timelineObjects / semanticSegments).');
+        return;
+    }
+
+    // Clear previous markers & overlays
+    [...airportMarkers, ...mostVisitedMarkers].forEach(m => { try{ map.removeLayer(m) }catch(e){} });
+    airportMarkers = [];
+    mostVisitedMarkers = [];
+    if (polylineDecorator) { try{ map.removeLayer(polylineDecorator); }catch(e){} polylineDecorator = null; }
+    if (currentPolyline) { try{ map.removeLayer(currentPolyline) }catch(e){} currentPolyline = null; }
+
+    // 1) extract path points (synchronous - fast enough)
+    items.forEach(obj => {
+        // ... (Extraction logic remains the same)
+        // placeVisit (old)
+        if (obj.placeVisit && obj.placeVisit.location) {
+            const loc = obj.placeVisit.location;
+            const lat = loc.latitudeE7/1e7, lon = loc.longitudeE7/1e7;
+            if (!isNaN(lat) && !isNaN(lon)) {
+                allCoordinates.push([lat, lon]);
+                const key = lat.toFixed(4)+','+lon.toFixed(4);
+                const name = loc.name || loc.address || 'Visited Location';
+                if (!visitedPlaces[key]) visitedPlaces[key] = { count:0, name, coords:[lat,lon] };
+                visitedPlaces[key].count++;
+            }
+        }
+        // semantic "visit" modern
+        else if (obj.visit && obj.visit.topCandidate && obj.visit.topCandidate.placeLocation) {
+            const pl = obj.visit.topCandidate.placeLocation;
+            const coords = parseLatLngString(pl.latLng);
+            if (coords) {
+                allCoordinates.push(coords);
+                const key = coords[0].toFixed(4)+','+coords[1].toFixed(4);
+                const name = pl.name || pl.address || 'Visited Location';
+                if (!visitedPlaces[key]) visitedPlaces[key] = { count:0, name, coords };
+                visitedPlaces[key].count++;
+            }
+        }
+
+        // activitySegment waypoints or timelinePath points
+        if (obj.activitySegment) {
+            if (obj.activitySegment.waypointPath && Array.isArray(obj.activitySegment.waypointPath.waypoints)) {
+                obj.activitySegment.waypointPath.waypoints.forEach(wp => {
+                    const lat = wp.latE7/1e7, lon = wp.lngE7/1e7;
+                    if (!isNaN(lat) && !isNaN(lon)) allCoordinates.push([lat,lon]);
+                });
+            } else {
+                if (obj.activitySegment.startLocation) {
+                    const s = obj.activitySegment.startLocation;
+                    if (s.latitudeE7 && s.longitudeE7) allCoordinates.push([s.latitudeE7/1e7, s.longitudeE7/1e7]);
+                }
+                if (obj.activitySegment.endLocation) {
+                    const eL = obj.activitySegment.endLocation;
+                    if (eL.latitudeE7 && eL.longitudeE7) allCoordinates.push([eL.latitudeE7/1e7, eL.longitudeE7/1e7]);
+                }
+            }
+        }
+        if (obj.timelinePath && Array.isArray(obj.timelinePath)) {
+            obj.timelinePath.forEach(tp => {
+                const p = parseLatLngString(tp.point);
+                if (p) allCoordinates.push(p);
+            });
+        }
+    });
+
+    const uniqueCoords = Array.from(new Set(allCoordinates.map(JSON.stringify))).map(JSON.parse);
+
+    if (uniqueCoords.length === 0) { showError('No coordinates found in file.'); return; }
+    drawPolyline(uniqueCoords);
+
+    // 2) Existing airport detection from place names (synchronous - quick check)
+    Object.values(visitedPlaces).forEach(p => {
+        if (/airport|terminal/i.test(p.name || '')) {
+            const key = p.coords.map(c => c.toFixed(2)).join(',');
+            if (!airportsDetected[key]) airportsDetected[key] = { name: p.name, coords: p.coords, count:0, source:'labeled' };
+            airportsDetected[key].count += p.count;
+        }
+    });
+
+    // --- FIX: Proximity detection chunked asynchronously to prevent crash ---
+    const radiusKm = Math.max(1, parseFloat(proximityInput.value) || 20);
+    const requireIata = requireIataCheckbox.checked;
+    const localAirportsMap = {}; 
+    
+    if (!airportDBLoaded) {
+        airportsStatus.textContent = 'Airport DB unavailable — using extended fallback sample.';
+    }
+
+    // 3) Proximity detection vs global airport DB (ASYNC CHUNKING)
+    for (let i = 0; i < uniqueCoords.length; i += CHUNK_SIZE) {
+        loadingMessage.textContent = `Processing coordinates: ${Math.min(i + CHUNK_SIZE, uniqueCoords.length)} of ${uniqueCoords.length} points...`;
+        
+        const chunk = uniqueCoords.slice(i, i + CHUNK_SIZE);
+        
+        for (const coord of chunk) {
+            for (const ap of airportDB) {
+                if (requireIata && (!ap.iata || ap.iata.trim() === '')) continue;
+                const plat = ap.lat, plon = ap.lon;
+                if (plat == null || plon == null || isNaN(plat) || isNaN(plon)) continue;
+                
+                const d = haversineDistance(coord, [plat, plon]);
+                if (d <= radiusKm) {
+                    const key = [plat.toFixed(4), plon.toFixed(4)].join(',');
+                    if (!localAirportsMap[key]) localAirportsMap[key] = { count:0, name: ap.name + (ap.iata ? (' ('+ap.iata+')') : ''), coords:[plat,plon], iata:ap.iata || '' };
+                    localAirportsMap[key].count++;
+                }
+            }
+        }
+        // CRITICAL STEP: Yield control back to the browser to prevent freezing
+        await yieldToBrowser();
+    }
+    // ----------------------------------------------------------------------
+
+    // Merge proximity-detected into airportsDetected
+    Object.values(localAirportsMap).forEach(ap => {
+        const k = ap.coords.map(c => c.toFixed(2)).join(',');
+        if (!airportsDetected[k]) airportsDetected[k] = { name: ap.name, coords: ap.coords, count: 0, source: 'proximity' };
+        airportsDetected[k].count += ap.count;
+    });
+
+    // 4) Draw most visited non-airport places
+    const nonAirportPlaces = Object.values(visitedPlaces).filter(p => !(/airport|terminal/i.test(p.name || '')));
+    const sortedPlaces = nonAirportPlaces.sort((a,b)=>b.count-a.count);
+    const topN = 10;
+    const maxVisits = sortedPlaces.length > 0 ? sortedPlaces[0].count : 1;
+    sortedPlaces.slice(0, topN).forEach(entry => {
+        const radius = 50 + (entry.count / maxVisits) * 250; 
+        const circle = L.circle(entry.coords, { color:'#10b981', fillColor:'#6ee7b7', fillOpacity:0.5, radius, weight:2 }).addTo(map);
+        circle.bindPopup(`🏠 <b>${escapeHtml(entry.name)}</b><br>Visits: <b>${entry.count}</b>`);
+        mostVisitedMarkers.push(circle);
+    });
+
+    // 5) Draw airport markers (orange) with counts
+    const airportKeys = Object.keys(airportsDetected);
+    airportKeys.forEach(k => {
+        const entry = airportsDetected[k];
+        try {
+            const marker = L.marker(entry.coords, { icon: airportIcon(entry.count), title: entry.name }).addTo(map);
+            marker.bindPopup(`✈️ <b>${escapeHtml(entry.name)}</b><br>Detected visits / proximity hits: <b>${entry.count}</b><br><span class="small-badge">source: ${entry.source || 'proximity/labeled'}</span>`);
+            airportMarkers.push(marker);
+        } catch(e){
+            console.warn('Failed to add airport marker', e);
+        }
+    });
+
+    // 6) Airport list UI
+    displayAirportList(airportsDetected);
+
+    showSuccess(`Path drawn (${uniqueCoords.length} points). Airports detected: ${airportKeys.length}. Top places: ${mostVisitedMarkers.length}.`);
+}
+
+// --- Display airport list in panel (sorted by count desc)
+function displayAirportList(airportsObj) {
+    airportListContainer.innerHTML = '';
+    const arr = Object.values(airportsObj).sort((a,b)=> (b.count||0) - (a.count||0));
+    if (arr.length === 0) {
+        airportListContainer.innerHTML = `<p class="text-gray-500 dark:text-gray-400">No airports detected within the configured radius.</p>`;
+        return;
+    }
+    const ul = document.createElement('ul');
+    ul.className = 'space-y-2';
+    arr.forEach(a => {
+        const li = document.createElement('li');
+        const [lat, lon] = a.coords;
+        const mapLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+        li.className = 'p-2 rounded bg-gray-100 dark:bg-gray-700 flex justify-between items-center';
+        li.innerHTML = `<div><strong class="text-indigo-600 dark:text-indigo-400">${escapeHtml(a.name)}</strong><div class="text-sm text-gray-500 dark:text-gray-300">Visits/hits: <b>${a.count}</b></div></div><div class="text-right"><a class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 transition-colors" href="${mapLink}" target="_blank">View <i class="fa-solid fa-up-right-from-square"></i></a></div>`;
+        ul.appendChild(li);
+    });
+    airportListContainer.appendChild(ul);
+}
+
+// --- Draw polyline (with decorator arrows)
+function drawPolyline(coords) {
+    if (currentPolyline) { try{ map.removeLayer(currentPolyline) }catch(e){} currentPolyline = null; }
+    if (polylineDecorator) { try{ map.removeLayer(polylineDecorator) }catch(e){} polylineDecorator = null; }
+    currentPolyline = L.polyline(coords, { color:'#4f46e5', weight:3, opacity:0.9, dashArray:'10,8' }).addTo(map);
+    if (typeof L.PolylineDecorator !== 'undefined') { 
+        polylineDecorator = L.polylineDecorator(currentPolyline, {
+            patterns: [{ offset:15, repeat:70, symbol: L.Symbol.arrowHead({ pixelSize:6, pathOptions:{color:'#4f46e5', fillOpacity:1} }) }]
+        }).addTo(map);
+    }
+    currentPolyline.on('mouseover', function(){ this.setStyle({ color:'#f97316', weight:6, dashArray:'' }); if (polylineDecorator) polylineDecorator.setStyle({opacity:0}); });
+    currentPolyline.on('mouseout', function(){ this.setStyle({ color:'#4f46e5', weight:3, dashArray:'10,8' }); if (polylineDecorator) polylineDecorator.setStyle({opacity:1}); });
+    currentPolyline.on('click', function(e){ L.popup().setLatLng(e.latlng).setContent(`Point: ${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`).openOn(map); });
+    try { map.fitBounds(currentPolyline.getBounds(), { padding:[50,50] }); } catch(e) { if (coords.length>0) map.setView(coords[0], 10); }
+}
+
+// --- small helper to escape HTML text for UI
+function escapeHtml(s){ 
+    return String(s||'').replaceAll('&','&').replaceAll('<','<').replaceAll('>','>').replaceAll('"','"').replaceAll("'",'&#39;'); 
+}
+
+</script>
+</body>
+</html>
