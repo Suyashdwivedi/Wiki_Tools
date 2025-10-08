@@ -468,28 +468,28 @@
     }
 
     async function wishAnniversary(user) {
-        if (!user || !user.name || !user.registration) return;
+        if (!user || !user.name || !user.registration) return;
 
-        const message = generateAnniversaryMessage(user);
-        if (!message) {
-            alert("This user is not eligible for wishing right now (not within +/- 10 days of anniversary).");
-            return;
-        }
-        try {
-            await navigator.clipboard.writeText(message);
-            showCopiedMessage();
-        } catch (err) {
-            console.error('Failed to copy text: ', err);
-            alert('Failed to copy message to clipboard. Please copy manually.');
-        }
+        const message = generateAnniversaryMessage(user);
+        if (!message) {
+            alert("This user is not eligible for wishing right now (not within +/- 10 days of anniversary).");
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(message);
+            showCopiedMessage(); // Assuming showCopiedMessage() is defined elsewhere
+        } catch (err) {
+            console.error('Failed to copy text: ', err);
+            alert('Failed to copy message to clipboard. Please copy manually.');
+        }
 
-        const homeWikiUrl = getHomeWikiUrl(user);
-        const wikiBaseUrl = (user.home && homeWikiUrl !== 'Not available') ? homeWikiUrl : `https://www.mediawiki.org`;
+        const homeWikiUrl = getHomeWikiUrl(user); // Assuming getHomeWikiUrl is defined elsewhere
+        const wikiBaseUrl = (user.home && homeWikiUrl !== 'Not available') ? homeWikiUrl : `https://www.mediawiki.org`;
 
-        // Redirect to the user's talk page for editing
-        const userTalkPageUrl = `${wikiBaseUrl}/w/index.php?title=User_talk:${encodeURIComponent(user.name.replace(/ /g, '_'))}&action=edit&section=new&preload=Template:Wiki_Anniversary_Wish&summary=Wiki Anniversary Wishes`;
-        window.open(userTalkPageUrl, '_blank');
-    }
+        // MODIFIED: Open the user's talk page for editing, relying on the user to paste the copied message.
+        const userTalkPageUrl = `${wikiBaseUrl}/w/index.php?title=User_talk:${encodeURIComponent(user.name.replace(/ /g, '_'))}&action=edit&summary=Wiki Anniversary Wishes`;
+        window.open(userTalkPageUrl, '_blank');
+    }
 
     function generateAnniversaryMessage(user) {
         if (!user.registration) return "";
