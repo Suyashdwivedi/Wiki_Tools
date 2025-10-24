@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wikimedia Subpage Lister - Live Results</title>
+    <meta name="description" content="A tool and guide for listing all subpages of a Wikimedia page using the Special:PrefixIndex feature and the MediaWiki API for live results.">
+    <meta name="keywords" content="Wikimedia, MediaWiki, Special:PrefixIndex, subpages, live results, page listing, wiki tools, MediaWiki API">
+    <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/wikimedia-subpage-lister.html" />
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/wikimedia-subpage-lister.html">
+    <meta property="og:title" content="Wikimedia Subpage Lister - Live Results">
+    <meta property="og:description" content="A tool and guide for listing all subpages of a Wikimedia page using the Special:PrefixIndex feature and the MediaWiki API for live results.">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://suyashdwivedi.github.io/Wiki_Tools/wikimedia-subpage-lister.html">
+    <meta property="twitter:title" content="Wikimedia Subpage Lister - Live Results">
+    <meta property="twitter:description" content="A tool and guide for listing all subpages of a Wikimedia page using the Special:PrefixIndex feature and the MediaWiki API for live results.">
+    <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" type="image/png">
+
+    <style>
+        :root {
+            --light-bg: #f4f4f9;
+            --light-text: #333;
+            --light-header-bg: #e0e0e0;
+            --light-button-bg: #007bff;
+            --light-button-text: white;
+            --light-link: #007bff;
+            --light-border: #ccc;
+            --light-error-bg: #ffdddd;
+            --light-error-text: #d8000c;
+            --scroll-btn-bg: #333;
+            --scroll-btn-text: #fff;
+
+            --dark-bg: #1c1c1c;
+            --dark-text: #f4f4f9;
+            --dark-header-bg: #333;
+            --dark-button-bg: #6c757d;
+            --dark-button-text: white;
+            --dark-link: #90b8ff;
+            --dark-border: #555;
+            --dark-error-bg: #440000;
+            --dark-error-text: #ff9999;
+            --dark-list-bg: #222;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+            background-color: var(--light-bg);
+            color: var(--light-text);
+        }
+
+        /* Night Mode Styles */
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+
+        body.dark-mode header {
+            background-color: var(--dark-header-bg);
+        }
+
+        body.dark-mode a {
+            color: var(--dark-link);
+        }
+
+        body.dark-mode button {
+            background-color: var(--dark-button-bg);
+            color: var(--dark-button-text);
+        }
+        
+        /* Night mode specific scroll buttons */
+        body.dark-mode .scroll-button {
+            background-color: var(--dark-button-bg);
+            color: var(--dark-button-text);
+            border: 1px solid var(--dark-border);
+        }
+
+
+        header {
+            background-color: var(--light-header-bg);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* To position the button */
+            border-bottom: 2px solid var(--light-border);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-title-group { /* New container for title and credit */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        
+        .header-content h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .header-credit { /* Style for the new credit line */
+            font-size: 0.75em;
+            margin-top: 2px;
+            color: #555; /* Subtle color */
+        }
+        body.dark-mode .header-credit {
+            color: #aaa;
+        }
+
+        .logo {
+            height: 75px; /* Big and colorful logo */
+            margin-right: 15px;
+            vertical-align: middle;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1200px; 
+            margin: auto;
+        }
+
+        .tool-section {
+            background-color: var(--light-header-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--light-border);
+        }
+
+        body.dark-mode .tool-section {
+            background-color: var(--dark-header-bg);
+            border: 1px solid var(--dark-border);
+        }
+
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 1px solid var(--light-border);
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s;
+            font-family: monospace;
+        }
+        body.dark-mode input[type="text"] {
+            background-color: #333;
+            color: var(--dark-text);
+            border: 1px solid var(--dark-border);
+        }
+        
+        button.action-button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            background-color: var(--light-button-bg);
+            color: var(--light-button-text);
+            margin-top: 10px;
+        }
+        button.action-button:hover {
+            opacity: 0.9;
+        }
+        body.dark-mode button.action-button {
+            background-color: var(--dark-button-bg);
+            color: var(--dark-button-text);
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px dashed #007bff;
+            border-radius: 8px;
+            min-height: 50px;
+            text-align: center;
+        }
+        body.dark-mode .result-box {
+            border: 2px dashed var(--dark-link);
+        }
+
+        .error-message {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: var(--light-error-bg);
+            color: var(--light-error-text);
+            font-weight: bold;
+            display: none;
+        }
+        body.dark-mode .error-message {
+            background-color: var(--dark-error-bg);
+            color: var(--dark-error-text);
+        }
+
+        .subpage-link {
+            word-break: break-all;
+        }
+
+        /* Styles for the Actual List Output */
+        #simulation-block { 
+            display: none; 
+        }
+        
+        .simulated-output {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid var(--light-border);
+            border-radius: 8px;
+            background-color: #fff;
+            text-align: left;
+        }
+        body.dark-mode .simulated-output {
+            background-color: var(--dark-list-bg);
+            border: 1px solid var(--dark-border);
+        }
+
+        .simulated-output ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .simulated-output li {
+            padding: 4px 0;
+            word-break: break-word;
+            width: 100%; 
+        }
+        .simulated-output a {
+            text-decoration: none;
+        }
+        .index-number {
+            font-weight: bold;
+            color: var(--light-button-bg);
+            margin-right: 5px;
+            min-width: 25px;
+            display: inline-block;
+        }
+        body.dark-mode .index-number {
+            color: var(--dark-link);
+        }
+
+        /* Responsive Columns (MediaWiki style) */
+        @media (min-width: 600px) {
+            .simulated-output ul {
+                column-count: 2; 
+                column-gap: 30px;
+            }
+            @media (min-width: 992px) {
+                 .simulated-output ul {
+                    column-count: 3; /* 3-COLUMN STYLE */
+                }
+            }
+            .simulated-output li {
+                 width: auto; 
+                 break-inside: avoid; 
+            }
+        }
+
+        /* Go to Top/Bottom Arrows Styles */
+        .scroll-button {
+            position: fixed;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background-color: var(--scroll-btn-bg);
+            color: var(--scroll-btn-text);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: opacity 0.3s, background-color 0.3s;
+            z-index: 1000;
+        }
+
+        #go-to-top {
+            bottom: 70px;
+            display: none; 
+        }
+
+        #go-to-bottom {
+            bottom: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            border-top: 1px solid var(--light-border);
+            margin-top: 20px;
+            font-size: 0.9em;
+            background-color: var(--light-header-bg);
+        }
+        body.dark-mode footer {
+            border-top: 1px solid var(--dark-border);
+            background-color: var(--dark-header-bg);
+        }
+
+        button#nightModeToggle {
+            padding: 8px 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            background-color: var(--light-button-bg);
+            color: var(--light-button-text);
+        }
+
+        button#nightModeToggle:hover {
+            opacity: 0.9;
+        }
+
+        /* Telegram style links for emphasis */
+        .telegram-style b { font-weight: bold; }
+        .telegram-style i { font-style: italic; }
+        .telegram-style u { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GC8PGC89NB');
+</script>
+	<script src="https://cdn.counter.dev/script.js"
+        data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+        data-utcoffset="6">
+</script>
+
+    <header>
+        <div class="header-content">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" class="logo">
+            <div class="header-title-group">
+                <h1>Wikimedia Subpage Lister</h1>
+                <div class="header-credit">
+                    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi">Suyash Dwivedi</a>
+                </div>
+            </div>
+        </div>
+        <button id="nightModeToggle">Night mode</button>
+    </header>
+
+    <div class="container telegram-style">
+        <h2>List Wikimedia Subpages with Live API Results</h2>
+        <p>Enter the full URL of any Wikimedia page (e.g., Wikipedia, Meta-Wiki) below to instantly generate the link and display live subpage results using the MediaWiki API.</p>
+
+        <hr>
+
+        <h3>🛠️ Subpage Finder Tool</h3>
+        <div class="tool-section">
+            <div id="error-message" class="error-message"></div>
+            <label for="url-input"><b>Enter Wikimedia Page URL:</b></label>
+            <input type="text" id="url-input" 
+                       placeholder="e.g., https://en.wikipedia.org/wiki/World_Vegan_Day"
+                       value="https://meta.wikimedia.org/wiki/Main_Page"
+                       onkeydown="if(event.key === 'Enter') generateLink()">
+            
+            <button class="action-button" onclick="generateLink()">Generate Subpage List Link & Fetch Results</button>
+            
+            <hr>
+            
+            <div id="simulation-block">
+                <h3>📝 Live Subpage List for <span id="simulated-prefix-title">Page Name</span></h3>
+                <p>The actual subpages for the entered URL will appear here after clicking the button.</p>
+                
+                <div id="subpage-list-container" class="simulated-output">
+                    </div>
+            </div>
+
+            <div class="result-box">
+                <p id="result-content">The direct link to the Special:PrefixIndex page will appear here.</p>
+            </div>
+            </div>
+
+        <hr>
+
+        <h3>📚 How the Tool Works</h3>
+        <p>The tool extracts the Base URL and the Full Page Name, and then uses the MediaWiki list=allpages API module to find all pages prefixed by the page name and a forward slash (/).</p>
+    </div>
+
+    <footer>
+        <p>
+            <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi">Created by Suyash Dwivedi | Updated on: 24 October 2025</a>
+        </p>
+    </footer>
+
+    <button id="go-to-top" class="scroll-button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Go to Top">&#9650;</button>
+    <button id="go-to-bottom" class="scroll-button" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" title="Go to Bottom">&#9660;</button>
+
+    <script>
+        // --- Utility function for basic namespace detection ---
+        function getNamespaceAndPrefix(pageTitlePath) {
+            const parts = pageTitlePath.split(':');
+            let namespace = 0; // Default to Main namespace (0)
+            let prefixForAPI = pageTitlePath;
+            
+            // Map common namespaces to their ID
+            const nsMap = {
+                "User": 2, "Project": 4, "Commons": 4, "File": 6, "Template": 10, 
+                "Help": 12, "Category": 14, "Portal": 100, "Draft": 118, "TimedText": 710 
+            };
+            
+            if (parts.length > 1) {
+                const nsName = parts[0];
+                if (nsMap[nsName] !== undefined) {
+                    namespace = nsMap[nsName];
+                    prefixForAPI = parts.slice(1).join(':'); // Prefix is everything after the colon
+                }
+            }
+
+            return { namespace, prefix: prefixForAPI };
+        }
+
+
+        // --- Live API Fetch and Render Function ---
+        function fetchAndRenderActualSubpages(baseURL, pageTitlePath) {
+            const pageTitleCleaned = pageTitlePath.replace(/_/g, ' ');
+            document.getElementById('simulated-prefix-title').textContent = pageTitleCleaned;
+            const container = document.getElementById('subpage-list-container');
+            container.innerHTML = '<p style="text-align:center;">Fetching live subpages...</p>';
+            document.getElementById('simulation-block').style.display = 'block';
+
+            const { namespace, prefix } = getNamespaceAndPrefix(pageTitlePath);
+
+            // Construct the full prefix for the API (PageTitle + trailing slash)
+            const fullPrefixForAPI = prefix + '/';
+
+            // Construct the API URL using list=allpages and apprefix
+            const apiURL = `${baseURL}/w/api.php?action=query&list=allpages&apnamespace=${namespace}&apprefix=${fullPrefixForAPI}&aplimit=max&format=json&origin=*`;
+
+            fetch(apiURL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const pages = data.query && data.query.allpages ? data.query.allpages : [];
+                    
+                    container.innerHTML = ''; // Clear loading message
+                    const ul = document.createElement('ul');
+
+                    if (pages.length === 0) {
+                        container.innerHTML = `<p style="text-align:center; font-weight:bold;">✅ No subpages found starting with "${pageTitleCleaned}/".</p>`;
+                        return;
+                    }
+                    
+                    const wikiBaseUrl = `${baseURL}/wiki/`;
+
+                    pages.forEach((page, index) => {
+                        const fullTitle = page.title;
+                        const listItem = document.createElement('li');
+                        
+                        // Construct the link element
+                        const link = document.createElement('a');
+                        link.href = wikiBaseUrl + fullTitle.replace(/ /g, '_');
+                        link.textContent = fullTitle;
+                        link.target = "_blank";
+                        
+                        // Add the index number
+                        const indexSpan = document.createElement('span');
+                        indexSpan.className = 'index-number';
+                        indexSpan.textContent = `${index + 1}.`;
+                        
+                        listItem.appendChild(indexSpan);
+                        listItem.appendChild(link);
+                        ul.appendChild(listItem);
+                    });
+                    
+                    container.appendChild(ul);
+                })
+                .catch(error => {
+                    console.error('API Fetch Error:', error);
+                    container.innerHTML = `<p style="color:var(--light-error-text); background-color:var(--light-error-bg); padding:10px; border-radius:4px;">❌ Error fetching live subpages. Please check the URL and ensure the page exists. (Error: ${error.message})</p>`;
+                });
+        }
+
+        // --- Core Subpage Functionality ---
+        function generateLink() {
+            let urlInput = document.getElementById('url-input').value.trim();
+            const resultContent = document.getElementById('result-content');
+            const errorMessage = document.getElementById('error-message');
+
+            // FIX: Remove trailing slash for consistent parsing (handles both URL formats)
+            if (urlInput.endsWith('/')) {
+                urlInput = urlInput.slice(0, -1);
+            }
+
+            errorMessage.style.display = 'none';
+            document.getElementById('simulation-block').style.display = 'none'; // Ensure hidden before valid click
+
+            if (!urlInput) {
+                errorMessage.textContent = 'Please enter a Wikimedia page URL.';
+                errorMessage.style.display = 'block';
+                resultContent.innerHTML = 'The direct link to the Special:PrefixIndex page will appear here.';
+                return;
+            }
+
+            // Regex to match a standard MediaWiki URL and capture the base URL and page title
+            const wikiUrlRegex = /^(https?:\/\/[^\/]+)(\/wiki\/)(.+)$/i;
+            const match = urlInput.match(wikiUrlRegex);
+
+            if (match) {
+                const baseURL = match[1];
+                const pageTitleEncoded = match[3];
+                const pageTitlePath = pageTitleEncoded.replace(/ /g, '_');
+
+
+                // 1. Construct and display the Special:PrefixIndex URL
+                const prefixIndexURL = `${baseURL}/wiki/Special:PrefixIndex/${pageTitlePath}/`;
+                resultContent.innerHTML = `
+                    <p><b>Direct Special:PrefixIndex Link (Click to open on wiki):</b></p>
+                    <a class="subpage-link" href="${prefixIndexURL}" target="_blank">
+                        ${prefixIndexURL}
+                    </a>
+                    <p>The live results fetched via API are displayed below.</p>
+                `;
+                
+                // 2. Fetch and render the actual list using the API
+                fetchAndRenderActualSubpages(baseURL, pageTitlePath);
+
+
+            } else {
+                errorMessage.textContent = 'Invalid Wikimedia URL format. Please ensure it follows the standard pattern, e.g., "https://en.wikipedia.org/wiki/Page_Name".';
+                errorMessage.style.display = 'block';
+                resultContent.innerHTML = 'The direct link to the Special:PrefixIndex page will appear here.';
+                document.getElementById('simulation-block').style.display = 'none';
+            }
+        }
+        
+        // --- Night Mode Functionality (Unchanged) ---
+        const nightModeToggle = document.getElementById('nightModeToggle');
+        const body = document.body;
+
+        function updateNightModeButtonText(isDark) {
+            nightModeToggle.textContent = isDark ? 'Day mode' : 'Night mode';
+        }
+
+        const savedMode = localStorage.getItem('darkMode');
+        let isDarkMode = savedMode === 'true';
+
+        if (savedMode === null) {
+            isDarkMode = false;
+        }
+
+        if (isDarkMode) {
+            body.classList.add('dark-mode');
+        }
+        updateNightModeButtonText(isDarkMode);
+
+
+        nightModeToggle.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            body.classList.toggle('dark-mode', isDarkMode);
+            localStorage.setItem('darkMode', isDarkMode);
+            updateNightModeButtonText(isDarkMode);
+        });
+        
+        // --- Scroll Button Logic (Unchanged) ---
+        const goToTopButton = document.getElementById('go-to-top');
+
+        window.onscroll = function() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                goToTopButton.style.display = "block";
+            } else {
+                goToTopButton.style.display = "none";
+            }
+        };
+
+        // Run functions on page load (Initial setup only)
+        window.onload = function() {
+            // Set initial content and ensure the live list area is hidden until the button is clicked.
+            document.getElementById('result-content').innerHTML = 'The direct link to the Special:PrefixIndex page will appear here.';
+            
+            // Clear the list container and set initial prompt
+            document.getElementById('subpage-list-container').innerHTML = '<p style="text-align:center;">Click the button above to load the live list of subpages.</p>';
+            
+            // Set the initial title text from the default input value
+            const defaultUrl = document.getElementById('url-input').value.trim();
+            const defaultTitleMatch = defaultUrl.match(/(\/wiki\/)(.+)$/i);
+            const defaultTitle = defaultTitleMatch ? defaultTitleMatch[2].replace(/_/g, ' ') : "Page Name";
+            document.getElementById('simulated-prefix-title').textContent = defaultTitle;
+            
+            // Keep the block visible with the prompt
+            document.getElementById('simulation-block').style.display = 'block'; 
+        };
+
+    </script>
+</body>
+</html>
