@@ -490,7 +490,7 @@
         const userTalkPageUrl = `${wikiBaseUrl}/w/index.php?title=User_talk:${encodeURIComponent(user.name.replace(/ /g, '_'))}&action=edit&summary=Wiki Anniversary Wishes`;
         window.open(userTalkPageUrl, '_blank');
     }
-
+////////////////////////////////
  function generateAnniversaryMessage(user) {
     if (!user.registration) return "";
 
@@ -501,16 +501,14 @@
     const imageWikitext = `[[File:Rose and Carnation Flower Bouquet 02.png|150px|right|Happy Wiki Anniversary]]`;
     const toolLine = `''Use this [https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html '''Tool'''] to send wiki anniversary wishes to other amazing Wikimedians.''`;
 
-    // Styled box (around message body only)
+    // Styled box around only the message body (including signature)
     const openDiv = `<div style="border: 3px solid #f75920; background: #f8f9fa; padding: 15px; margin: 10px 0; font-size: 95%; line-height: 1.6em;">`;
     const closeDiv = `</div>`;
 
     let innerMessage = "";
 
     if (isToday) {
-        innerMessage = `== Happy Wiki Anniversary 🎉 ==
-
-${openDiv}
+        innerMessage = `\r\n== Happy Wiki Anniversary 🎉 ==\r\n\r\n${openDiv}
 ${imageWikitext}
 
 Dear [[User:${user.name}|${user.name}]],
@@ -518,13 +516,11 @@ Dear [[User:${user.name}|${user.name}]],
 Wishing you a very happy wiki anniversary today, celebrating '''${yearsCompleted} years''' (as per SUL) of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!
 
 ${toolLine}
-${closeDiv}
 
--- ~~~~`;
+-- ~~~~
+${closeDiv}`;
     } else if (daysToNext > 0 && daysToNext <= 10) {
-        innerMessage = `== Early Wiki Anniversary Wishes 🎉 ==
-
-${openDiv}
+        innerMessage = `\r\n== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${openDiv}
 ${imageWikitext}
 
 Dear [[User:${user.name}|${user.name}]],
@@ -532,14 +528,12 @@ Dear [[User:${user.name}|${user.name}]],
 Your wiki anniversary is just around the corner, in '''${daysToNext} days!''' What a wonderful milestone of '''${yearsCompleted + 1} years''' on Wiki (as per SUL). Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!
 
 ${toolLine}
-${closeDiv}
 
--- ~~~~`;
+-- ~~~~
+${closeDiv}`;
     } else if (daysSinceLast > 0 && daysSinceLast <= 30) {
         const daysBelated = daysSinceLast;
-        innerMessage = `== Belated Wiki Anniversary Wishes 🎉 ==
-
-${openDiv}
+        innerMessage = `\r\n== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${openDiv}
 ${imageWikitext}
 
 Dear [[User:${user.name}|${user.name}]],
@@ -547,14 +541,14 @@ Dear [[User:${user.name}|${user.name}]],
 Your wiki anniversary was '''${daysBelated} days''' ago, marking '''${yearsCompleted} years''' (as per SUL) of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!
 
 ${toolLine}
-${closeDiv}
 
--- ~~~~`;
+-- ~~~~
+${closeDiv}`;
     }
 
     return innerMessage;
 }
-
+////////////////////////////
     function getUserDetails() {
         const input = document.getElementById('username').value.trim();
         if (!input) return;
