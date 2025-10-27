@@ -154,7 +154,7 @@
 </main>
 
 <footer>
-    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 08 October 2025<br>
+    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 27 October 2025<br>
     Idea from <a href="https://gnoeee.github.io/Wiki-Anniversary/" target="_blank">Wiki Anniversary</a>
 </footer>
 
@@ -391,31 +391,68 @@ function showButtons(){
         calendarButton.style.display='none';
     }
 }
-
-function getAnniversaryMessage(){
+////////////////////////////
+function getAnniversaryMessage() {
     if (!storedUser) return "";
+
     const username = storedUser.name;
     const edits = storedUser.editcount;
     const totalEditsFormatted = edits.toLocaleString();
     const { daysToNext, yearsCompleted, isToday, daysSinceLast } = calculateAnniversaryData(storedUser.registration);
-    
-    let message = "";
+
     const imageWikitext = `[[File:Rose and Carnation Flower Bouquet 02.png|150px|right|Happy Wiki Anniversary]]`;
     const toolLine = `''Use this [https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html '''Tool'''] to send wiki anniversary wishes to other amazing Wikimedians.''`;
 
+    const openDiv = `<div style="border: 3px solid #f75920; background: #f8f9fa; padding: 15px; margin: 10px 0; font-size: 95%; line-height: 1.6em;">`;
+    const closeDiv = `</div>`;
+
+    let message = "";
+
     if (isToday) {
-        message = `== Happy Wiki Anniversary 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nWishing you a very happy wiki anniversary today, celebrating '''${yearsCompleted} years''' (as per SUL) of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
-    } else if(daysToNext > 0 && daysToNext <= 10){
-        message = `== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary is just around the corner, in '''${daysToNext} days!''' What a wonderful milestone of '''${yearsCompleted} years''' on Wiki (as per SUL). Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
-    } else if(daysSinceLast > 0 && daysSinceLast <= 30) {
+        message = `\r\n== Happy Wiki Anniversary 🎉 ==\r\n\r\n${openDiv}
+${imageWikitext}
+
+Dear [[User:${username}|${username}]],
+
+Wishing you a very happy wiki anniversary today, celebrating '''${yearsCompleted} years''' (as per SUL) of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!
+
+${toolLine}
+
+-- ~~~~
+${closeDiv}`;
+    } else if (daysToNext > 0 && daysToNext <= 10) {
+        message = `\r\n== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${openDiv}
+${imageWikitext}
+
+Dear [[User:${username}|${username}]],
+
+Your wiki anniversary is just around the corner, in '''${daysToNext} days!''' What a wonderful milestone of '''${yearsCompleted + 1} years''' on Wiki (as per SUL). Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!
+
+${toolLine}
+
+-- ~~~~
+${closeDiv}`;
+    } else if (daysSinceLast > 0 && daysSinceLast <= 30) {
         const years = yearsCompleted;
         const daysBelated = daysSinceLast;
-        message = `== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${imageWikitext}\r\n\r\nDear  [[User:${username}|${username}]],\r\n\r\nYour wiki anniversary was '''${daysBelated} days''' ago, marking '''${years} years''' (as per SUL) of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!\r\n\r\n${toolLine}\r\n\r\n-- ~~~~`;
+        message = `\r\n== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${openDiv}
+${imageWikitext}
+
+Dear [[User:${username}|${username}]],
+
+Your wiki anniversary was '''${daysBelated} days''' ago, marking '''${years} years''' (as per SUL) of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!
+
+${toolLine}
+
+-- ~~~~
+${closeDiv}`;
     } else {
         return "";
     }
+
     return message;
 }
+////////////////////////
 
 async function handleWishAnniversary(){
     if (!storedUser) {
