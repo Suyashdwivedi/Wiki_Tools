@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Find Wikipedia articles across any language that are missing images. Filter by language, size, and stub status. Contribute to making Wikipedia better!" />
+  <meta name="keywords" content="Wikipedia, articles without images, stub articles, multilingual, Wikimedia, global" />
+  <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/Wiki-articles-without-images.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/Wiki-articles-without-images.html" />
+  <meta property="og:title" content="Multi-Wiki - No Images (500)" />
+  <meta property="og:description" content="Find Wikipedia articles across any language that are missing images. Filter by language, size, and stub status." />
+  <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://suyashdwivedi.github.io/Wiki_Tools/Wiki-articles-without-images.html" />
+  <meta property="twitter:title" content="Multi-Wiki - No Images (500)" />
+  <meta property="twitter:description" content="Find Wikipedia articles across any language that are missing images. Filter by language, size, and stub status." />
+  <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
+  <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+
+  <title>Multi-Wiki - No Images (500)</title>
+  <style>
+    :root {
+      --bg-color: #fefefe;
+      --text-color: #000;
+      --header-bg: #e0e0e0;
+      --grid-bg: #f9f9f9;
+      --grid-border: #ccc;
+      --recent-bg: #ffffcc;
+    }
+    body.night-mode {
+      --bg-color: #121212;
+      --text-color: #e0e0e0;
+      --header-bg: #333;
+      --grid-bg: #1e1e1e;
+      --grid-border: #555;
+      --recent-bg: #3c3c12;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 1rem;
+      background: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+    }
+    h1 {
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .logo {
+      height: 75px; /* Big and colorful logo height */
+    }
+    .banner {
+      background: var(--header-bg);
+      padding: 1rem;
+      text-align: center;
+      font-weight: bold;
+      border-radius: 8px;
+    }
+    .filters {
+      margin: 1rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      align-items: center;
+    }
+    .lang-filter-group {
+        display: flex;
+        flex-direction: row; /* Changed to row for side-by-side */
+        gap: 10px; /* Space between dropdown and input */
+        align-items: center;
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .grid-item {
+      background: var(--grid-bg);
+      padding: 0.75rem;
+      border: 1px solid var(--grid-border);
+      border-radius: 5px;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    .recent {
+      background-color: var(--recent-bg);
+    }
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: var(--text-color);
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border: 1px solid var(--text-color);
+      background-color: var(--header-bg);
+      color: var(--text-color);
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    /* Night Mode Button Styling */
+    .night-mode-toggle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 0.5rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+      border: none;
+      background: none;
+      color: var(--text-color);
+    }
+    /* Go to Top/Bottom Buttons */
+    .scroll-button {
+      position: fixed;
+      right: 20px;
+      padding: 10px 15px;
+      background: var(--header-bg);
+      color: var(--text-color);
+      border: 1px solid var(--grid-border);
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      z-index: 1000;
+      display: none; /* Hidden by default */
+    }
+    #go-to-top {
+      bottom: 70px;
+    }
+    #go-to-bottom {
+      bottom: 20px;
+    }
+    #langCodeInput, #langSelect {
+        padding: 5px;
+        border: 1px solid var(--grid-border);
+        background-color: var(--grid-bg);
+        color: var(--text-color);
+    }
+  </style>
+</head>
+<body>
+  <button class="night-mode-toggle" id="night-mode-button" onclick="toggleNightMode()">&#127769;</button>
+
+  <h1>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" class="logo" />
+    Multi-Wiki - No Images (500)
+  </h1>
+  <div class="banner">Wikipedia Articles Without Images (Global)</div>
+  
+  <div class="filters">
+    <div class="lang-filter-group">
+        <label for="langSelect">Select Wiki:</label>
+        <select id="langSelect">
+				<option value="awa" selected>Awadhi (awa)</option>    			
+                <option value="en">English (en)</option>
+                <option value="de">German (de)</option>
+                <option value="fr">French (fr)</option>
+                <option value="es">Spanish (es)</option>
+                <option value="ru">Russian (ru)</option>
+                <option value="zh">Chinese (zh)</option>        
+                <option value="hi">Hindi (hi)</option>
+                <option value="bn">Bengali (bn)</option>
+                <option value="gu">Gujarati (gu)</option>
+                <option value="kn">Kannada (kn)</option>
+                <option value="ml">Malayalam (ml)</option>
+                <option value="mr">Marathi (mr)</option>
+                <option value="ne">Nepali (ne)</option>
+                <option value="or">Odia (or)</option>
+                <option value="pa">Punjabi (pa)</option>
+                <option value="sa">Sanskrit (sa)</option>
+                <option value="ta">Tamil (ta)</option>
+                <option value="te">Telugu (te)</option>
+                <option value="awa">Awadhi (awa)</option>
+        </select>
+        <label for="langCodeInput">Or Enter Code:</label>
+        <input type="text" id="langCodeInput" placeholder="e.g. 'it', 'kn'"/>
+    </div>
+    <label>Min Size (bytes): <input type="number" id="minSize" value="0" /></label>
+    <label><input type="checkbox" id="stubOnly" /> Stub only</label>
+  </div>
+  
+  <div style="text-align:center">
+    <button id="load-more-button-top" style="display:none" onclick="loadMore()">Load Next 500</button>
+    <button onclick="runQuery()">Check Articles Without Images</button>
+  </div>
+  
+  <div id="status" style="margin:1rem; font-weight:bold; text-align:center;">Select a wiki or enter a code to start.</div>
+  <div class="grid-container" id="results"></div>
+  
+  <div style="text-align:center">
+    <button id="load-more-button" style="display: none; margin-top:1rem;" onclick="loadMore()">Load Next 500</button>
+  </div>
+  
+  <div class="footer">
+    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 30 August 2025
+  </div>
+
+  <button id="go-to-top" class="scroll-button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Go to Top</button>
+  <button id="go-to-bottom" class="scroll-button" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})">↓ Go to Bottom</button>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GC8PGC89NB');
+  </script>
+  <script src="https://cdn.counter.dev/script.js"
+    data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+    data-utcoffset="6">
+  </script>
+
+  <script>
+    let offset = 0;
+    const resultsDiv = document.getElementById("results");
+    const statusDiv = document.getElementById("status");
+    const RECENT_EDIT_THRESHOLD = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30); // last 30 days
+
+    // Function to determine the language code: uses dropdown, then falls back to input box
+    function getLangCode() {
+        const selectedLang = document.getElementById("langSelect").value.trim().toLowerCase();
+        if (selectedLang) {
+            return selectedLang;
+        }
+        return document.getElementById("langCodeInput").value.trim().toLowerCase();
+    }
+
+    // Night Mode Script
+    function toggleNightMode() {
+      document.body.classList.toggle('night-mode');
+      let isNight = document.body.classList.contains('night-mode');
+      localStorage.setItem('nightMode', isNight);
+      document.getElementById('night-mode-button').innerHTML = isNight ? '&#127774;' : '&#127769;'; // Sun/Moon emoji
+    }
+    // Check local storage for night mode preference on load
+    if (localStorage.getItem('nightMode') === 'true') {
+      document.body.classList.add('night-mode');
+      document.getElementById('night-mode-button').innerHTML = '&#127774;';
+    }
+
+    // Scroll Button Visibility Script
+    window.onscroll = function() {
+      const topButton = document.getElementById('go-to-top');
+      const bottomButton = document.getElementById('go-to-bottom');
+      if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        topButton.style.display = "block";
+        bottomButton.style.display = "block";
+      } else {
+        topButton.style.display = "none";
+        bottomButton.style.display = "none";
+      }
+    };
+
+    async function runQuery() {
+      const lang = getLangCode();
+      if (!lang) {
+          statusDiv.textContent = "Please select a wiki or enter a valid language code to start.";
+          return;
+      }
+      offset = 0;
+      resultsDiv.innerHTML = "";
+      document.getElementById("load-more-button").style.display = "none";
+      document.getElementById("load-more-button-top").style.display = "none";
+      statusDiv.textContent = `Starting query for ${lang}.wikipedia.org...`;
+      await loadMore();
+    }
+
+    async function loadMore() {
+      const lang = getLangCode();
+      if (!lang) return; 
+
+      const apiBase = `https://${lang}.wikipedia.org/w/api.php?origin=*`;
+      const wikiBase = `https://${lang}.wikipedia.org/wiki/`;
+      const minSize = parseInt(document.getElementById("minSize").value) || 0;
+      const stubOnly = document.getElementById("stubOnly").checked;
+      
+      statusDiv.textContent = `Fetching articles from ${lang}.wikipedia.org (Batch ${Math.floor(offset / 500) + 1})...`;
+
+      const pages = await getAllPages(apiBase, offset);
+      
+      if (!pages || !pages.length) {
+        statusDiv.textContent = `No more pages found on ${lang}.wikipedia.org.`;
+        document.getElementById("load-more-button").style.display = "none";
+        document.getElementById("load-more-button-top").style.display = "none";
+        return;
+      }
+      
+      statusDiv.textContent = `Checking ${pages.length} articles for images and filters...`;
+
+      let count = resultsDiv.children.length;
+      let displayed = 0;
+      let checkPromises = [];
+      
+      for (const page of pages) {
+        checkPromises.push((async () => {
+          const [noImage, info, isStub] = await Promise.all([
+            checkNoImage(apiBase, page.title),
+            getPageInfo(apiBase, page.title),
+            checkStubCategory(apiBase, page.title)
+          ]);
+
+          if (!noImage || info.length < minSize || (stubOnly && !isStub)) return;
+
+          const div = document.createElement("div");
+          div.className = "grid-item";
+          if (new Date(info.touched) > RECENT_EDIT_THRESHOLD) {
+            div.classList.add("recent");
+          }
+          div.innerHTML = `<strong>${count + 1 + displayed}.</strong> <a href="${wikiBase + encodeURIComponent(page.title)}" target="_blank">${page.title}</a><br><small>${info.length} bytes${isStub ? ' (Stub)' : ''}</small>`;
+          
+          displayed++;
+          return div;
+        })());
+      }
+
+      const newElements = await Promise.all(checkPromises);
+      newElements.filter(el => el).forEach(el => resultsDiv.appendChild(el));
+
+      statusDiv.textContent = `Done. Total displayed: ${resultsDiv.children.length} articles on ${lang}.wikipedia.org.`;
+      
+      offset += pages.length;
+      document.getElementById("load-more-button").style.display = "inline-block";
+      document.getElementById("load-more-button-top").style.display = "inline-block";
+    }
+    
+    async function getAllPages(apiUrl, offset = 0) {
+      const params_fetch = new URLSearchParams({
+        action: "query",
+        list: "allpages",
+        apnamespace: "0",
+        aplimit: "500", 
+        format: "json",
+      });
+
+       try {
+          const response = await fetch(`${apiUrl}&${params_fetch.toString()}`);
+          const data = await response.json();
+          if (data.error) throw new Error(data.error.info);
+          return data.query?.allpages || [];
+        } catch (e) {
+          statusDiv.textContent = `API Error for ${apiUrl}: ${e.message}. Check if the language code is valid.`;
+          console.error("Failed to get pages", e);
+          return [];
+        }
+    }
+
+    async function checkNoImage(apiUrl, title) {
+      const params = new URLSearchParams({
+        action: "query",
+        prop: "images",
+        titles: title,
+        format: "json",
+        imlimit: "1" 
+      });
+      try {
+        const res = await fetch(`${apiUrl}&${params.toString()}`);
+        const data = await res.json();
+        const page = Object.values(data.query.pages)[0];
+        return !page.images || page.images.length === 0;
+      } catch (e) {
+        console.warn("Image check failed", e);
+        return false;
+      }
+    }
+
+    async function getPageInfo(apiUrl, title) {
+      const params = new URLSearchParams({
+        action: "query",
+        prop: "info",
+        titles: title,
+        inprop: "url|talkid|size|touched", 
+        format: "json"
+      });
+      try {
+        const res = await fetch(`${apiUrl}&${params.toString()}`);
+        const data = await res.json();
+        const page = Object.values(data.query.pages)[0];
+        return {
+          length: page.length || 0,
+          touched: page.touched || new Date(0),
+          url: page.fullurl || '#',
+          talkid: page.talkid
+        };
+      } catch (e) {
+        console.warn("Page info failed", e);
+        return { length: 0, touched: new Date(0) };
+      }
+    }
+
+    async function checkStubCategory(apiUrl, title) {
+      const params = new URLSearchParams({
+        action: "query",
+        prop: "categories",
+        titles: title,
+        format: "json",
+        cllimit: "max"
+      });
+      try {
+        const res = await fetch(`${apiUrl}&${params.toString()}`);
+        const data = await res.json();
+        const page = Object.values(data.query.pages)[0];
+        if (!page.categories) return false;
+        return page.categories.some(cat => 
+          /stubs?|articles with a stub template|अधूरे लेख|स्टब/i.test(cat.title)
+        );
+      } catch (e) {
+        console.warn("Stub category check failed", e);
+        return false;
+      }
+    }
+
+    // Initial load: run Night Mode setup
+    document.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('nightMode') === 'true') {
+          document.body.classList.add('night-mode');
+          document.getElementById('night-mode-button').innerHTML = '&#127774;';
+      }
+    });
+
+  </script>
+</body>
+</html>
