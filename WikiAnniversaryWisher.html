@@ -65,7 +65,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="loadNightModePreference()">
 
 <button class="night-mode-button" onclick="toggleNightMode()">Night Mode</button>
 
@@ -114,9 +114,31 @@
     let lastSortedColumn = -1;
     let lastSortAsc = true;
 
+    // --- MODIFICATION START ---
+
+    // Function to load the saved preference on page load
+    function loadNightModePreference() {
+        if (localStorage.getItem('nightMode') === 'enabled') {
+            document.body.classList.add('night-mode');
+        }
+    }
+
+    // Function to toggle Night Mode and save the preference
     function toggleNightMode() {
         document.body.classList.toggle('night-mode');
+        const isNightMode = document.body.classList.contains('night-mode');
+        if (isNightMode) {
+            localStorage.setItem('nightMode', 'enabled');
+        } else {
+            localStorage.setItem('nightMode', 'disabled');
+        }
     }
+    
+    // Call the load function immediately when the script runs (in addition to the body onload)
+    loadNightModePreference(); 
+    
+    // --- MODIFICATION END ---
+
 
     function showCopiedMessage() {
         const msg = document.getElementById('copiedConfirmation');
@@ -231,17 +253,18 @@
         // Header row
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
-        // Added Anniversary Status to the headers list
-        const headers = ['Username', 'Registration Date', 'Total Edit Count', 'Home Wiki', 'ID', 'Anniversary Status', 'Add Reminder', 'Wish Anniversary'];
+        // MODIFICATION: Added 'S.No.' to the headers list
+        const headers = ['S.No.', 'Username', 'Registration Date', 'Total Edit Count', 'Home Wiki', 'ID', 'Anniversary Status', 'Add Reminder', 'Wish Anniversary'];
         
         headers.forEach((text, idx) => {
             const th = document.createElement('th');
             th.innerHTML = text;
             
-            // Only make the columns with data sortable (first 6 columns)
-            if (idx <= 5) { 
+            // MODIFICATION: Only make the columns with data sortable (S.No. is not sortable, so from index 1 to 6)
+            if (idx >= 1 && idx <= 6) { 
                  th.innerHTML += '<span class="sort-indicator">↕</span>'; // Add sort indicator
-                 th.onclick = () => sortTable(table, idx);
+                 // MODIFICATION: Adjust the index passed to sortTable since the data columns have shifted by 1
+                 th.onclick = () => sortTable(table, idx); 
             }
             headerRow.appendChild(th);
         });
@@ -250,6 +273,8 @@
 
         // Body
         const tbody = document.createElement('tbody');
+
+        let serialNumber = 1; // Initialize serial number
 
         sortedUsers.forEach(user => {
             const row = document.createElement('tr');
@@ -263,6 +288,13 @@
                 tbody.appendChild(row);
                 return;
             }
+
+            // MODIFICATION: Serial Number Cell
+            const serialCell = document.createElement('td');
+            serialCell.textContent = serialNumber++;
+            // Adding a data-sort attribute for the serial number to ensure stable re-sorting if needed
+            serialCell.setAttribute('data-sort', serialNumber - 1); 
+            row.appendChild(serialCell);
 
             const { daysToNext, yearsCompleted, isToday, daysSinceLast } = calculateAnniversaryData(user.registration);
             // Anniversary Score: 3=Today, 2=Upcoming, 1=Belated, 0=Future/Inactive period
@@ -414,13 +446,15 @@
             const bCell = b.cells[colIndex];
 
             // Columns that should be sorted NUMERICALLY based on data-sort attribute:
-            // 1: Registration Date (timestamp), 2: Edit Count, 4: ID, 5: Anniversary Status (score)
-            if (colIndex === 1 || colIndex === 2 || colIndex === 4 || colIndex === 5) {
+            // 0: S.No., 2: Registration Date (timestamp), 3: Edit Count, 5: ID, 6: Anniversary Status (score)
+            // MODIFICATION: The column indices for sorting have shifted by 1 due to the new 'S.No.' column.
+            if (colIndex === 0 || colIndex === 2 || colIndex === 3 || colIndex === 5 || colIndex === 6) {
                 aVal = Number(aCell.getAttribute('data-sort')) || 0;
                 bVal = Number(bCell.getAttribute('data-sort')) || 0;
             } 
             // Columns that should be sorted as case-insensitive TEXT:
-            // 0: Username, 3: Home Wiki
+            // 1: Username, 4: Home Wiki
+            // MODIFICATION: The column indices for sorting have shifted by 1 due to the new 'S.No.' column.
             else { 
                 aVal = aCell.textContent.trim().toLowerCase();
                 bVal = bCell.textContent.trim().toLowerCase();
