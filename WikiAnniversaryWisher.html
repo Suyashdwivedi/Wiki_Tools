@@ -2,27 +2,27 @@
 <html lang="en">
 <head>
    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Wiki Anniversary wisher - Multi User</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wiki Anniversary wisher - Multi User</title>
+    
     <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/6/6b/Draw_this_birthday_cake_.svg">
 
     <meta name="description" content="A tool to check and send wishes to multiple users' Wiki anniversaries, contributions, and wish them well." />
-    <meta name="keywords" content="Wiki, MediaWiki, anniversary, user, contributions, birthday, bulk, multi-user" />
-    <meta name="author" content="Suyash Dwivedi" />
-    <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/WikiAnniversaryWisher.html" />
+    <meta name="keywords" content="Wiki, MediaWiki, anniversary, user, contributions, birthday, bulk, multi-user" />
+    <meta name="author" content="Suyash Dwivedi" />
+    <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/WikiAnniversaryWisher.html" />
 
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/WikiAnniversaryWisher.html" />
-    <meta property="og:title" content="Wiki Anniversary - Multi User" />
-    <meta property="og:description" content="A tool to check multiple users' Wiki anniversaries, contributions, and wish them well." />
-    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Wikidata_birthday_celebration_visual_-_group_and_cake.png/960px-Wikidata_birthday_celebration_visual_-_group_and_cake.png" />
+    <meta property="og:title" content="Wiki Anniversary - Multi User" />
+    <meta property="og:description" content="A tool to check multiple users' Wiki anniversaries, contributions, and wish them well." />
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Wikidata_birthday_celebration_visual_-_group_and_cake.png/960px-Wikidata_birthday_celebration_visual_-_group_and_cake.png" />
 
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://suyashdwivedi.github.io/Wiki_Tools/WikiAnniversaryWisher.html" />
-    <meta property="twitter:title" content="Wiki Anniversary - Multi User" />
-    <meta property="twitter:description" content="A tool to check multiple users' Wiki anniversaries, contributions, and wish them well." />
-    <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Wikidata_birthday_celebration_visual_-_group_and_cake.png/960px-Wikidata_birthday_celebration_visual_-_group_and_cake.png" />
+    <meta property="twitter:url" content="https://suyashdwivedi.github.io/Wiki_Tools/WikiAnniversaryWisher.html" />
+    <meta property="twitter:title" content="Wiki Anniversary - Multi User" />
+    <meta property="twitter:description" content="A tool to check multiple users' Wiki anniversaries, contributions, and wish them well." />
+    <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Wikidata_birthday_celebration_visual_-_group_and_cake.png/960px-Wikidata_birthday_celebration_visual_-_group_and_cake.png" />
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #343a40; text-align: center; overflow-x: hidden; }
         header { background-color: #007bff; color: white; padding: 1em; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; flex-direction: column; }
@@ -81,8 +81,6 @@
     </p>
 </header>
 
-
-
 <main>
     <form id="userForm" onsubmit="event.preventDefault(); getUserDetails();">
         <label for="username">Enter up to 100 Usernames (comma separated):</label>
@@ -95,7 +93,7 @@
 </main>
 
 <footer>
-    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 27 October 2025
+    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 02 November 2025
 </footer>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
@@ -114,16 +112,34 @@
     let lastSortedColumn = -1;
     let lastSortAsc = true;
 
-    // --- MODIFICATION START ---
+    // Function to check if a year is a leap year
+    function isLeapYear(year) {
+        return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    }
 
-    // Function to load the saved preference on page load
+    // Function to get anniversary date for a given year, handling leap years
+    function getAnniversaryForYear(regDate, targetYear) {
+        let anniversary = new Date(regDate);
+        anniversary.setFullYear(targetYear);
+        anniversary.setHours(0, 0, 0, 0);
+        
+        // Handle leap day (Feb 29) for non-leap years
+        if (regDate.getMonth() === 1 && regDate.getDate() === 29) {
+            if (!isLeapYear(targetYear)) {
+                // Celebrate on Feb 28 in non-leap years
+                anniversary.setDate(28);
+            }
+        }
+        
+        return anniversary;
+    }
+
     function loadNightModePreference() {
         if (localStorage.getItem('nightMode') === 'enabled') {
             document.body.classList.add('night-mode');
         }
     }
 
-    // Function to toggle Night Mode and save the preference
     function toggleNightMode() {
         document.body.classList.toggle('night-mode');
         const isNightMode = document.body.classList.contains('night-mode');
@@ -134,11 +150,7 @@
         }
     }
     
-    // Call the load function immediately when the script runs (in addition to the body onload)
     loadNightModePreference(); 
-    
-    // --- MODIFICATION END ---
-
 
     function showCopiedMessage() {
         const msg = document.getElementById('copiedConfirmation');
@@ -148,62 +160,70 @@
 
     function calculateAnniversaryData(registrationDate) {
         if (!registrationDate) return {};
+        
         const regDate = new Date(registrationDate);
         const today = new Date();
+        
+        // Reset time part to midnight for accurate date comparison
+        today.setHours(0, 0, 0, 0);
+        regDate.setHours(0, 0, 0, 0);
 
-        let anniversaryThisYear = new Date(regDate);
-        anniversaryThisYear.setFullYear(today.getFullYear());
-
-        // Handle leap day for users who registered on Feb 29th
-        if (regDate.getMonth() === 1 && regDate.getDate() === 29 && anniversaryThisYear.getDate() !== 29) {
-             // If this year is not a leap year, the date will typically be March 1st if not adjusted. 
-             // We adjust it to the 28th for a consistent non-leap anniversary.
-             anniversaryThisYear.setDate(28); 
-        }
-
+        // Get anniversary date for current year
+        let anniversaryThisYear = getAnniversaryForYear(regDate, today.getFullYear());
+        
         let yearsCompleted;
         let daysToNext;
         let daysSinceLast;
-
-        // Reset time part to midnight for accurate date comparison
-        today.setHours(0, 0, 0, 0);
-        anniversaryThisYear.setHours(0, 0, 0, 0);
+        let isToday = (today.getTime() === anniversaryThisYear.getTime());
 
         if (today >= anniversaryThisYear) {
-            yearsCompleted = today.getFullYear() - regDate.getFullYear();
-            // Calculate days since last anniversary
-            daysSinceLast = Math.floor((today - anniversaryThisYear) / (1000 * 60 * 60 * 24));
+            // Anniversary date has passed this year or is today
             
-            let nextAnniversary = new Date(anniversaryThisYear);
-            nextAnniversary.setFullYear(today.getFullYear() + 1);
-             // Re-check for leap day on next anniversary
-            if (regDate.getMonth() === 1 && regDate.getDate() === 29 && nextAnniversary.getDate() !== 29) {
-                 nextAnniversary.setDate(28);
+            if (regDate.getFullYear() === today.getFullYear()) {
+                // User registered this year - no anniversary yet (need at least 1 year)
+                yearsCompleted = 0;
+                daysSinceLast = Math.floor((today - regDate) / (1000 * 60 * 60 * 24));
+                
+                // Next anniversary is next year
+                let nextAnniversary = getAnniversaryForYear(regDate, today.getFullYear() + 1);
+                daysToNext = Math.ceil((nextAnniversary - today) / (1000 * 60 * 60 * 24));
+            } else {
+                // User registered in a previous year
+                yearsCompleted = today.getFullYear() - regDate.getFullYear();
+                
+                // Calculate days since last anniversary (this year's anniversary)
+                daysSinceLast = Math.floor((today - anniversaryThisYear) / (1000 * 60 * 60 * 24));
+                
+                // Next anniversary is next year
+                let nextAnniversary = getAnniversaryForYear(regDate, today.getFullYear() + 1);
+                daysToNext = Math.ceil((nextAnniversary - today) / (1000 * 60 * 60 * 24));
             }
-            // Calculate days to next anniversary
-            daysToNext = Math.ceil((nextAnniversary - today) / (1000 * 60 * 60 * 24));
             
         } else {
+            // Anniversary hasn't occurred yet this year
             yearsCompleted = today.getFullYear() - regDate.getFullYear() - 1;
-            // Calculate days to next anniversary
+            
+            // Anniversary is coming up this year
             daysToNext = Math.ceil((anniversaryThisYear - today) / (1000 * 60 * 60 * 24));
-            daysSinceLast = 0; // The anniversary is in the future
+            daysSinceLast = 0;
         }
-
-        const isToday = (today.getMonth() === regDate.getMonth() && today.getDate() === regDate.getDate());
 
         return { daysToNext, yearsCompleted, isToday, daysSinceLast };
     }
 
     function isAnniversaryEligible(registration) {
-        const { isToday, daysToNext, daysSinceLast } = calculateAnniversaryData(registration);
+        const { isToday, daysToNext, daysSinceLast, yearsCompleted } = calculateAnniversaryData(registration);
+        
+        // Must have completed at least 1 year to be eligible for anniversary wishes
+        if (yearsCompleted < 1) return false;
+        
+        // Eligible if: today is anniversary, or within 10 days before, or within 30 days after
         return isToday || (daysToNext > 0 && daysToNext <= 10) || (daysSinceLast > 0 && daysSinceLast <= 30);
     }
 
     function getHomeWikiUrl(user) {
         if (!user.merged || !user.home) return "Not available";
         const match = user.merged.find(e => e.wiki === user.home);
-        // The URL provided by the API may not end in a slash, so we ensure it's a valid base URL.
         return match ? match.url.replace(/\/$/, '') : "Not available";
     }
 
@@ -216,7 +236,6 @@
             try {
                 const res = await fetch(url);
                 const data = await res.json();
-                // Check for a 'missing' flag in globaluserinfo
                 if (data.query && data.query.globaluserinfo && data.query.globaluserinfo.missing) {
                      return { name: username, error: true, message: "User does not exist globally" };
                 }
@@ -239,9 +258,7 @@
         const ineligibleUsers = users.filter(user => !user.error && !isAnniversaryEligible(user.registration));
         const errorUsers = users.filter(user => user.error);
 
-        // Concatenate: Eligible first, then Ineligible, then Errors
         const sortedUsers = [...eligibleUsers, ...ineligibleUsers, ...errorUsers];
-
 
         if (sortedUsers.length === 0) {
             container.innerHTML = '<p>No user data found. Please check the usernames and try again.</p>';
@@ -250,20 +267,16 @@
 
         const table = document.createElement('table');
 
-        // Header row
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
-        // MODIFICATION: Added 'S.No.' to the headers list
         const headers = ['S.No.', 'Username', 'Registration Date', 'Total Edit Count', 'Home Wiki', 'ID', 'Anniversary Status', 'Add Reminder', 'Wish Anniversary'];
         
         headers.forEach((text, idx) => {
             const th = document.createElement('th');
             th.innerHTML = text;
             
-            // MODIFICATION: Only make the columns with data sortable (S.No. is not sortable, so from index 1 to 6)
             if (idx >= 1 && idx <= 6) { 
-                 th.innerHTML += '<span class="sort-indicator">↕</span>'; // Add sort indicator
-                 // MODIFICATION: Adjust the index passed to sortTable since the data columns have shifted by 1
+                 th.innerHTML += '<span class="sort-indicator">↕</span>';
                  th.onclick = () => sortTable(table, idx); 
             }
             headerRow.appendChild(th);
@@ -271,10 +284,9 @@
         thead.appendChild(headerRow);
         table.appendChild(thead);
 
-        // Body
         const tbody = document.createElement('tbody');
 
-        let serialNumber = 1; // Initialize serial number
+        let serialNumber = 1;
 
         sortedUsers.forEach(user => {
             const row = document.createElement('tr');
@@ -289,20 +301,17 @@
                 return;
             }
 
-            // MODIFICATION: Serial Number Cell
             const serialCell = document.createElement('td');
             serialCell.textContent = serialNumber++;
-            // Adding a data-sort attribute for the serial number to ensure stable re-sorting if needed
             serialCell.setAttribute('data-sort', serialNumber - 1); 
             row.appendChild(serialCell);
 
             const { daysToNext, yearsCompleted, isToday, daysSinceLast } = calculateAnniversaryData(user.registration);
-            // Anniversary Score: 3=Today, 2=Upcoming, 1=Belated, 0=Future/Inactive period
             const anniversaryScore = isToday ? 3 : (daysToNext > 0 && daysToNext <= 10) ? 2 : (daysSinceLast > 0 && daysSinceLast <= 30) ? 1 : 0;
 
             // Username linked
             const usernameCell = document.createElement('td');
-            usernameCell.setAttribute('data-sort', user.name.toLowerCase()); // for sorting (Text)
+            usernameCell.setAttribute('data-sort', user.name.toLowerCase());
             const homeUrl = getHomeWikiUrl(user);
             const userPageUrl = (user.home && homeUrl !== 'Not available')
                 ? `${homeUrl}/wiki/User:${encodeURIComponent(user.name.replace(/ /g, '_'))}`
@@ -317,25 +326,23 @@
 
             // Registration Date
             const regDateCell = document.createElement('td');
-            const registrationDate = user.registration
-                ? new Date(user.registration)
-                : null;
-            regDateCell.setAttribute('data-sort', registrationDate ? registrationDate.getTime() : 0); // for sorting (Numeric)
+            const registrationDate = user.registration ? new Date(user.registration) : null;
+            regDateCell.setAttribute('data-sort', registrationDate ? registrationDate.getTime() : 0);
             regDateCell.textContent = registrationDate
-                ? registrationDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                ? `${String(registrationDate.getDate()).padStart(2, '0')}/${registrationDate.toLocaleDateString('en-US', { month: 'long' })}/${registrationDate.getFullYear()}`
                 : 'N/A';
             row.appendChild(regDateCell);
 
             // Total Edit Count
             const editCountCell = document.createElement('td');
             const editCount = user.editcount ?? 'N/A';
-            editCountCell.setAttribute('data-sort', user.editcount ?? 0); // for sorting (Numeric)
-            editCountCell.textContent = editCount.toLocaleString('en-US') ?? 'N/A';
+            editCountCell.setAttribute('data-sort', user.editcount ?? 0);
+            editCountCell.textContent = editCount !== 'N/A' ? editCount.toLocaleString('en-US') : 'N/A';
             row.appendChild(editCountCell);
 
             // Home Wiki Link
             const homeWikiCell = document.createElement('td');
-            homeWikiCell.setAttribute('data-sort', user.home ? user.home.toLowerCase() : 'zzzz'); // for sorting (Text)
+            homeWikiCell.setAttribute('data-sort', user.home ? user.home.toLowerCase() : 'zzzz');
             if (homeUrl !== "Not available") {
                 const homeLink = document.createElement('a');
                 homeLink.href = homeUrl;
@@ -349,7 +356,7 @@
 
             // ID
             const idCell = document.createElement('td');
-            idCell.setAttribute('data-sort', user.id ?? 0); // for sorting (Numeric)
+            idCell.setAttribute('data-sort', user.id ?? 0);
             idCell.textContent = user.id ?? 'N/A';
             row.appendChild(idCell);
 
@@ -357,7 +364,12 @@
             const statusCell = document.createElement('td');
             let statusText = '-';
             let statusColor = '#6c757d'; 
-            if (isToday) {
+            
+            if (yearsCompleted < 1) {
+                // Not yet eligible for anniversary
+                statusText = `Registered recently (${daysToNext} days to first anniversary)`;
+                statusColor = '#6c757d';
+            } else if (isToday) {
                 statusText = `TODAY! (${yearsCompleted} years)`;
                 statusColor = 'green';
             } else if (daysToNext > 0 && daysToNext <= 10) {
@@ -370,14 +382,13 @@
                 statusText = `In ${daysToNext} days (${yearsCompleted + 1} years)`;
                 statusColor = '#6c757d';
             }
+            
             statusCell.textContent = statusText;
             statusCell.style.color = statusColor;
-            // Add a sort attribute for priority (3=today, 2=upcoming, 1=belated, 0=future) (Numeric)
             statusCell.setAttribute('data-sort', anniversaryScore); 
             row.appendChild(statusCell);
 
-
-            // Add Reminder button (Not sortable)
+            // Add Reminder button
             const reminderCell = document.createElement('td');
             const reminderBtn = document.createElement('button');
             reminderBtn.textContent = "🗓️ Save to Calendar";
@@ -386,7 +397,7 @@
             reminderCell.appendChild(reminderBtn);
             row.appendChild(reminderCell);
 
-            // Wish Anniversary button (Not sortable)
+            // Wish Anniversary button
             const wishCell = document.createElement('td');
             if (isAnniversaryEligible(user.registration)) {
                 const wishBtn = document.createElement('button');
@@ -405,7 +416,6 @@
         table.appendChild(tbody);
         container.appendChild(table);
 
-        // Apply initial sort indicator on the last sorted column
         if (lastSortedColumn !== -1) {
              const th = table.querySelector(`thead th:nth-child(${lastSortedColumn + 1})`);
              if (th) {
@@ -417,20 +427,16 @@
 
     function sortTable(table, colIndex) {
         const tbody = table.tBodies[0];
-        // Filter out error rows which don't have enough cells
         const rowsArray = Array.from(tbody.rows).filter(row => row.cells.length > 1); 
         
-        // Determine sort order
         let asc = (colIndex === lastSortedColumn) ? !lastSortAsc : true;
 
-        // Reset indicators
         table.querySelectorAll('th').forEach(th => {
             th.classList.remove('sort-asc', 'sort-desc');
             const indicator = th.querySelector('.sort-indicator');
             if(indicator) indicator.textContent = '↕';
         });
 
-        // Update current indicator
         const currentTh = table.querySelector(`thead th:nth-child(${colIndex + 1})`);
         if (currentTh) {
             currentTh.classList.add(asc ? 'sort-asc' : 'sort-desc');
@@ -445,28 +451,19 @@
             const aCell = a.cells[colIndex];
             const bCell = b.cells[colIndex];
 
-            // Columns that should be sorted NUMERICALLY based on data-sort attribute:
-            // 0: S.No., 2: Registration Date (timestamp), 3: Edit Count, 5: ID, 6: Anniversary Status (score)
-            // MODIFICATION: The column indices for sorting have shifted by 1 due to the new 'S.No.' column.
             if (colIndex === 0 || colIndex === 2 || colIndex === 3 || colIndex === 5 || colIndex === 6) {
                 aVal = Number(aCell.getAttribute('data-sort')) || 0;
                 bVal = Number(bCell.getAttribute('data-sort')) || 0;
-            } 
-            // Columns that should be sorted as case-insensitive TEXT:
-            // 1: Username, 4: Home Wiki
-            // MODIFICATION: The column indices for sorting have shifted by 1 due to the new 'S.No.' column.
-            else { 
+            } else { 
                 aVal = aCell.textContent.trim().toLowerCase();
                 bVal = bCell.textContent.trim().toLowerCase();
             }
 
-            // Compare logic
             if (aVal > bVal) return asc ? 1 : -1;
             if (aVal < bVal) return asc ? -1 : 1;
             return 0;
         });
 
-        // Reorder rows
         while(tbody.firstChild) {
             tbody.removeChild(tbody.firstChild);
         }
@@ -475,17 +472,15 @@
 
     function addToCalendar(user) {
         if (!user || !user.registration) return;
-        const anniversaryDate = new Date(user.registration);
+        
+        const regDate = new Date(user.registration);
         const today = new Date();
-        const nextAnniversary = new Date(anniversaryDate);
-        nextAnniversary.setFullYear(today.getFullYear());
         
-        // Adjust for leap year or if the current year's anniversary passed
-        if (today > nextAnniversary) nextAnniversary.setFullYear(today.getFullYear() + 1);
+        // Get next anniversary
+        let nextAnniversary = getAnniversaryForYear(regDate, today.getFullYear());
         
-        // Handle Feb 29th for non-leap years
-        if (anniversaryDate.getMonth() === 1 && anniversaryDate.getDate() === 29 && nextAnniversary.getDate() !== 29) {
-             nextAnniversary.setDate(28); 
+        if (today > nextAnniversary) {
+            nextAnniversary = getAnniversaryForYear(regDate, today.getFullYear() + 1);
         }
 
         const nextYear = nextAnniversary.getFullYear();
@@ -494,55 +489,61 @@
         const formattedDate = `${nextYear}${nextMonth}${nextDay}`; 
         
         const eventTitle = `Wiki Anniversary of ${user.name}`;
-        const eventDetails = `Wiki anniversary of ${user.name}, joined on ${new Date(user.registration).toLocaleDateString('en-US')}, total edits: ${user.editcount?.toLocaleString() || 'N/A'}.`;
         
-        // Dates format: YYYYMMDD/YYYYMMDD for an all-day event
+       // Format dates as dd/Month/yyyy
+        const currentDate = `${String(today.getDate()).padStart(2, '0')}/${today.toLocaleDateString('en-US', { month: 'long' })}/${today.getFullYear()}`;
+        const joinDate = `${String(regDate.getDate()).padStart(2, '0')}/${regDate.toLocaleDateString('en-US', { month: 'long' })}/${regDate.getFullYear()}`;
+        
+        const eventDetails = `Wiki anniversary of ${user.name}, joined on ${joinDate}, till ${currentDate} total edits calculated: ${user.editcount?.toLocaleString() || 'N/A'}. Click here https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html to wish anniversary.`;
+        
         const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${formattedDate}/${formattedDate}&details=${encodeURIComponent(eventDetails)}&sf=true&output=xml`;
         window.open(calendarUrl, '_blank');
     }
-
     async function wishAnniversary(user) {
-        if (!user || !user.name || !user.registration) return;
+        if (!user || !user.name || !user.registration) return;
 
-        const message = generateAnniversaryMessage(user);
-        if (!message) {
-            alert("This user is not eligible for wishing right now (not within +/- 10 days of anniversary).");
-            return;
-        }
-        try {
-            await navigator.clipboard.writeText(message);
-            showCopiedMessage(); // Assuming showCopiedMessage() is defined elsewhere
-        } catch (err) {
-            console.error('Failed to copy text: ', err);
-            alert('Failed to copy message to clipboard. Please copy manually.');
-        }
+        const message = generateAnniversaryMessage(user);
+        if (!message) {
+            alert("This user is not eligible for wishing right now.");
+            return;
+        }
+        
+        try {
+            await navigator.clipboard.writeText(message);
+            showCopiedMessage();
+        } catch (err) {
+            console.error('Failed to copy text: ', err);
+            alert('Failed to copy message to clipboard. Please copy manually.');
+        }
 
-        const homeWikiUrl = getHomeWikiUrl(user); // Assuming getHomeWikiUrl is defined elsewhere
-        const wikiBaseUrl = (user.home && homeWikiUrl !== 'Not available') ? homeWikiUrl : `https://www.mediawiki.org`;
+        const homeWikiUrl = getHomeWikiUrl(user);
+        const wikiBaseUrl = (user.home && homeWikiUrl !== 'Not available') ? homeWikiUrl : `https://www.mediawiki.org`;
 
-        // MODIFIED: Open the user's talk page for editing, relying on the user to paste the copied message.
-        const userTalkPageUrl = `${wikiBaseUrl}/w/index.php?title=User_talk:${encodeURIComponent(user.name.replace(/ /g, '_'))}&action=edit&summary=Wiki Anniversary Wishes`;
-        window.open(userTalkPageUrl, '_blank');
-    }
-////////////////////////////////
- function generateAnniversaryMessage(user) {
-    if (!user.registration) return "";
+        const userTalkPageUrl = `${wikiBaseUrl}/w/index.php?title=User_talk:${encodeURIComponent(user.name.replace(/ /g, '_'))}&action=edit&summary=Wiki Anniversary Wishes`;
+        window.open(userTalkPageUrl, '_blank');
+    }
 
-    const { daysToNext, yearsCompleted, isToday, daysSinceLast } = calculateAnniversaryData(user.registration);
-    const edits = user.editcount || 0;
-    const totalEditsFormatted = edits.toLocaleString();
+    function generateAnniversaryMessage(user) {
+        if (!user.registration) return "";
 
-    const imageWikitext = `[[File:Rose and Carnation Flower Bouquet 02.png|150px|right|Happy Wiki Anniversary]]`;
-    const toolLine = `''Use this [https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html '''Tool'''] to send wiki anniversary wishes to other amazing Wikimedians.''`;
+        const { daysToNext, yearsCompleted, isToday, daysSinceLast } = calculateAnniversaryData(user.registration);
+        
+        // Don't generate message if less than 1 year completed
+        if (yearsCompleted < 1) return "";
+        
+        const edits = user.editcount || 0;
+        const totalEditsFormatted = edits.toLocaleString();
 
-    // Styled box around only the message body (including signature)
-    const openDiv = `<div style="border: 3px solid #f75920; background: #f8f9fa; padding: 15px; margin: 10px 0; font-size: 95%; line-height: 1.6em;">`;
-    const closeDiv = `</div>`;
+        const imageWikitext = `[[File:Rose and Carnation Flower Bouquet 02.png|150px|right|Happy Wiki Anniversary]]`;
+        const toolLine = `''Use this [https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html '''Tool'''] to send wiki anniversary wishes to other amazing Wikimedians.''`;
 
-    let innerMessage = "";
+        const openDiv = `<div style="border: 3px solid #f75920; background: #f8f9fa; padding: 15px; margin: 10px 0; font-size: 95%; line-height: 1.6em;">`;
+        const closeDiv = `</div>`;
 
-    if (isToday) {
-        innerMessage = `\r\n== Happy Wiki Anniversary 🎉 ==\r\n\r\n${openDiv}
+        let innerMessage = "";
+
+        if (isToday) {
+            innerMessage = `\r\n== Happy Wiki Anniversary 🎉 ==\r\n\r\n${openDiv}
 ${imageWikitext}
 
 Dear [[User:${user.name}|${user.name}]],
@@ -553,8 +554,8 @@ ${toolLine}
 
 -- ~~~~
 ${closeDiv}`;
-    } else if (daysToNext > 0 && daysToNext <= 10) {
-        innerMessage = `\r\n== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${openDiv}
+        } else if (daysToNext > 0 && daysToNext <= 10) {
+            innerMessage = `\r\n== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${openDiv}
 ${imageWikitext}
 
 Dear [[User:${user.name}|${user.name}]],
@@ -565,9 +566,9 @@ ${toolLine}
 
 -- ~~~~
 ${closeDiv}`;
-    } else if (daysSinceLast > 0 && daysSinceLast <= 30) {
-        const daysBelated = daysSinceLast;
-        innerMessage = `\r\n== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${openDiv}
+        } else if (daysSinceLast > 0 && daysSinceLast <= 30) {
+            const daysBelated = daysSinceLast;
+            innerMessage = `\r\n== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${openDiv}
 ${imageWikitext}
 
 Dear [[User:${user.name}|${user.name}]],
@@ -578,11 +579,11 @@ ${toolLine}
 
 -- ~~~~
 ${closeDiv}`;
+        }
+
+        return innerMessage;
     }
 
-    return innerMessage;
-}
-////////////////////////////
     function getUserDetails() {
         const input = document.getElementById('username').value.trim();
         if (!input) return;
