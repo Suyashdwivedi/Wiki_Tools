@@ -154,7 +154,7 @@
 </main>
 
 <footer>
-    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 02 November 2025<br>
+    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Project: <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank">Wiki's Lazy Coders</a> | Updated on: 27 October 2025<br>
 </footer>
 
 <div class="scroll-buttons">
@@ -511,9 +511,41 @@ function handleKeyPress(event){
     }
 }
 
+// Change 7: Implement Local Storage for Night Mode Persistence (Start)
+/**
+ * Checks local storage for a night mode preference and applies it immediately.
+ */
+function loadNightMode() {
+    if (localStorage.getItem('nightMode') === 'enabled') {
+        document.body.classList.add('night-mode');
+    }
+}
+
+/**
+ * Checks the current mode and updates the Night Mode button text.
+ */
+function checkNightMode() {
+    const isNightMode = document.body.classList.contains('night-mode');
+    document.querySelector('.night-mode-button').textContent = isNightMode ? 'Day Mode' : 'Night Mode';
+}
+
 function toggleNightMode() {
     document.body.classList.toggle('night-mode');
+    const isNightMode = document.body.classList.contains('night-mode');
+
+    if (isNightMode) {
+        // Save preference: Night mode is enabled
+        localStorage.setItem('nightMode', 'enabled');
+    } else {
+        // Save preference: Night mode is disabled (remove the key)
+        localStorage.removeItem('nightMode');
+    }
+
+    // Update button text after toggling
+    checkNightMode();
 }
+// Change 7: Implement Local Storage for Night Mode Persistence (End)
+
 
 // Change 6: Update addToCalendar Function (Start)
 function addToCalendar() {
@@ -555,6 +587,12 @@ function goToBottom() {
         behavior: 'smooth'
     });
 }
+
+// Add event listener to load the night mode setting on page load
+window.addEventListener('load', () => {
+    loadNightMode();
+    checkNightMode(); 
+});
 </script>
 </body>
 </html>
