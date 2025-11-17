@@ -117,32 +117,46 @@
             100% { opacity: 0; }
         }
         
-        /* Go to top/bottom arrows (2025-10-24) */
-        .scroll-arrow {
-            position: fixed;
-            bottom: 60px;
-            right: 20px;
-            z-index: 100;
-            font-size: 24px;
-            cursor: pointer;
-            color: #007bff;
-            background: #fff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: opacity 0.3s;
-        }
-        #go-to-top { bottom: 60px; }
-        #go-to-bottom { bottom: 10px; }
+/* Go to top/bottom arrows (NEW ROUND BUTTONS) */
+.scroll-arrow {
+    position: fixed;
+    right: 20px;
+    z-index: 100;
+    width: 40px;         /* bigger circle */
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;     /* bigger arrow */
+    font-weight: bold;
+    color: white;        /* white arrow */
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.22);
+    transition: transform 0.2s ease, opacity 0.3s;
+}
+
+#go-to-top {
+    bottom: 80px;
+    background-color: #3bb065;  /* green */
+}
+
+#go-to-bottom {
+    bottom: 30px;
+    background-color: #f7ac46;  /* orange */
+}
+
+.scroll-arrow:hover {
+    transform: scale(1.12);
+}
+
     </style>
 </head>
 <body onload="loadNightModePreference()">
 
-<button id="go-to-top" class="scroll-arrow" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">⬆</button>
-<button id="go-to-bottom" class="scroll-arrow" onclick="window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })">⬇</button>
+<button id="go-to-top" class="scroll-arrow" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">▲</button>
+<button id="go-to-bottom" class="scroll-arrow" onclick="window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })">▼</button>
+
 
 <button class="night-mode-button" onclick="toggleNightMode()">Night Mode</button>
 
