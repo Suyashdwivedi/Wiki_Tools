@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
     <title>Wiki Anniversary wisher - Multi User</title>
     
     <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/0/0e/Logo_anniversaire_rouge.svg">
@@ -23,11 +24,13 @@
     <meta property="twitter:title" content="Wiki Anniversary - Multi User" />
     <meta property="twitter:description" content="A tool to check multiple users' Wiki anniversaries, contributions, and wish them well." />
     <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Wikidata_birthday_celebration_visual_-_group_and_cake.png/960px-Wikidata_birthday_celebration_visual_-_group_and_cake.png" />
+
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #343a40; text-align: center; overflow-x: hidden; }
         header { background-color: #007bff; color: white; padding: 1em; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; flex-direction: column; }
         header h1, header h3 { margin: 0; }
-        header img { height: 75px; margin-right: 15px; }
+        /* Logo (2025-08-29) - big and colorful */
+        header img { height: 75px; margin-right: 15px; } 
         #inspiration { margin-top: 10px; font-style: italic; color: #fff; padding-bottom: 10px; max-width: 800px; margin-left: auto; margin-right: auto;}
         main { max-width: 1000px; margin: 20px auto; background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); animation: fadeIn 0.5s ease-in-out; }
         form { display: flex; flex-direction: column; align-items: center; max-width: 600px; margin: 0 auto 20px; }
@@ -35,6 +38,37 @@
         input { padding: 10px; margin-bottom: 20px; width: 100%; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 5px; font-size: 1rem; }
         button { background-color: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; transition: 0.3s ease; font-size: 1rem; }
         button:hover { background-color: #0056b3; }
+        
+        /* Class for dynamically generated buttons (using smaller padding) */
+        .wish-button, .reminder-button {
+            background-color: #007bff; 
+            color: white;
+            padding: 5px 10px; 
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s ease;
+            font-size: 1rem;
+            margin: 2px;
+        }
+        
+        .wish-button:hover, .reminder-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* PERSISTENT STYLE: Orange background when a button is selected (.clicked-wish) */
+        .wish-button.clicked-wish {
+            background-color: orange; 
+            box-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
+            transition: background-color 0.3s;
+        }
+
+        /* Updated Active State: Darker orange when actively pressing the already orange button */
+        .wish-button:active {
+            background-color: darkorange !important; 
+            transition: background-color 0s;
+        }
+
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 8px; border: 1px solid #ddd; text-align: center; }
         th { background-color: #007bff; color: white; cursor: pointer; user-select: none; }
@@ -42,6 +76,8 @@
         th .sort-indicator { margin-left: 5px; opacity: 0.7; }
         th.sort-asc .sort-indicator { opacity: 1; }
         th.sort-desc .sort-indicator { opacity: 1; }
+        
+        /* Night Mode Button (2025-07-25) */
         .night-mode-button { position: absolute; top: 10px; right: 10px; background-color: #007bff; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
         .night-mode { background-color: #121212; color: #f8f9fa; }
         .night-mode header { background-color: #1f1f1f; }
@@ -51,6 +87,23 @@
         .night-mode input { background-color: #3e3e3e; color: #f8f9fa; border: 1px solid #555; }
         .night-mode button { background-color: #8ab4f8; color: black; }
         .night-mode th { background-color: #8ab4f8; color: black; }
+        
+        /* Night mode specific button styles */
+        .night-mode .wish-button, .night-mode .reminder-button {
+            background-color: #8ab4f8;
+            color: black;
+        }
+        .night-mode .wish-button:hover, .night-mode .reminder-button:hover {
+            background-color: #6c99e1;
+        }
+        .night-mode .wish-button:active, .night-mode .wish-button.clicked-wish {
+            background-color: orange; 
+            color: black;
+        }
+        .night-mode .wish-button:active {
+            background-color: darkorange !important; 
+        }
+
         footer { margin-top: 20px; padding: 10px; font-size: 0.9em; color: #6c757d; }
         .copied-message {
             color: green;
@@ -63,14 +116,38 @@
             0% { opacity: 1; }
             100% { opacity: 0; }
         }
+        
+        /* Go to top/bottom arrows (2025-10-24) */
+        .scroll-arrow {
+            position: fixed;
+            bottom: 60px;
+            right: 20px;
+            z-index: 100;
+            font-size: 24px;
+            cursor: pointer;
+            color: #007bff;
+            background: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: opacity 0.3s;
+        }
+        #go-to-top { bottom: 60px; }
+        #go-to-bottom { bottom: 10px; }
     </style>
 </head>
 <body onload="loadNightModePreference()">
 
+<button id="go-to-top" class="scroll-arrow" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">⬆</button>
+<button id="go-to-bottom" class="scroll-arrow" onclick="window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })">⬇</button>
+
 <button class="night-mode-button" onclick="toggleNightMode()">Night Mode</button>
 
 <header>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" style="height: 75px; float: left; margin-right: 15px;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" style="height: 75px; float: left; margin-right: 15px; width: auto;">
     <div>
         <h1>Wish Wiki Anniversary</h1>
         <h3>(Multi-user mode, according to SUL)</h3>
@@ -93,24 +170,25 @@
 </main>
 	
 <footer>
-    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Project: <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank">Wiki's Lazy Coders</a> | Updated on: 05 November 2025<br>
+    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Project: <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank">Wiki's Lazy Coders</a> | Updated on: <strong>18 November 2025</strong>
 </footer>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
 <script>
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
-	gtag('config', 'G-GC8PGC89NB');
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GC8PGC89NB');
 </script>
 <script src="https://cdn.counter.dev/script.js"
-	data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
-	data-utcoffset="6">
+    data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+    data-utcoffset="6">
 </script>
 
 <script>
     let lastSortedColumn = -1;
     let lastSortAsc = true;
+    let lastClickedWishButton = null; // To track the last orange button
 
     // Function to check if a year is a leap year
     function isLeapYear(year) {
@@ -237,7 +315,7 @@
                 const res = await fetch(url);
                 const data = await res.json();
                 if (data.query && data.query.globaluserinfo && data.query.globaluserinfo.missing) {
-                     return { name: username, error: true, message: "User does not exist globally" };
+                    return { name: username, error: true, message: "User does not exist globally" };
                 }
                 return data.query.globaluserinfo || { name: username, error: true, message: "API data missing" };
             } catch (e) {
@@ -314,8 +392,8 @@
             usernameCell.setAttribute('data-sort', user.name.toLowerCase());
             const homeUrl = getHomeWikiUrl(user);
             const userPageUrl = (user.home && homeUrl !== 'Not available')
-                ? `${homeUrl}/wiki/User:${encodeURIComponent(user.name.replace(/ /g, '_'))}`
-                : `https://www.mediawiki.org/wiki/User:${encodeURIComponent(user.name.replace(/ /g, '_'))}`;
+                ? `${homeUrl}/wiki/User_talk:${encodeURIComponent(user.name.replace(/ /g, '_'))}` 
+                : `https://www.mediawiki.org/wiki/User_talk:${encodeURIComponent(user.name.replace(/ /g, '_'))}`;
             
             const userLink = document.createElement('a');
             userLink.href = userPageUrl;
@@ -393,7 +471,7 @@
             const reminderBtn = document.createElement('button');
             reminderBtn.textContent = "🗓️ Save to Calendar";
             reminderBtn.onclick = () => addToCalendar(user);
-            reminderBtn.style.padding = '5px 10px';
+            reminderBtn.classList.add('reminder-button');
             reminderCell.appendChild(reminderBtn);
             row.appendChild(reminderCell);
 
@@ -402,8 +480,15 @@
             if (isAnniversaryEligible(user.registration)) {
                 const wishBtn = document.createElement('button');
                 wishBtn.textContent = "🎉 Copy & Open Talk";
-                wishBtn.onclick = () => wishAnniversary(user);
-                wishBtn.style.padding = '5px 10px';
+                wishBtn.onclick = (event) => wishAnniversary(user, event);
+                wishBtn.classList.add('wish-button'); 
+                
+                // Set orange if this was the last button clicked and data is reloaded
+                if (lastClickedWishButton && lastClickedWishButton.dataset.username === user.name) {
+                    wishBtn.classList.add('clicked-wish');
+                    lastClickedWishButton = wishBtn; // Update reference if table is redrawn
+                }
+                
                 wishCell.appendChild(wishBtn);
             } else {
                 wishCell.textContent = '-';
@@ -499,8 +584,26 @@
         const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${formattedDate}/${formattedDate}&details=${encodeURIComponent(eventDetails)}&sf=true&output=xml`;
         window.open(calendarUrl, '_blank');
     }
-    async function wishAnniversary(user) {
+    
+    // Function to handle persistent button coloring
+    async function wishAnniversary(user, event) {
         if (!user || !user.name || !user.registration) return;
+
+        const currentButton = event.currentTarget; // Get the clicked button element
+
+        // 1. Remove the class from the previously clicked button
+        if (lastClickedWishButton && lastClickedWishButton !== currentButton) {
+            lastClickedWishButton.classList.remove('clicked-wish');
+        }
+
+        // 2. Add the class to the current button
+        currentButton.classList.add('clicked-wish');
+
+        // 3. Store the current button reference
+        lastClickedWishButton = currentButton;
+        
+        // Storing username on the button element itself for tracking
+        currentButton.dataset.username = user.name; 
 
         const message = generateAnniversaryMessage(user);
         if (!message) {
@@ -519,6 +622,7 @@
         const homeWikiUrl = getHomeWikiUrl(user);
         const wikiBaseUrl = (user.home && homeWikiUrl !== 'Not available') ? homeWikiUrl : `https://www.mediawiki.org`;
 
+        // The target URL is the user talk page
         const userTalkPageUrl = `${wikiBaseUrl}/w/index.php?title=User_talk:${encodeURIComponent(user.name.replace(/ /g, '_'))}&action=edit&summary=Wiki Anniversary Wishes`;
         window.open(userTalkPageUrl, '_blank');
     }
@@ -552,7 +656,7 @@ Wishing you a very happy wiki anniversary today, celebrating '''${yearsCompleted
 
 ${toolLine}
 
--- ~~~~
+- ~~~~
 ${closeDiv}`;
         } else if (daysToNext > 0 && daysToNext <= 10) {
             innerMessage = `\r\n== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${openDiv}
@@ -564,7 +668,7 @@ Your wiki anniversary is just around the corner, in '''${daysToNext} days!''' Wh
 
 ${toolLine}
 
--- ~~~~
+- ~~~~
 ${closeDiv}`;
         } else if (daysSinceLast > 0 && daysSinceLast <= 30) {
             const daysBelated = daysSinceLast;
@@ -577,7 +681,7 @@ Your wiki anniversary was '''${daysBelated} days''' ago, marking '''${yearsCompl
 
 ${toolLine}
 
--- ~~~~
+- ~~~~
 ${closeDiv}`;
         }
 
