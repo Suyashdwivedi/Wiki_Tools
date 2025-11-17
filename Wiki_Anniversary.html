@@ -457,28 +457,43 @@ function getAnniversaryMessage() {
     const closeDiv = `</div>`;
     let message = "";
     if (isToday) {
-        message = `\r\n== Happy Wiki Anniversary 🎉 ==\r\n\r\n${openDiv}${imageWikitext}Dear [[User:${username}|${username}]],Wishing you a very happy wiki anniversary today, celebrating '''${yearsCompleted} years''' (as per SUL) of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!
+        message = `\r\n== Happy Wiki Anniversary 🎉 ==\r\n\r\n${openDiv}
+${imageWikitext}
+
+Dear [[User:${username}|${username}]],
+
+Wishing you a very happy wiki anniversary today, celebrating '''${yearsCompleted} years''' (as per SUL) of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!
 		
-	${toolLine}
+${toolLine}
 		
-	: ~~~~
-	${closeDiv}`;
+: ~~~~
+${closeDiv}`;
     } else if (daysToNext > 0 && daysToNext <= 10) {
-        message = `\r\n== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${openDiv}${imageWikitext}Dear [[User:${username}|${username}]],Your wiki anniversary is just around the corner, in '''${daysToNext} days!''' What a wonderful milestone of '''${yearsCompleted + 1} years''' on Wiki (as per SUL). Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!
+        message = `\r\n== Early Wiki Anniversary Wishes 🎉 ==\r\n\r\n${openDiv}
+${imageWikitext}
+
+Dear [[User:${username}|${username}]],
+
+Your wiki anniversary is just around the corner, in '''${daysToNext} days!''' What a wonderful milestone of '''${yearsCompleted + 1} years''' on Wiki (as per SUL). Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!
 		
-	${toolLine}
-	: ~~~~
+${toolLine}
+: ~~~~
 		
-	${closeDiv}`;
+${closeDiv}`;
     } else if (daysSinceLast > 0 && daysSinceLast <= 30) {
         const daysBelated = daysSinceLast;
-        message = `\r\n== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${openDiv}${imageWikitext}Dear [[User:${username}|${username}]],Your wiki anniversary was '''${daysBelated} days''' ago, marking '''${yearsCompleted} years''' (as per SUL) of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!
+        message = `\r\n== Belated Wiki Anniversary Wishes 🎉 ==\r\n\r\n${openDiv}
+${imageWikitext}
+
+Dear [[User:${username}|${username}]],
+
+Your wiki anniversary was '''${daysBelated} days''' ago, marking '''${yearsCompleted} years''' (as per SUL) of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!
 		
-	${toolLine}
+${toolLine}
 		
-	: ~~~~
+: ~~~~
 		
-	${closeDiv}`;
+${closeDiv}`;
     } else {
         return "";
     }
