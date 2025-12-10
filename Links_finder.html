@@ -1,0 +1,582 @@
+<a href="#top" style="position: fixed; bottom: 20px; right: 20px; padding: 10px; background: #333; color: white; border-radius: 50%; text-decoration: none; z-index: 1000; opacity: 0.7;" title="Go to top">↑</a>
+
+<head id="top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESEAP 2026 Manual Link & Keyword Validator</title>
+    
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/250px-Wiki%27s_Lazy_Coders.png" type="image/x-icon">
+
+    <meta name="description" content="Manual validation tool for checking links and keywords in ESEAP 2026 scholarship applications and generating a final report.">
+    <meta name="keywords" content="ESEAP 2026, link checker, keyword validation, manual report, Wikimedia">
+    <meta name="author" content="Wikimedia Community">
+    <link rel="canonical" href="https://suyashdwivedi.github.io/zonestamper.html">
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-GC8PGC89NB');
+    </script>
+	<script src="https://cdn.counter.dev/script.js"
+        data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+        data-utcoffset="6">
+    </script>
+    
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            /* Light Mode Variables */
+            --bg-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --header-bg: white;
+            --header-text: #667eea;
+            --card-bg: white;
+            --card-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            --detail-text: #333;
+            --primary-color: #667eea;
+            --primary-hover: #5568d3;
+            --secondary-text: #666;
+            --tertiary-bg: #f8f9fa;
+            --danger: #dc3545;
+            --success: #28a745;
+            --info: #17a2b8;
+            --flag: #ffc107;
+            --input-border: #ddd;
+            --table-border: #eee;
+            --table-header: #f1f1f1;
+        }
+
+        /* Night Mode Styles */
+        body.dark-mode {
+            --bg-color: #2c3e50;
+            --header-bg: #34495e;
+            --header-text: #9b59b6;
+            --card-bg: #34495e;
+            --card-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            --detail-text: #ecf0f1;
+            --primary-color: #9b59b6;
+            --primary-hover: #8e44ad;
+            --secondary-text: #bdc3c7;
+            --tertiary-bg: #4a647a;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --info: #3498db;
+            --flag: #f39c12;
+            --input-border: #555;
+            --table-border: #555;
+            --table-header: #4a647a;
+            color: var(--detail-text);
+        }
+
+        /* Applying Variables */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: var(--bg-color);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--detail-text);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: var(--header-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .header img {
+            height: 75px;
+            margin-right: 15px;
+        }
+
+        .header-content {
+            flex-grow: 1;
+        }
+        
+        .header h1 {
+            color: var(--header-text);
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: var(--secondary-text);
+        }
+        
+        .controls, .results {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+        }
+
+        .controls h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: flex-end;
+        }
+
+        .input-field {
+            flex-grow: 1;
+            min-width: 0;
+            /* Make this container full width for the textarea */
+            width: 100%; 
+        }
+        
+        .input-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--secondary-text);
+        }
+
+        .input-group input[type="text"],
+        /* Ensure that the textarea inside the input-field is full width */
+        .input-field textarea { 
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--input-border);
+            border-radius: 5px;
+            background: var(--card-bg);
+            color: var(--detail-text);
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        
+        .btn-analyze {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .btn-report {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            margin-top: 15px;
+        }
+
+        .results h2 {
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--table-border);
+            padding-bottom: 10px;
+            color: var(--detail-text);
+        }
+
+        .section {
+            margin-top: 25px;
+        }
+
+        .section h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        th, td {
+            border: 1px solid var(--table-border);
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--table-header);
+            font-weight: bold;
+            color: var(--detail-text);
+        }
+
+        .action-cell button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        .action-cell button.checked {
+            border: 2px solid var(--success);
+        }
+        .action-cell button.wrong {
+            border: 2px solid var(--danger);
+        }
+        .action-cell button.info {
+            border: 2px solid var(--info);
+        }
+        .action-cell button.flag {
+            border: 2px solid var(--flag);
+        }
+        .action-cell button:hover {
+            opacity: 0.8;
+        }
+
+        .action-cell .btn-check { background: var(--success); color: white; }
+        .action-cell .btn-wrong { background: var(--danger); color: white; }
+        .action-cell .btn-info { background: var(--info); color: white; }
+        .action-cell .btn-flag { background: var(--flag); color: #333; }
+
+
+        .status-ok { color: var(--success); font-weight: bold; }
+        .status-error { color: var(--danger); font-weight: bold; }
+        .status-info-text { color: var(--primary-color); font-weight: bold; }
+        
+        .line-item {
+            background: var(--tertiary-bg);
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        /* Night Mode Button */
+        #nightModeToggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+            z-index: 1001;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            color: var(--secondary-text);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <button id="nightModeToggle" onclick="toggleNightMode()">🌙</button>
+    <div class="container">
+        <div class="header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/250px-Wiki%27s_Lazy_Coders.png" alt="Logo">
+            <div class="header-content">
+                <h1>🔗 Links finder validator & Reporting Tool</h1>
+                <p>Paste statements, check links, count keywords, and export a validation report. | Updated on: 10 December 2025</p>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <h3>📝 Applicant Data Input</h3>
+            
+            <div class="input-group">
+                <div class="input-field" style="flex-basis: 35%;">
+                    <label for="applicantName">Reference Name (Username, ID, or Name)</label>
+                    <input type="text" id="applicantName" placeholder="e.g., Rara Kamiliya" value="Applicant Reference">
+                </div>
+                <div class="input-field" style="flex-basis: 35%;">
+                    <label for="searchTerm">Keyword / Term to search</label>
+                    <input type="text" id="searchTerm" placeholder="e.g., Madura, meetup, admin">
+                </div>
+                <button onclick="analyzeStatement()" id="analyzeBtn" class="btn-analyze" style="flex-basis: 20%; height: 42px;">Analyze Statement</button>
+            </div>
+
+            <div class="input-field" style="width: 100%;">
+                <label for="statementText">Paste Applicant's Statement Here</label>
+                <textarea id="statementText" rows="10" placeholder="Paste the full text from one of the applicant's response fields (Contributions, Experience, etc.)"></textarea>
+            </div>
+        </div>
+        
+        <div class="results" id="results" style="display: none;">
+             <button onclick="exportReport()" id="reportBtn" class="btn-report">⬇️ Download Link Report</button>
+
+            </div>
+
+        <div class="footer">
+            <p>Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" style="color: var(--secondary-text);">Suyash Dwivedi</a> | Updated on: 10 December 2025</p>
+        </div>
+    </div>
+
+    <script>
+        // Store status of each unique link (URL + Reference)
+        // Key format: 'Reference Name|URL' -> { status: 'checked', url: '...' }
+        let linkStatuses = {};
+
+        // --- Custom Functions for User Requirements ---
+        function toggleNightMode() {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDarkMode = body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            document.getElementById('nightModeToggle').textContent = isDarkMode ? '☀️' : '🌙';
+        }
+
+        // Apply dark mode on load if preferred
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('nightModeToggle').textContent = '☀️';
+        }
+
+        // --- Core Application Functions ---
+
+        /**
+         * Extracts links (ignoring parentheses) and finds keyword matches.
+         */
+        function extractAndAnalyzeText(text, keyword) {
+            const lines = text.split('\n');
+            const links = [];
+            const keywordMatches = [];
+            
+            // 1. Link Extraction (Filtered: ignores links containing ( or ) )
+            // Regex captures http/https, followed by characters that are NOT: 
+            // whitespace, (), [], {}, <, >, comma, semicolon, colon, quote, apostrophe.
+            const linkRegex = /(https?:\/\/[^\s()\[\]{}<>,;:"']+)/g; 
+            let linkMatch;
+            while ((linkMatch = linkRegex.exec(text)) !== null) {
+                // Ensure no trailing non-URL characters get included (though regex is strict)
+                let url = linkMatch[0].trim().replace(/[.,]$/, ''); 
+                links.push(url);
+            }
+
+            // 2. Keyword Search
+            if (keyword) {
+                const caseInsensitiveKeyword = new RegExp(keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+                lines.forEach((line, index) => {
+                    if (line.match(caseInsensitiveKeyword)) {
+                        keywordMatches.push({
+                            line: index + 1,
+                            text: line.trim()
+                        });
+                    }
+                });
+            }
+
+            return { links: [...new Set(links)], keywordMatches: keywordMatches }; // Return unique links
+        }
+
+        /**
+         * Runs the analysis based on direct user input.
+         */
+        function analyzeStatement() {
+            const name = document.getElementById('applicantName').value.trim() || 'Single Statement Applicant';
+            const searchTerm = document.getElementById('searchTerm').value.trim();
+            const statement = document.getElementById('statementText').value.trim();
+            const resultsEl = document.getElementById('results');
+            resultsEl.style.display = 'none';
+
+            if (!statement) {
+                alert('Please paste the applicant\'s statement into the text area to begin analysis.');
+                return;
+            }
+
+            const analysis = extractAndAnalyzeText(statement, searchTerm);
+            renderResults(name, searchTerm, analysis);
+        }
+        
+        /**
+         * Updates the visual status of a link and stores it globally.
+         */
+        window.setLinkStatus = function(url, status, reference) {
+            const key = `${reference}|${url}`;
+            
+            // Update global store
+            linkStatuses[key] = {
+                url: url,
+                reference: reference,
+                status: status
+            };
+
+            // Update UI (remove all status classes, then add the new one)
+            const rowId = `link-row-${btoa(key)}`;
+            const row = document.getElementById(rowId);
+            if (row) {
+                // Update the status text display
+                const statusCell = row.querySelector('.status-cell span');
+                if (statusCell) {
+                    statusCell.textContent = status.toUpperCase();
+                    statusCell.className = `status-ok`; // Use status-ok class for all positive statuses
+                }
+
+                // Update button styles
+                const buttons = row.querySelectorAll('.action-cell button');
+                buttons.forEach(btn => {
+                    btn.classList.remove('checked', 'wrong', 'info', 'flag');
+                });
+                // Find the button that matches the new status and apply the class
+                const targetButton = row.querySelector(`.btn-${status}`);
+                if (targetButton) {
+                    targetButton.classList.add(status);
+                }
+            }
+        }
+        
+        /**
+         * Renders the analysis results (Links and Keywords).
+         */
+        function renderResults(name, searchTerm, analysis) {
+            const resultsEl = document.getElementById('results');
+            let html = '';
+
+            // --- Section 1: Applicant Display ---
+            html += `<h2>✅ Analysis for Applicant: "${name}"</h2>`;
+            
+            // --- Section 2: Link Analysis ---
+            const totalLinks = analysis.links.length;
+            html += '<div class="section">';
+            html += `<h4>🔗 Extracted Web Links (${totalLinks} Unique Links)</h4>`;
+            html += `<p class="status-error" style="font-weight: bold; margin-bottom: 15px;">⚠️ IMPORTANT: Due to browser security restrictions (CORS), live link checking cannot be performed by this client-side tool. Please use the buttons to log your manual verification status.</p>`;
+            
+            if (totalLinks > 0) {
+                html += '<table>';
+                html += '<thead><tr><th>#</th><th>Web Link (Click to verify manually)</th><th>Status</th><th>Actions</th></tr></thead>';
+                html += '<tbody>';
+                
+                analysis.links.forEach((url, index) => {
+                    const key = `${name}|${url}`;
+                    const rowId = `link-row-${btoa(key)}`;
+                    
+                    // Retrieve status from global store or set default
+                    if (!linkStatuses[key]) {
+                        linkStatuses[key] = { url: url, reference: name, status: 'pending' };
+                    }
+                    const currentStatus = linkStatuses[key].status;
+                    const statusText = currentStatus.toUpperCase();
+                    const statusClass = currentStatus !== 'pending' ? 'status-ok' : 'status-info-text';
+
+                    html += `<tr id="${rowId}">`;
+                    html += `<td>${index + 1}</td>`;
+                    html += `<td><a href="${url}" target="_blank">${url}</a></td>`;
+                    html += `<td class="status-cell"><span class="${statusClass}">${statusText}</span></td>`;
+                    html += `<td class="action-cell">`;
+                    
+                    // Buttons: Use currentStatus to determine initial highlighted state
+                    html += `<button class="btn-checked ${currentStatus === 'checked' ? 'checked' : ''}" onclick="setLinkStatus('${url.replace(/'/g, "\\'")}', 'checked', '${name.replace(/'/g, "\\'")}')" title="Mark as Verified & Valid">✅ Check</button>`;
+                    html += `<button class="btn-wrong ${currentStatus === 'wrong' ? 'wrong' : ''}" onclick="setLinkStatus('${url.replace(/'/g, "\\'")}', 'wrong', '${name.replace(/'/g, "\\'")}')" title="Mark as Invalid or Broken">❌ Wrong</button>`;
+                    html += `<button class="btn-info ${currentStatus === 'info' ? 'info' : ''}" onclick="setLinkStatus('${url.replace(/'/g, "\\'")}', 'info', '${name.replace(/'/g, "\\'")}')" title="Additional Information Needed (e.g., login)">ℹ️ Info</button>`;
+                    html += `<button class="btn-flag ${currentStatus === 'flag' ? 'flag' : ''}" onclick="setLinkStatus('${url.replace(/'/g, "\\'")}', 'flag', '${name.replace(/'/g, "\\'")}')" title="Flag for Review/Escalation">🚩 Flag</button>`;
+                    html += `</td>`;
+                    html += `</tr>`;
+                });
+                html += '</tbody></table>';
+            } else {
+                 html += '<p class="status-info-text">No web links (http/https) were found in the statement.</p>';
+            }
+            html += '</div>';
+
+
+            // --- Section 3: Keyword Analysis ---
+            if (searchTerm) {
+                html += '<div class="section">';
+                html += `<h4>📝 Keyword Occurrence Analysis: "${searchTerm}"</h4>`;
+                
+                const keywordTotalCount = analysis.keywordMatches.length;
+                html += `<p><strong>Total occurrences: <span class="status-ok">${keywordTotalCount}</span></strong></p>`;
+                
+                if (keywordTotalCount > 0) {
+                    analysis.keywordMatches.forEach(match => {
+                        // Highlight the keyword in the line
+                        const highlightedText = match.text.replace(new RegExp(searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi'), function(match) {
+                            return `<mark>${match}</mark>`;
+                        });
+                        
+                        html += `<div class="line-item">Line ${match.line}: ${highlightedText}</div>`;
+                    });
+                } else {
+                     html += `<p class="status-info-text">The keyword "${searchTerm}" did not appear in the statement.</p>`;
+                }
+                
+                html += '</div>';
+            }
+            
+            // Inject all generated HTML *after* the Download button
+            resultsEl.innerHTML = document.getElementById('reportBtn').outerHTML + html;
+            resultsEl.style.display = 'block';
+            resultsEl.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        /**
+         * Generates and downloads the link status report as a CSV.
+         */
+        window.exportReport = function() {
+            if (Object.keys(linkStatuses).length === 0) {
+                alert("No links have been analyzed to generate a report.");
+                return;
+            }
+
+            const headers = ['Applicant_Reference', 'Web_Link', 'Verification_Status'];
+            let csv = headers.join(',') + '\n';
+            
+            // Sort by status for better reporting overview
+            const sortedLinks = Object.values(linkStatuses).sort((a, b) => a.status.localeCompare(b.status));
+
+            sortedLinks.forEach(item => {
+                // Ensure text is enclosed in quotes and quotes within the text are escaped
+                const row = [
+                    item.reference,
+                    item.url,
+                    item.status
+                ].map(cell => {
+                    const safeCell = (cell === null || cell === undefined) ? '' : String(cell).replace(/"/g, '""');
+                    return '"' + safeCell + '"';
+                }).join(',');
+                
+                csv += row + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'eseap_link_validation_report_' + new Date().toISOString().slice(0, 10) + '.csv';
+            
+            // Append to body, trigger download, then remove
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+<a href="#bottom" style="position: fixed; bottom: 20px; left: 20px; padding: 10px; background: #333; color: white; border-radius: 50%; text-decoration: none; z-index: 1000; opacity: 0.7;" title="Go to bottom">↓</a>
+<div id="bottom"></div>
+</html>
