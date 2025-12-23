@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commons Quality Checker | Suyash Dwivedi</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="A stunning tool to discover Quality Images, Featured Pictures, and Valued Media from Wikimedia Commons categories.">
+    <meta name="keywords" content="Wikimedia Commons, Quality Images, Featured Pictures, Valued Images, Wiki Tools, MediaWiki">
+    <meta name="author" content="Suyash Dwivedi">
+    <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/Commons_VI_FI_QI_finder.html">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Commons Quality Checker">
+    <meta property="og:description" content="Discover Quality Images, Featured Pictures, and Valued Media from Wikimedia Commons categories.">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/Commons_VI_FI_QI_finder.html">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Commons Quality Checker">
+    <meta name="twitter:description" content="Discover Quality Images, Featured Pictures, and Valued Media from Wikimedia Commons categories.">
+    <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-GC8PGC89NB');
+    </script>
+    
+    <!-- Counter Script -->
+    <script src="https://cdn.counter.dev/script.js"
+        data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+        data-utcoffset="6">
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient-start: #0f2027;
+            --bg-gradient-mid: #203a43;
+            --bg-gradient-end: #2c5364;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --header-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-color: #667eea;
+            --accent-hover: #764ba2;
+            --shadow: 0 10px 40px rgba(0,0,0,0.1);
+            --shadow-hover: 0 15px 50px rgba(102, 126, 234, 0.3);
+        }
+
+        body.dark-mode {
+            --bg-gradient-start: #000000;
+            --bg-gradient-mid: #0a0a0a;
+            --bg-gradient-end: #1a1a1a;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --header-bg: linear-gradient(135deg, #434343 0%, #000000 100%);
+            --accent-color: #bb86fc;
+            --accent-hover: #985eff;
+            --shadow: 0 10px 40px rgba(0,0,0,0.5);
+            --shadow-hover: 0 15px 50px rgba(187, 134, 252, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        header {
+            background: var(--header-bg);
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            height: 80px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .header-text h1 {
+            font-size: 2rem;
+            color: white;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 5px;
+        }
+
+        .header-text small {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.9rem;
+            font-weight: 300;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .assessment-logos {
+            display: flex;
+            gap: 10px;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        .assessment-logos img {
+            width: 35px;
+            height: 35px;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .assessment-logos img:hover {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        #night-mode-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        #night-mode-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 30px;
+        }
+
+        .search-area {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 50px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-area:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-5px);
+        }
+
+        .search-area h2 {
+            color: var(--accent-color);
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 300px;
+            max-width: 600px;
+            padding: 15px 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50px;
+            outline: none;
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        button#search-btn {
+            padding: 15px 40px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button#search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button#search-btn:active {
+            transform: translateY(-1px);
+        }
+
+        #status {
+            margin-top: 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            min-height: 30px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .image-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .image-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .thumb-container {
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            overflow: hidden;
+            position: relative;
+        }
+
+        body.dark-mode .thumb-container {
+            background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+        }
+
+        .thumb-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.1) 100%);
+            pointer-events: none;
+        }
+
+        .thumb-container img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .image-card:hover .thumb-container img {
+            transform: scale(1.05);
+        }
+
+        .info-pane {
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        .file-title {
+            display: block;
+            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            color: var(--text-color);
+            min-height: 42px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .assessment-icons {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .assessment-icons img {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .assessment-icons img:hover {
+            transform: scale(1.15) rotate(10deg);
+        }
+
+        .meta-data {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 2px solid rgba(102, 126, 234, 0.1);
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        .meta-data a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .meta-data a:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+
+        .nav-btn {
+            position: fixed;
+            right: 30px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        #go-top { bottom: 100px; }
+        #go-bottom { bottom: 30px; }
+
+        footer {
+            text-align: center;
+            padding: 50px 20px;
+            font-size: 0.95rem;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
+        }
+
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: white;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
+            }
+
+            .header-text h1 {
+                font-size: 1.5rem;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+
+            input[type="text"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" class="logo" alt="Wiki's Lazy Coders Logo">
+        <div class="header-text">
+            <h1>Commons Assessment Checker</h1>
+            <small>Discover Quality, Featured & Valued Media</small>
+        </div>
+    </div>
+    <div class="header-right">
+        <div class="assessment-logos">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Quality_images_logo.svg/330px-Quality_images_logo.svg.png" alt="Quality Image" title="Quality Image">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Cscr-featured.svg/120px-Cscr-featured.svg.png" alt="Featured Picture" title="Featured Picture">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Valued_image_seal.svg/400px-Valued_image_seal.svg.png" alt="Valued Image" title="Valued Image">
+        </div>
+        <button id="night-mode-btn" onclick="toggleNightMode()">🌙 Dark Mode</button>
+    </div>
+</header>
+
+<div class="container">
+    <div class="search-area">
+        <h2>🔍 Search for Assessed Images</h2>
+        <div class="search-container">
+            <input type="text" id="category-input" placeholder="Enter category (e.g., Images by User:Suyash.dwivedi)" value="Images by User:Suyash.dwivedi">
+            <button id="search-btn" onclick="startSearch()">Check Category</button>
+        </div>
+        <p id="status"></p>
+    </div>
+
+    <div id="results" class="results-grid"></div>
+</div>
+
+<button id="go-top" class="nav-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Go to top">↑</button>
+<button id="go-bottom" class="nav-btn" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" title="Go to bottom">↓</button>
+
+<footer>
+    <p>
+        ✨ <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Created by Suyash Dwivedi</a> | 
+        🚀 Updated on: December 23, 2025
+    </p>
+    <p style="margin-top: 10px; opacity: 0.7;">
+        Powered by Wikimedia Commons API | Made with ❤️
+    </p>
+</footer>
+
+<script>
+    const ICON_QI = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Quality_images_logo.svg/330px-Quality_images_logo.svg.png";
+    const ICON_FP = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Cscr-featured.svg/120px-Cscr-featured.svg.png";
+    const ICON_VI = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Valued_image_seal.svg/400px-Valued_image_seal.svg.png";
+
+    function toggleNightMode() {
+        document.body.classList.toggle('dark-mode');
+        const btn = document.getElementById('night-mode-btn');
+        btn.textContent = document.body.classList.contains('dark-mode') ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+
+    async function startSearch() {
+        const input = document.getElementById('category-input').value.trim();
+        const resultsDiv = document.getElementById('results');
+        const statusDiv = document.getElementById('status');
+        
+        if (!input) {
+            statusDiv.innerHTML = '⚠️ Please enter a category name';
+            return;
+        }
+
+        let category = input.startsWith('Category:') ? input : 'Category:' + input;
+        
+        resultsDiv.innerHTML = '';
+        statusDiv.innerHTML = '<span class="loading-spinner"></span> Scanning category for assessed masterpieces...';
+
+        try {
+            const files = await fetchCategoryFiles(category);
+            if (files.length === 0) {
+                statusDiv.innerHTML = '❌ No files found in this category. Please check the category name.';
+                return;
+            }
+
+            statusDiv.innerHTML = `<span class="loading-spinner"></span> Found ${files.length} files. Checking assessments...`;
+
+            let foundCount = 0;
+            for (const file of files) {
+                const assessment = await checkImageAssessment(file.title);
+                if (assessment.isRecognized) {
+                    foundCount++;
+                    await displayImage(file, assessment.types);
+                }
+            }
+
+            if (foundCount === 0) {
+                statusDiv.innerHTML = '📭 No assessed images found in this category.';
+            } else {
+                statusDiv.innerHTML = `✅ Finished! Found <strong>${foundCount}</strong> assessed image${foundCount > 1 ? 's' : ''} out of ${files.length} total files.`;
+            }
+        } catch (error) {
+            statusDiv.innerHTML = '❌ Error fetching data. Please check the category name and try again.';
+            console.error(error);
+        }
+    }
+
+    async function fetchCategoryFiles(category) {
+        const url = `https://commons.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtitle=${encodeURIComponent(category)}&cmtype=file&cmlimit=500&format=json&origin=*`;
+        const response = await fetch(url);
+        const data = await response.json();
+        return data.query.categorymembers || [];
+    }
+
+    async function checkImageAssessment(fileTitle) {
+        const url = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(fileTitle)}&prop=categories&format=json&origin=*`;
+        const response = await fetch(url);
+        const data = await response.json();
+        const pages = data.query.pages;
+        const pageId = Object.keys(pages)[0];
+        const categories = pages[pageId].categories || [];
+        
+        const assessments = { isRecognized: false, types: [] };
+
+        categories.forEach(cat => {
+            if (cat.title.includes('Quality images')) assessments.types.push('QI');
+            if (cat.title.includes('Featured pictures on Wikimedia Commons')) assessments.types.push('FP');
+            if (cat.title.includes('Commons:Valued images')) assessments.types.push('VI');
+        });
+
+        if (assessments.types.length > 0) assessments.isRecognized = true;
+        return assessments;
+    }
+
+    async function displayImage(file, types) {
+        const url = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(file.title)}&prop=imageinfo&iiprop=url|thumburl|user|timestamp&iiurlwidth=300&format=json&origin=*`;
+        const response = await fetch(url);
+        const data = await response.json();
+        const pages = data.query.pages;
+        const pageId = Object.keys(pages)[0];
+        const info = pages[pageId].imageinfo[0];
+
+        const resultsDiv = document.getElementById('results');
+        const card = document.createElement('div');
+        card.className = 'image-card';
+        
+        let iconsHtml = '';
+        if (types.includes('QI')) iconsHtml += `<img src="${ICON_QI}" title="Quality Image" alt="QI">`;
+        if (types.includes('FP')) iconsHtml += `<img src="${ICON_FP}" title="Featured Picture" alt="FP">`;
+        if (types.includes('VI')) iconsHtml += `<img src="${ICON_VI}" title="Valued Image" alt="VI">`;
+
+        const uploadDate = new Date(info.timestamp).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'});
+        const userProfileUrl = `https://commons.wikimedia.org/wiki/User:${encodeURIComponent(info.user)}`;
+
+        card.innerHTML = `
+            <div class="assessment-icons">${iconsHtml}</div>
+            <div class="thumb-container">
+                <a href="${info.descriptionurl}" target="_blank">
+                    <img src="${info.thumburl || info.url}" alt="Image thumbnail" loading="lazy">
+                </a>
+            </div>
+            <div class="info-pane">
+                <a href="${info.descriptionurl}" target="_blank" class="file-title">
+                    ${file.title.replace('File:', '')}
+                </a>
+                <div class="meta-data">
+                    👤 Uploader: <a href="${userProfileUrl}" target="_blank">${info.user}</a><br>
+                    📅 Uploaded: <strong>${uploadDate}</strong>
+                </div>
+            </div>
+        `;
+        resultsDiv.appendChild(card);
+    }
+
+    // Allow Enter key to trigger search
+    document.getElementById('category-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            startSearch();
+        }
+    });
+</script>
+
+</body>
+</html>
