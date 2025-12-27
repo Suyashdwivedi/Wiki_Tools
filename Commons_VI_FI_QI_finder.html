@@ -227,6 +227,25 @@
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
 
+        select#depth-select {
+            padding: 15px 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50px;
+            outline: none;
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        select#depth-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
         button#search-btn {
             padding: 15px 40px;
             border-radius: 50px;
@@ -460,6 +479,10 @@
             input[type="text"] {
                 width: 100%;
             }
+
+            select#depth-select {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -488,6 +511,13 @@
         <h2>🔍 Search for Assessed Images</h2>
         <div class="search-container">
             <input type="text" id="category-input" placeholder="Enter category (e.g., Images by User:Suyash.dwivedi)" value="Images by User:Suyash.dwivedi">
+            <select id="depth-select">
+                <option value="1">Depth: 1 Level</option>
+                <option value="2">Depth: 2 Levels</option>
+                <option value="3">Depth: 3 Levels</option>
+                <option value="4">Depth: 4 Levels</option>
+                <option value="5">Depth: 5 Levels</option>
+            </select>
             <button id="search-btn" onclick="startSearch()">Check Category</button>
         </div>
         <p id="status"></p>
@@ -502,7 +532,7 @@
 <footer>
     <p>
         ✨ <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Created by Suyash Dwivedi</a> | 
-        🚀 Updated on: December 23, 2025
+        🚀 Updated on: December 27, 2025
     </p>
     <p style="margin-top: 10px; opacity: 0.7;">
         Powered by Wikimedia Commons API | Made with ❤️
@@ -514,14 +544,38 @@
     const ICON_FP = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Cscr-featured.svg/120px-Cscr-featured.svg.png";
     const ICON_VI = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Valued_image_seal.svg/400px-Valued_image_seal.svg.png";
 
+    let totalFiles = 0;
+    let processedFiles = 0;
+    let foundCount = 0;
+
     function toggleNightMode() {
         document.body.classList.toggle('dark-mode');
         const btn = document.getElementById('night-mode-btn');
-        btn.textContent = document.body.classList.contains('dark-mode') ? '☀️ Light Mode' : '🌙 Dark Mode';
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        btn.textContent = isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode';
+        
+        // Save preference to localStorage
+        localStorage.setItem('darkMode', isDarkMode ? 'true' : 'false');
     }
+
+    // Load dark mode preference on page load
+    function loadDarkModePreference() {
+        const darkModePref = localStorage.getItem('darkMode');
+        if (darkModePref === 'true') {
+            document.body.classList.add('dark-mode');
+            const btn = document.getElementById('night-mode-btn');
+            if (btn) {
+                btn.textContent = '☀️ Light Mode';
+            }
+        }
+    }
+
+    // Apply dark mode preference immediately when script loads
+    loadDarkModePreference();
 
     async function startSearch() {
         const input = document.getElementById('category-input').value.trim();
+        const depth = parseInt(document.getElementById('depth-select').value);
         const resultsDiv = document.getElementById('results');
         const statusDiv = document.getElementById('status');
         
@@ -533,35 +587,102 @@
         let category = input.startsWith('Category:') ? input : 'Category:' + input;
         
         resultsDiv.innerHTML = '';
-        statusDiv.innerHTML = '<span class="loading-spinner"></span> Scanning category for assessed masterpieces...';
+        totalFiles = 0;
+        processedFiles = 0;
+        foundCount = 0;
+        statusDiv.innerHTML = '<span class="loading-spinner"></span> Scanning categories...';
 
         try {
-            const files = await fetchCategoryFiles(category);
-            if (files.length === 0) {
-                statusDiv.innerHTML = '❌ No files found in this category. Please check the category name.';
+            const allCategories = await fetchCategoriesRecursive(category, depth, 1);
+            statusDiv.innerHTML = `<span class="loading-spinner"></span> Found ${allCategories.length} categor${allCategories.length > 1 ? 'ies' : 'y'}. Fetching files...`;
+
+            const allFiles = [];
+            const processedTitles = new Set();
+
+            for (const cat of allCategories) {
+                const files = await fetchCategoryFiles(cat);
+                for (const file of files) {
+                    if (!processedTitles.has(file.title)) {
+                        processedTitles.add(file.title);
+                        file.sourceCategory = cat; // Store the source category
+                        allFiles.push(file);
+                    }
+                }
+            }
+
+            totalFiles = allFiles.length;
+
+            if (totalFiles === 0) {
+                statusDiv.innerHTML = '❌ No files found in these categories.';
                 return;
             }
 
-            statusDiv.innerHTML = `<span class="loading-spinner"></span> Found ${files.length} files. Checking assessments...`;
+            statusDiv.innerHTML = `<span class="loading-spinner"></span> Found ${totalFiles} files. Checking assessments... (0/${totalFiles})`;
 
-            let foundCount = 0;
-            for (const file of files) {
+            for (const file of allFiles) {
                 const assessment = await checkImageAssessment(file.title);
+                processedFiles++;
+                
                 if (assessment.isRecognized) {
                     foundCount++;
                     await displayImage(file, assessment.types);
                 }
+
+                if (processedFiles % 10 === 0 || processedFiles === totalFiles) {
+                    statusDiv.innerHTML = `<span class="loading-spinner"></span> Checking assessments... (${processedFiles}/${totalFiles}) - Found ${foundCount} assessed image${foundCount !== 1 ? 's' : ''}`;
+                }
             }
 
             if (foundCount === 0) {
-                statusDiv.innerHTML = '📭 No assessed images found in this category.';
+                statusDiv.innerHTML = `🔭 No assessed images found in ${allCategories.length} categor${allCategories.length > 1 ? 'ies' : 'y'} (${totalFiles} total files checked).`;
             } else {
-                statusDiv.innerHTML = `✅ Finished! Found <strong>${foundCount}</strong> assessed image${foundCount > 1 ? 's' : ''} out of ${files.length} total files.`;
+                statusDiv.innerHTML = `✅ Finished! Found <strong>${foundCount}</strong> assessed image${foundCount > 1 ? 's' : ''} out of ${totalFiles} total files across ${allCategories.length} categor${allCategories.length > 1 ? 'ies' : 'y'}.`;
+            }
+            
+            // Play completion sound
+            try {
+                const audio = new Audio('https://suyashdwivedi.github.io/alert.mp3');
+                audio.play().catch(e => console.log('Could not play audio:', e));
+            } catch (e) {
+                console.log('Audio not available');
             }
         } catch (error) {
             statusDiv.innerHTML = '❌ Error fetching data. Please check the category name and try again.';
             console.error(error);
+            
+            // Play error sound as well
+            try {
+                const audio = new Audio('https://suyashdwivedi.github.io/alert.mp3');
+                audio.play().catch(e => console.log('Could not play audio:', e));
+            } catch (e) {
+                console.log('Audio not available');
+            }
         }
+    }
+
+    async function fetchCategoriesRecursive(category, maxDepth, currentDepth) {
+        const categories = [category];
+        
+        if (currentDepth >= maxDepth) {
+            return categories;
+        }
+
+        const url = `https://commons.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtitle=${encodeURIComponent(category)}&cmtype=subcat&cmlimit=500&format=json&origin=*`;
+        
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            const subcategories = data.query.categorymembers || [];
+
+            for (const subcat of subcategories) {
+                const subCats = await fetchCategoriesRecursive(subcat.title, maxDepth, currentDepth + 1);
+                categories.push(...subCats);
+            }
+        } catch (error) {
+            console.error(`Error fetching subcategories for ${category}:`, error);
+        }
+
+        return categories;
     }
 
     async function fetchCategoryFiles(category) {
@@ -592,12 +713,13 @@
     }
 
     async function displayImage(file, types) {
-        const url = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(file.title)}&prop=imageinfo&iiprop=url|thumburl|user|timestamp&iiurlwidth=300&format=json&origin=*`;
+        const url = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(file.title)}&prop=imageinfo|categories&iiprop=url|thumburl|user|timestamp&iiurlwidth=300&cllimit=500&clshow=!hidden&format=json&origin=*`;
         const response = await fetch(url);
         const data = await response.json();
         const pages = data.query.pages;
         const pageId = Object.keys(pages)[0];
         const info = pages[pageId].imageinfo[0];
+        const categories = pages[pageId].categories || [];
 
         const resultsDiv = document.getElementById('results');
         const card = document.createElement('div');
@@ -611,6 +733,35 @@
         const uploadDate = new Date(info.timestamp).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'});
         const userProfileUrl = `https://commons.wikimedia.org/wiki/User:${encodeURIComponent(info.user)}`;
 
+        // Filter out hidden and irrelevant categories
+        const relevantCategories = categories.filter(cat => {
+            const catTitle = cat.title.toLowerCase();
+            return !catTitle.includes('quality images') && 
+                   !catTitle.includes('featured pictures') && 
+                   !catTitle.includes('valued images') &&
+                   !catTitle.includes('cc-by') &&
+                   !catTitle.includes('cc-zero') &&
+                   !catTitle.includes('self-published') &&
+                   !catTitle.includes('flickr') &&
+                   !catTitle.includes('license') &&
+                   !catTitle.includes('pd-') &&
+                   !catTitle.includes('attribution') &&
+                   !catTitle.includes('gfdl');
+        });
+
+        // Create category links HTML
+        let categoryHtml = '';
+        if (relevantCategories.length > 0) {
+            const categoryLinks = relevantCategories.map(cat => {
+                const catName = cat.title.replace('Category:', '');
+                return `<a href="https://commons.wikimedia.org/wiki/${encodeURIComponent(cat.title)}" target="_blank" style="color: var(--accent-color); text-decoration: none; font-weight: 500; display: inline-block; margin: 3px 8px 3px 0;">${catName}</a>`;
+            }).join('');
+            
+            categoryHtml = `<div style="margin-bottom: 10px; font-size: 0.82rem; line-height: 1.6;">
+                📁 ${categoryLinks}
+            </div>`;
+        }
+
         card.innerHTML = `
             <div class="assessment-icons">${iconsHtml}</div>
             <div class="thumb-container">
@@ -622,6 +773,7 @@
                 <a href="${info.descriptionurl}" target="_blank" class="file-title">
                     ${file.title.replace('File:', '')}
                 </a>
+                ${categoryHtml}
                 <div class="meta-data">
                     👤 Uploader: <a href="${userProfileUrl}" target="_blank">${info.user}</a><br>
                     📅 Uploaded: <strong>${uploadDate}</strong>
