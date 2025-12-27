@@ -512,6 +512,7 @@
         <div class="search-container">
             <input type="text" id="category-input" placeholder="Enter category (e.g., Images by User:Suyash.dwivedi)">
             <select id="depth-select">
+                <option value="0">Depth: 0 (Main category only)</option>
                 <option value="1">Depth: 1 Level</option>
                 <option value="2">Depth: 2 Levels</option>
                 <option value="3">Depth: 3 Levels</option>
@@ -599,15 +600,24 @@
             const allFiles = [];
             const processedTitles = new Set();
 
-            for (const cat of allCategories) {
-                const files = await fetchCategoryFiles(cat);
-                for (const file of files) {
-                    if (!processedTitles.has(file.title)) {
-                        processedTitles.add(file.title);
-                        file.sourceCategory = cat; // Store the source category
-                        allFiles.push(file);
+            // Fetch all files in parallel with larger batches
+            const batchSize = 25;
+            for (let i = 0; i < allCategories.length; i += batchSize) {
+                const batch = allCategories.slice(i, i + batchSize);
+                const filesPromises = batch.map(cat => fetchCategoryFiles(cat));
+                const filesResults = await Promise.all(filesPromises);
+                
+                filesResults.forEach(files => {
+                    for (const file of files) {
+                        if (!processedTitles.has(file.title)) {
+                            processedTitles.add(file.title);
+                            allFiles.push(file);
+                        }
                     }
-                }
+                });
+                
+                // Update progress during file fetching
+                statusDiv.innerHTML = `<span class="loading-spinner"></span> Fetching files from categories... (${Math.min(i + batchSize, allCategories.length)}/${allCategories.length} categories processed)`;
             }
 
             totalFiles = allFiles.length;
@@ -619,18 +629,27 @@
 
             statusDiv.innerHTML = `<span class="loading-spinner"></span> Found ${totalFiles} files. Checking assessments... (0/${totalFiles})`;
 
-            for (const file of allFiles) {
-                const assessment = await checkImageAssessment(file.title);
-                processedFiles++;
+            // Process files in parallel batches
+            const checkBatchSize = 25;
+            for (let i = 0; i < allFiles.length; i += checkBatchSize) {
+                const batch = allFiles.slice(i, i + checkBatchSize);
+                const assessmentPromises = batch.map(async file => {
+                    const assessment = await checkImageAssessment(file.title);
+                    return { file, assessment };
+                });
                 
-                if (assessment.isRecognized) {
-                    foundCount++;
-                    await displayImage(file, assessment.types);
+                const results = await Promise.all(assessmentPromises);
+                
+                for (const { file, assessment } of results) {
+                    processedFiles++;
+                    
+                    if (assessment.isRecognized) {
+                        foundCount++;
+                        await displayImage(file, assessment.types);
+                    }
                 }
 
-                if (processedFiles % 10 === 0 || processedFiles === totalFiles) {
-                    statusDiv.innerHTML = `<span class="loading-spinner"></span> Checking assessments... (${processedFiles}/${totalFiles}) - Found ${foundCount} assessed image${foundCount !== 1 ? 's' : ''}`;
-                }
+                statusDiv.innerHTML = `<span class="loading-spinner"></span> Checking assessments... (${processedFiles}/${totalFiles}) - Found ${foundCount} assessed image${foundCount !== 1 ? 's' : ''}`;
             }
 
             if (foundCount === 0) {
@@ -661,9 +680,14 @@
     }
 
     async function fetchCategoriesRecursive(category, maxDepth, currentDepth) {
+        if (maxDepth === 0) {
+            // Depth 0: only return the main category
+            return [category];
+        }
+        
         const categories = [category];
         
-        if (currentDepth >= maxDepth) {
+        if (currentDepth > maxDepth) {
             return categories;
         }
 
@@ -674,9 +698,15 @@
             const data = await response.json();
             const subcategories = data.query.categorymembers || [];
 
-            for (const subcat of subcategories) {
-                const subCats = await fetchCategoriesRecursive(subcat.title, maxDepth, currentDepth + 1);
-                categories.push(...subCats);
+            // Process subcategories in parallel batches
+            const batchSize = 25;
+            for (let i = 0; i < subcategories.length; i += batchSize) {
+                const batch = subcategories.slice(i, i + batchSize);
+                const promises = batch.map(subcat => 
+                    fetchCategoriesRecursive(subcat.title, maxDepth, currentDepth + 1)
+                );
+                const results = await Promise.all(promises);
+                results.forEach(subCats => categories.push(...subCats));
             }
         } catch (error) {
             console.error(`Error fetching subcategories for ${category}:`, error);
@@ -793,4 +823,3 @@
 
 </body>
 </html>
-
