@@ -34,7 +34,7 @@
     <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/piexifjs@1.0.6/piexif.min.js"></script>
     
-    <!-- Leaflet CSS and JS for map -->
+    <!-- Leaflet CSS and JS for OpenStreetMap -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
@@ -511,7 +511,7 @@
                             </div>
                         </div>
                         <button class="btn btn-primary" onclick="initMap()" style="margin-top: 15px;">
-                            🗺️ Pick Location on Map (OpenStreetMap)
+                            🗺️ Pick Location on Map
                         </button>
                         <div id="map"></div>
                     </div>
@@ -542,8 +542,29 @@
                     <summary style="cursor: pointer; font-weight: 600; font-size: 1.1em; color: #667eea;">
                         📋 View All Raw EXIF Data (Read-Only)
                     </summary>
+                    <button class="btn btn-secondary" onclick="refreshRawExifDisplay()" style="margin: 15px 0;">
+                        🔄 Refresh EXIF Display with Current Edits
+                    </button>
                     <div class="all-exif-data" id="allExifData" style="margin-top: 15px;"></div>
                 </details>
+            </div>
+
+            <!-- OpenStreetMap Info -->
+            <div style="background: #e7f3ff; border: 2px solid #2196F3; border-radius: 10px; padding: 20px; margin-top: 30px;">
+                <h3 style="color: #0d47a1; margin-bottom: 15px;">🗺️ About the Map Feature</h3>
+                <p style="color: #0d47a1; margin-bottom: 10px;">
+                    This tool uses <strong>OpenStreetMap</strong> with <strong>Leaflet.js</strong> for the interactive map picker.
+                </p>
+                <ul style="color: #0d47a1; margin-left: 20px; line-height: 1.8;">
+                    <li>✅ <strong>No API key required</strong> - Works immediately!</li>
+                    <li>✅ <strong>Works offline</strong> from file:// protocol</li>
+                    <li>✅ <strong>100% Free</strong> and open source</li>
+                    <li>✅ <strong>Community-driven</strong> global map data</li>
+                    <li>✅ <strong>Privacy-friendly</strong> - No tracking</li>
+                </ul>
+                <p style="color: #0d47a1; margin-top: 15px; font-size: 0.95em;">
+                    <strong>How to use:</strong> Click the "Pick Location on Map" button, then drag the marker or click anywhere on the map to set your GPS coordinates. The city name will be automatically filled!
+                </p>
             </div>
 
             <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid #e0e0e0; color: #666; font-size: 0.95em;">
@@ -818,10 +839,24 @@
             const container = document.getElementById('allExifData');
             let html = '<table><thead><tr><th>Property</th><th>Value</th></tr></thead><tbody>';
             
-            for (let key in exifData) {
-                if (exifData.hasOwnProperty(key) && exifData[key]) {
-                    html += `<tr><td><strong>${key}</strong></td><td>${exifData[key]}</td></tr>`;
+            const entries = Object.entries(exifData).sort((a, b) => a[0].localeCompare(b[0]));
+            
+            for (let [key, value] of entries) {
+                if (value !== null && value !== undefined && value !== '') {
+                    // Format arrays nicely
+                    let displayValue = value;
+                    if (Array.isArray(value)) {
+                        displayValue = JSON.stringify(value);
+                    } else if (typeof value === 'object') {
+                        displayValue = JSON.stringify(value);
+                    }
+                    
+                    html += `<tr><td><strong>${key}</strong></td><td>${displayValue}</td></tr>`;
                 }
+            }
+            
+            if (entries.length === 0) {
+                html += '<tr><td colspan="2" style="text-align: center; color: #999;">No EXIF data found in this image</td></tr>';
             }
             
             html += '</tbody></table>';
@@ -862,20 +897,23 @@
 
             // Initialize map if not already created
             if (!map) {
-                // Create Leaflet map
+                // Create Leaflet map with OpenStreetMap tiles
                 map = L.map('map').setView([lat, lon], 15);
 
                 // Add OpenStreetMap tiles
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors',
+                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
                     maxZoom: 19
                 }).addTo(map);
 
                 // Add draggable marker
                 marker = L.marker([lat, lon], {
                     draggable: true,
-                    title: 'Drag to set location'
+                    title: 'Drag me to set location'
                 }).addTo(map);
+
+                // Popup for the marker
+                marker.bindPopup('Drag me or click on the map to set location!').openPopup();
 
                 // Update coordinates when marker is dragged
                 marker.on('dragend', function(event) {
@@ -883,7 +921,7 @@
                     document.getElementById('gpsLatitude').value = position.lat.toFixed(6);
                     document.getElementById('gpsLongitude').value = position.lng.toFixed(6);
                     
-                    // Try to get location name using reverse geocoding
+                    // Get city name from coordinates using Nominatim (OSM geocoding)
                     fetchLocationName(position.lat, position.lng);
                 });
 
@@ -894,8 +932,11 @@
                     document.getElementById('gpsLatitude').value = position.lat.toFixed(6);
                     document.getElementById('gpsLongitude').value = position.lng.toFixed(6);
                     
-                    // Try to get location name
+                    // Get city name
                     fetchLocationName(position.lat, position.lng);
+                    
+                    // Update popup
+                    marker.setPopupContent(`Location: ${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`).openPopup();
                 });
             } else {
                 // If map already exists, just update position
@@ -904,16 +945,25 @@
             }
         }
 
-        // Function to get location name from coordinates using Nominatim (OpenStreetMap)
+        // Function to get location name from coordinates using Nominatim (OpenStreetMap Geocoding API)
         function fetchLocationName(lat, lon) {
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`, {
+                headers: {
+                    'User-Agent': 'EXIF-Editor-Tool'
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.address) {
-                        const city = data.address.city || data.address.town || data.address.village || 
-                                    data.address.county || data.address.state || '';
+                        const city = data.address.city || 
+                                    data.address.town || 
+                                    data.address.village || 
+                                    data.address.municipality ||
+                                    data.address.county || 
+                                    data.address.state || '';
                         if (city) {
                             document.getElementById('gpsCity').value = city;
+                            showSuccess(`📍 Location found: ${city}`);
                         }
                     }
                 })
@@ -1042,7 +1092,7 @@
 
         function downloadImage() {
             if (!originalImage) {
-                showError('No image loaded');
+                showError('❌ No image loaded');
                 return;
             }
 
@@ -1056,6 +1106,8 @@
                 if (!exifObj["GPS"]) exifObj["GPS"] = {};
                 if (!exifObj["Interop"]) exifObj["Interop"] = {};
 
+                console.log('Original EXIF before updates:', JSON.parse(JSON.stringify(exifObj)));
+
                 // Update with all edited values from form fields
                 document.querySelectorAll('[data-ifd]').forEach(input => {
                     const ifd = input.dataset.ifd;
@@ -1065,18 +1117,33 @@
                     if (value) {
                         // Handle UserComment specially (needs byte encoding)
                         if (tag === piexif.ExifIFD.UserComment) {
-                            exifObj[ifd][tag] = piexif.helper.convertStringToBytes(value);
+                            const encoded = piexif.helper.convertStringToBytes(value);
+                            exifObj[ifd][tag] = encoded;
                         }
-                        // Handle numeric fields
+                        // Handle numeric fields that should be ratios [numerator, denominator]
+                        else if (tag === piexif.ImageIFD.XResolution || tag === piexif.ImageIFD.YResolution) {
+                            const num = parseFloat(value);
+                            if (!isNaN(num)) {
+                                exifObj[ifd][tag] = [Math.round(num), 1];
+                            }
+                        }
+                        // Handle ISO (should be a number)
+                        else if (tag === piexif.ExifIFD.ISOSpeedRatings) {
+                            const iso = parseInt(value);
+                            if (!isNaN(iso)) {
+                                exifObj[ifd][tag] = iso;
+                            }
+                        }
+                        // Handle other numeric fields
                         else if (input.type === 'number') {
                             const numValue = parseFloat(value);
                             if (!isNaN(numValue)) {
-                                exifObj[ifd][tag] = numValue;
+                                exifObj[ifd][tag] = Math.round(numValue);
                             }
                         }
-                        // Handle text fields
+                        // Handle text fields - ensure they're strings
                         else {
-                            exifObj[ifd][tag] = value;
+                            exifObj[ifd][tag] = String(value);
                         }
                     }
                 });
@@ -1098,16 +1165,21 @@
                     }
                 }
 
-                console.log('EXIF Object before dump:', exifObj);
+                console.log('Updated EXIF before dump:', exifObj);
 
                 // Dump EXIF data to binary
                 const exifBytes = piexif.dump(exifObj);
+                console.log('EXIF bytes generated:', exifBytes.length, 'bytes');
                 
                 // Insert EXIF into image
                 const newImage = piexif.insert(exifBytes, originalImage);
+                console.log('New image created with EXIF');
                 
                 // Update preview
                 document.getElementById('modifiedPreview').src = newImage;
+                
+                // Update the raw EXIF display with new data
+                updateRawExifDisplay(exifObj);
                 
                 // Create download link
                 const link = document.createElement('a');
@@ -1118,16 +1190,105 @@
                 const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
                 link.download = `image-exif-updated-${timestamp}.jpg`;
                 
+                // Trigger download
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
 
                 showSuccess('✅ Image downloaded successfully with updated EXIF data!');
+                console.log('Download triggered successfully');
 
             } catch (error) {
                 console.error('Error processing EXIF:', error);
-                showError('❌ Error updating EXIF data: ' + error.message + '. Please check your input values.');
+                console.error('Error stack:', error.stack);
+                showError('❌ Error updating EXIF data: ' + error.message + '. Please check the console for details.');
             }
+        }
+
+        function updateRawExifDisplay(exifObj) {
+            // Convert EXIF object to readable format and update the display
+            const container = document.getElementById('allExifData');
+            let html = '<table><thead><tr><th>IFD</th><th>Tag</th><th>Value</th></tr></thead><tbody>';
+            
+            // Display all IFD sections
+            for (let ifd in exifObj) {
+                if (exifObj[ifd] && typeof exifObj[ifd] === 'object' && ifd !== '_gpsData') {
+                    for (let tag in exifObj[ifd]) {
+                        let value = exifObj[ifd][tag];
+                        
+                        // Format array values
+                        if (Array.isArray(value)) {
+                            if (value.length === 2 && typeof value[0] === 'number' && typeof value[1] === 'number') {
+                                value = `${value[0]}/${value[1]} (${(value[0]/value[1]).toFixed(2)})`;
+                            } else {
+                                value = JSON.stringify(value);
+                            }
+                        }
+                        // Format byte arrays
+                        else if (typeof value === 'object' && value !== null) {
+                            value = JSON.stringify(value);
+                        }
+                        
+                        html += `<tr><td><strong>${ifd}</strong></td><td>${tag}</td><td>${value}</td></tr>`;
+                    }
+                }
+            }
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function refreshRawExifDisplay() {
+            if (!originalExifObj) {
+                showError('❌ No image loaded');
+                return;
+            }
+
+            // Create a copy of the EXIF object with current edits
+            let exifObj = JSON.parse(JSON.stringify(originalExifObj));
+            
+            // Update with all edited values from form fields
+            document.querySelectorAll('[data-ifd]').forEach(input => {
+                const ifd = input.dataset.ifd;
+                const tag = parseInt(input.dataset.tag);
+                const value = input.value.trim();
+                
+                if (!exifObj[ifd]) exifObj[ifd] = {};
+                
+                if (value) {
+                    if (tag === piexif.ExifIFD.UserComment) {
+                        exifObj[ifd][tag] = value; // Show as string in display
+                    } else if (input.type === 'number') {
+                        const numValue = parseFloat(value);
+                        if (!isNaN(numValue)) {
+                            exifObj[ifd][tag] = numValue;
+                        }
+                    } else {
+                        exifObj[ifd][tag] = value;
+                    }
+                }
+            });
+
+            // Update GPS data in the display
+            const lat = parseFloat(document.getElementById('gpsLatitude').value);
+            const lon = parseFloat(document.getElementById('gpsLongitude').value);
+            const alt = parseFloat(document.getElementById('gpsAltitude').value);
+
+            if (!isNaN(lat) && !isNaN(lon)) {
+                if (!exifObj.GPS) exifObj.GPS = {};
+                exifObj.GPS[piexif.GPSIFD.GPSLatitude] = convertDDToDMS(Math.abs(lat));
+                exifObj.GPS[piexif.GPSIFD.GPSLatitudeRef] = lat >= 0 ? 'N' : 'S';
+                exifObj.GPS[piexif.GPSIFD.GPSLongitude] = convertDDToDMS(Math.abs(lon));
+                exifObj.GPS[piexif.GPSIFD.GPSLongitudeRef] = lon >= 0 ? 'E' : 'W';
+                
+                if (!isNaN(alt)) {
+                    exifObj.GPS[piexif.GPSIFD.GPSAltitude] = [Math.round(Math.abs(alt) * 100), 100];
+                    exifObj.GPS[piexif.GPSIFD.GPSAltitudeRef] = alt >= 0 ? 0 : 1;
+                }
+            }
+
+            updateRawExifDisplay(exifObj);
+            showSuccess('✅ EXIF display updated with your current edits!');
         }
 
         function showLoading(show) {
