@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced EXIF Data Editor 📸</title>
+    <meta name="description" content="A powerful tool to view, edit, and update EXIF metadata in JPEG images. Upload via drag & drop, file picker, or URL, then download with modified EXIF data.">
+    <meta name="keywords" content="EXIF, metadata, EXIF editor, image metadata, photo editor, JPEG, EXIF data, image EXIF, photo metadata, GPS, location">
+    <meta name="author" content="Suyash Dwivedi">
+    <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/exif-editor.html">
+    <meta property="og:title" content="Advanced EXIF Data Editor">
+    <meta property="og:description" content="A powerful tool to view, edit, and update EXIF metadata in JPEG images with GPS location picker.">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/exif-editor.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Advanced EXIF Data Editor">
+    <meta name="twitter:description" content="A powerful tool to view, edit, and update EXIF metadata in JPEG images with GPS location picker.">
+    <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-GC8PGC89NB');
+    </script>
+    <script src="https://cdn.counter.dev/script.js"
+        data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+        data-utcoffset="6">
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/piexifjs@1.0.6/piexif.min.js"></script>
+    
+    <!-- Leaflet CSS and JS for map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header img {
+            height: 75px;
+            float: left;
+            margin-right: 15px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .upload-section {
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area.dragover {
+            background: #e8ebff;
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+
+        .upload-area:hover {
+            background: #f0f2ff;
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .upload-subtext {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .url-input-container {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .preview-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .preview-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .preview-box {
+            text-align: center;
+        }
+
+        .preview-box h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .preview-box img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .section-header:first-of-type {
+            margin-top: 0;
+        }
+
+        .exif-editor {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .exif-editor h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .exif-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .exif-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .exif-field label {
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .exif-field input,
+        .exif-field textarea,
+        .exif-field select {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .exif-field input:focus,
+        .exif-field textarea:focus,
+        .exif-field select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .exif-field textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .exif-field small {
+            margin-top: 5px;
+            display: block;
+            font-size: 0.85em;
+        }
+
+        .gps-section {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .gps-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        #map {
+            width: 100%;
+            height: 400px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .error {
+            background: #ffe0e0;
+            color: #c00;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success.active {
+            display: block;
+        }
+
+        .all-exif-data {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .all-exif-data table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .all-exif-data th,
+        .all-exif-data td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .all-exif-data th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .all-exif-data tr:hover {
+            background: #f0f2ff;
+        }
+
+        @media (max-width: 768px) {
+            .preview-container {
+                grid-template-columns: 1fr;
+            }
+
+            .exif-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gps-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo">
+            <h1>📸 Advanced EXIF Data Editor</h1>
+            <p>Upload, edit EXIF metadata with GPS location picker, and download your images</p>
+        </div>
+
+        <div class="content">
+            <div class="error" id="errorMessage"></div>
+            <div class="success" id="successMessage"></div>
+
+            <div class="upload-section">
+                <div class="upload-area" id="dropArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Drag & Drop your image here</div>
+                    <div class="upload-subtext">or click to browse</div>
+                    <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                        Choose File
+                    </button>
+                    <input type="file" id="fileInput" accept="image/jpeg,image/jpg">
+                </div>
+
+                <div class="url-input-container">
+                    <input 
+                        type="url" 
+                        class="url-input" 
+                        id="imageUrl" 
+                        placeholder="Or paste image URL here..."
+                    >
+                    <button class="btn btn-primary" onclick="loadFromUrl()">Load from URL</button>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <p>⏳ Loading image and EXIF data...</p>
+            </div>
+
+            <div class="preview-section" id="previewSection">
+                <div class="preview-container">
+                    <div class="preview-box">
+                        <h3>Original Image</h3>
+                        <img id="originalPreview" alt="Original">
+                    </div>
+                    <div class="preview-box">
+                        <h3>Preview</h3>
+                        <img id="modifiedPreview" alt="Modified">
+                    </div>
+                </div>
+
+                <div class="exif-editor">
+                    <h3>✏️ Edit EXIF Metadata</h3>
+                    
+                    <!-- Basic Information Section -->
+                    <div class="section-header">📝 Basic Information</div>
+                    <div class="exif-grid" id="basicFields"></div>
+
+                    <!-- Camera Details Section -->
+                    <div class="section-header">📷 Camera & Technical Details</div>
+                    <div class="exif-grid" id="cameraFields"></div>
+
+                    <!-- GPS Location Section -->
+                    <div class="section-header">📍 GPS Location</div>
+                    <div class="gps-section">
+                        <div class="gps-controls">
+                            <div class="exif-field">
+                                <label>Latitude (decimal degrees)</label>
+                                <input type="text" id="gpsLatitude" placeholder="e.g., 23.245703">
+                                <small style="color: #666;">North is positive, South is negative</small>
+                            </div>
+                            <div class="exif-field">
+                                <label>Longitude (decimal degrees)</label>
+                                <input type="text" id="gpsLongitude" placeholder="e.g., 77.411578">
+                                <small style="color: #666;">East is positive, West is negative</small>
+                            </div>
+                            <div class="exif-field">
+                                <label>Altitude (meters above sea level)</label>
+                                <input type="number" id="gpsAltitude" placeholder="e.g., 515" step="0.1">
+                            </div>
+                            <div class="exif-field">
+                                <label>Location Name / City</label>
+                                <input type="text" id="gpsCity" placeholder="e.g., Bhopal">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="initMap()" style="margin-top: 15px;">
+                            🗺️ Pick Location on Map (OpenStreetMap)
+                        </button>
+                        <div id="map"></div>
+                    </div>
+
+                    <!-- Additional Details Section -->
+                    <div class="section-header">🔧 Additional Details</div>
+                    <div class="exif-grid" id="additionalFields"></div>
+
+                    <!-- Keywords and Categories -->
+                    <div class="section-header">🏷️ Keywords & Categories</div>
+                    <div class="exif-grid" id="keywordFields"></div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-success" onclick="downloadImage()">
+                        💾 Download Image with Updated EXIF
+                    </button>
+                    <button class="btn btn-secondary" onclick="copyMetadata()">
+                        📋 Copy All EXIF Data
+                    </button>
+                    <button class="btn btn-primary" onclick="pasteMetadata()">
+                        📥 Paste EXIF Data
+                    </button>
+                </div>
+
+                <!-- Show all raw EXIF data -->
+                <details style="margin-top: 30px; background: #f8f9ff; padding: 20px; border-radius: 10px;">
+                    <summary style="cursor: pointer; font-weight: 600; font-size: 1.1em; color: #667eea;">
+                        📋 View All Raw EXIF Data (Read-Only)
+                    </summary>
+                    <div class="all-exif-data" id="allExifData" style="margin-top: 15px;"></div>
+                </details>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid #e0e0e0; color: #666; font-size: 0.95em;">
+                Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" style="color: #667eea; text-decoration: none; font-weight: 600;">Suyash Dwivedi</a> | 
+                Project: <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank" style="color: #667eea; text-decoration: none; font-weight: 600;">Wiki's Lazy Coders</a> | 
+                Updated on: 29 January 2026
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let originalImage = null;
+        let originalExifObj = null;
+        let currentImageData = null;
+        let map = null;
+        let marker = null;
+        let copiedMetadata = null;
+
+        // Drag and drop functionality
+        const dropArea = document.getElementById('dropArea');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => {
+                dropArea.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => {
+                dropArea.classList.remove('dragover');
+            }, false);
+        });
+
+        dropArea.addEventListener('drop', handleDrop, false);
+        dropArea.addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            handleFiles(this.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+                    loadImage(file);
+                } else {
+                    showError('Please upload a JPEG image. EXIF editing only works with JPEG files.');
+                }
+            }
+        }
+
+        function loadFromUrl() {
+            const url = document.getElementById('imageUrl').value.trim();
+            if (!url) {
+                showError('Please enter an image URL');
+                return;
+            }
+
+            showLoading(true);
+            hideMessages();
+
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    if (blob.type === 'image/jpeg' || blob.type === 'image/jpg') {
+                        loadImage(blob);
+                    } else {
+                        showError('The URL must point to a JPEG image. EXIF editing only works with JPEG files.');
+                        showLoading(false);
+                    }
+                })
+                .catch(error => {
+                    showError('Failed to load image from URL. Make sure the URL is correct and accessible.');
+                    showLoading(false);
+                });
+        }
+
+        function loadImage(file) {
+            showLoading(true);
+            hideMessages();
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                originalImage = e.target.result;
+                
+                // Display original preview
+                document.getElementById('originalPreview').src = originalImage;
+                document.getElementById('modifiedPreview').src = originalImage;
+
+                // Extract ALL EXIF data using piexif
+                try {
+                    originalExifObj = piexif.load(originalImage);
+                } catch (err) {
+                    originalExifObj = {"0th": {}, "Exif": {}, "GPS": {}, "Interop": {}, "1st": {}};
+                }
+
+                // Also use exif-js for easier reading
+                const img = new Image();
+                img.onload = function() {
+                    EXIF.getData(img, function() {
+                        const allTags = EXIF.getAllTags(this);
+                        displayAllExifFields(allTags, originalExifObj);
+                        document.getElementById('previewSection').style.display = 'block';
+                        showLoading(false);
+                    });
+                };
+                img.src = originalImage;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function displayAllExifFields(exifData, exifObj) {
+            // Basic fields
+            const basicContainer = document.getElementById('basicFields');
+            basicContainer.innerHTML = '';
+
+            const basicFields = [
+                { key: 'ImageDescription', label: 'Image Description', type: 'textarea', ifd: '0th', tag: piexif.ImageIFD.ImageDescription },
+                { key: 'Artist', label: 'Artist / Author / Photographer', type: 'text', ifd: '0th', tag: piexif.ImageIFD.Artist },
+                { key: 'Copyright', label: 'Copyright Holder', type: 'text', ifd: '0th', tag: piexif.ImageIFD.Copyright },
+                { key: 'DateTime', label: 'Date and Time', type: 'text', ifd: '0th', tag: piexif.ImageIFD.DateTime, placeholder: 'YYYY:MM:DD HH:MM:SS' },
+                { key: 'Software', label: 'Software Used', type: 'text', ifd: '0th', tag: piexif.ImageIFD.Software },
+                { key: 'UserComment', label: 'User Comment', type: 'textarea', ifd: 'Exif', tag: piexif.ExifIFD.UserComment }
+            ];
+
+            basicFields.forEach(field => {
+                const fieldDiv = createExifField(field, exifData, exifObj);
+                basicContainer.appendChild(fieldDiv);
+            });
+
+            // Camera fields
+            const cameraContainer = document.getElementById('cameraFields');
+            cameraContainer.innerHTML = '';
+
+            const cameraFields = [
+                { key: 'Make', label: 'Camera Manufacturer', type: 'text', ifd: '0th', tag: piexif.ImageIFD.Make, placeholder: 'e.g., Canon' },
+                { key: 'Model', label: 'Camera Model', type: 'text', ifd: '0th', tag: piexif.ImageIFD.Model, placeholder: 'e.g., Canon EOS 600D' },
+                { key: 'LensModel', label: 'Lens Model', type: 'text', ifd: 'Exif', tag: piexif.ExifIFD.LensModel, placeholder: 'e.g., EF-S18-55mm f/3.5-5.6 IS II' },
+                { key: 'ExposureTime', label: 'Exposure Time / Shutter Speed', type: 'text', ifd: 'Exif', tag: piexif.ExifIFD.ExposureTime, placeholder: 'e.g., 1/100 or 0.01' },
+                { key: 'FNumber', label: 'F-Number / Aperture', type: 'text', ifd: 'Exif', tag: piexif.ExifIFD.FNumber, placeholder: 'e.g., f/5.6' },
+                { key: 'ISOSpeedRatings', label: 'ISO Speed', type: 'number', ifd: 'Exif', tag: piexif.ExifIFD.ISOSpeedRatings, placeholder: 'e.g., 2500' },
+                { key: 'FocalLength', label: 'Focal Length (mm)', type: 'text', ifd: 'Exif', tag: piexif.ExifIFD.FocalLength, placeholder: 'e.g., 55mm' },
+                { key: 'Flash', label: 'Flash', type: 'text', ifd: 'Exif', tag: piexif.ExifIFD.Flash, placeholder: 'e.g., Flash did not fire' },
+                { key: 'WhiteBalance', label: 'White Balance', type: 'text', ifd: 'Exif', tag: piexif.ExifIFD.WhiteBalance, placeholder: 'e.g., Auto' },
+                { key: 'ExposureMode', label: 'Exposure Mode', type: 'text', ifd: 'Exif', tag: piexif.ExifIFD.ExposureMode, placeholder: 'e.g., Auto' },
+                { key: 'MeteringMode', label: 'Metering Mode', type: 'text', ifd: 'Exif', tag: piexif.ExifIFD.MeteringMode, placeholder: 'e.g., Pattern' },
+                { key: 'SceneCaptureType', label: 'Scene Capture Type', type: 'text', ifd: 'Exif', tag: piexif.ExifIFD.SceneCaptureType, placeholder: 'e.g., Standard' }
+            ];
+
+            cameraFields.forEach(field => {
+                const fieldDiv = createExifField(field, exifData, exifObj);
+                cameraContainer.appendChild(fieldDiv);
+            });
+
+            // Additional fields
+            const additionalContainer = document.getElementById('additionalFields');
+            additionalContainer.innerHTML = '';
+
+            const additionalFields = [
+                { key: 'Orientation', label: 'Orientation', type: 'text', ifd: '0th', tag: piexif.ImageIFD.Orientation, placeholder: 'e.g., Normal' },
+                { key: 'XResolution', label: 'Horizontal Resolution (dpi)', type: 'number', ifd: '0th', tag: piexif.ImageIFD.XResolution, placeholder: 'e.g., 72' },
+                { key: 'YResolution', label: 'Vertical Resolution (dpi)', type: 'number', ifd: '0th', tag: piexif.ImageIFD.YResolution, placeholder: 'e.g., 72' },
+                { key: 'ColorSpace', label: 'Color Space', type: 'text', ifd: 'Exif', tag: piexif.ExifIFD.ColorSpace, placeholder: 'e.g., sRGB' },
+                { key: 'ExifVersion', label: 'EXIF Version', type: 'text', ifd: 'Exif', tag: piexif.ExifIFD.ExifVersion, placeholder: 'e.g., 2.3' }
+            ];
+
+            additionalFields.forEach(field => {
+                const fieldDiv = createExifField(field, exifData, exifObj);
+                additionalContainer.appendChild(fieldDiv);
+            });
+
+            // Keywords and categories
+            const keywordContainer = document.getElementById('keywordFields');
+            keywordContainer.innerHTML = '';
+
+            const keywordFields = [
+                { key: 'Keywords', label: 'Keywords (comma-separated)', type: 'textarea', ifd: '0th', tag: piexif.ImageIFD.XPKeywords, placeholder: 'e.g., Bhopal, IND, India, Madhya Pradesh' },
+                { key: 'Subject', label: 'Subject / Category', type: 'text', ifd: '0th', tag: piexif.ImageIFD.XPSubject, placeholder: 'e.g., Landscape, Portrait' },
+                { key: 'Title', label: 'Title', type: 'text', ifd: '0th', tag: piexif.ImageIFD.XPTitle, placeholder: 'Image title' },
+                { key: 'Rating', label: 'Rating (0-5)', type: 'number', ifd: '0th', tag: piexif.ImageIFD.Rating, placeholder: '0-5', min: '0', max: '5' }
+            ];
+
+            keywordFields.forEach(field => {
+                const fieldDiv = createExifField(field, exifData, exifObj);
+                keywordContainer.appendChild(fieldDiv);
+            });
+
+            // GPS fields
+            if (exifObj.GPS && exifObj.GPS[piexif.GPSIFD.GPSLatitude]) {
+                const lat = convertDMSToDD(exifObj.GPS[piexif.GPSIFD.GPSLatitude], exifObj.GPS[piexif.GPSIFD.GPSLatitudeRef]);
+                const lon = convertDMSToDD(exifObj.GPS[piexif.GPSIFD.GPSLongitude], exifObj.GPS[piexif.GPSIFD.GPSLongitudeRef]);
+                document.getElementById('gpsLatitude').value = lat.toFixed(6);
+                document.getElementById('gpsLongitude').value = lon.toFixed(6);
+            }
+            if (exifObj.GPS && exifObj.GPS[piexif.GPSIFD.GPSAltitude]) {
+                const altitude = exifObj.GPS[piexif.GPSIFD.GPSAltitude];
+                if (Array.isArray(altitude)) {
+                    document.getElementById('gpsAltitude').value = (altitude[0] / altitude[1]).toFixed(1);
+                } else {
+                    document.getElementById('gpsAltitude').value = altitude;
+                }
+            }
+
+            // Display all EXIF data in table
+            displayAllExifTable(exifData);
+        }
+
+        function createExifField(field, exifData, exifObj) {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'exif-field';
+
+            const label = document.createElement('label');
+            label.textContent = field.label;
+            fieldDiv.appendChild(label);
+
+            const input = document.createElement(field.type === 'textarea' ? 'textarea' : 'input');
+            input.id = `exif-${field.ifd}-${field.tag}`;
+            input.dataset.ifd = field.ifd;
+            input.dataset.tag = field.tag;
+            input.dataset.key = field.key;
+            
+            if (field.placeholder) {
+                input.placeholder = field.placeholder;
+            }
+            
+            // Get current value
+            let currentValue = '';
+            if (field.key === 'UserComment' && exifData[field.key]) {
+                currentValue = exifData[field.key];
+            } else if (exifObj[field.ifd] && exifObj[field.ifd][field.tag] !== undefined) {
+                const val = exifObj[field.ifd][field.tag];
+                // Handle array values (like ratios)
+                if (Array.isArray(val) && val.length === 2) {
+                    currentValue = val[0] / val[1];
+                } else {
+                    currentValue = val;
+                }
+            } else {
+                currentValue = exifData[field.key] || '';
+            }
+
+            input.value = currentValue;
+            
+            if (field.type !== 'textarea') {
+                input.type = field.type;
+                if (field.min) input.min = field.min;
+                if (field.max) input.max = field.max;
+            }
+            
+            fieldDiv.appendChild(input);
+            return fieldDiv;
+        }
+
+        function displayAllExifTable(exifData) {
+            const container = document.getElementById('allExifData');
+            let html = '<table><thead><tr><th>Property</th><th>Value</th></tr></thead><tbody>';
+            
+            for (let key in exifData) {
+                if (exifData.hasOwnProperty(key) && exifData[key]) {
+                    html += `<tr><td><strong>${key}</strong></td><td>${exifData[key]}</td></tr>`;
+                }
+            }
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function convertDMSToDD(dms, ref) {
+            const degrees = dms[0][0] / dms[0][1];
+            const minutes = dms[1][0] / dms[1][1];
+            const seconds = dms[2][0] / dms[2][1];
+            
+            let dd = degrees + minutes/60 + seconds/3600;
+            
+            if (ref === 'S' || ref === 'W') {
+                dd = dd * -1;
+            }
+            
+            return dd;
+        }
+
+        function convertDDToDMS(dd) {
+            const absolute = Math.abs(dd);
+            const degrees = Math.floor(absolute);
+            const minutesNotTruncated = (absolute - degrees) * 60;
+            const minutes = Math.floor(minutesNotTruncated);
+            const seconds = Math.floor((minutesNotTruncated - minutes) * 60 * 100);
+            
+            return [[degrees, 1], [minutes, 1], [seconds, 100]];
+        }
+
+        function initMap() {
+            const lat = parseFloat(document.getElementById('gpsLatitude').value) || 23.2599;
+            const lon = parseFloat(document.getElementById('gpsLongitude').value) || 77.4126;
+
+            const mapDiv = document.getElementById('map');
+            mapDiv.style.display = 'block';
+            mapDiv.style.height = '400px';
+
+            // Initialize map if not already created
+            if (!map) {
+                // Create Leaflet map
+                map = L.map('map').setView([lat, lon], 15);
+
+                // Add OpenStreetMap tiles
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 19
+                }).addTo(map);
+
+                // Add draggable marker
+                marker = L.marker([lat, lon], {
+                    draggable: true,
+                    title: 'Drag to set location'
+                }).addTo(map);
+
+                // Update coordinates when marker is dragged
+                marker.on('dragend', function(event) {
+                    const position = marker.getLatLng();
+                    document.getElementById('gpsLatitude').value = position.lat.toFixed(6);
+                    document.getElementById('gpsLongitude').value = position.lng.toFixed(6);
+                    
+                    // Try to get location name using reverse geocoding
+                    fetchLocationName(position.lat, position.lng);
+                });
+
+                // Update marker position when clicking on map
+                map.on('click', function(event) {
+                    const position = event.latlng;
+                    marker.setLatLng(position);
+                    document.getElementById('gpsLatitude').value = position.lat.toFixed(6);
+                    document.getElementById('gpsLongitude').value = position.lng.toFixed(6);
+                    
+                    // Try to get location name
+                    fetchLocationName(position.lat, position.lng);
+                });
+            } else {
+                // If map already exists, just update position
+                map.setView([lat, lon], 15);
+                marker.setLatLng([lat, lon]);
+            }
+        }
+
+        // Function to get location name from coordinates using Nominatim (OpenStreetMap)
+        function fetchLocationName(lat, lon) {
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.address) {
+                        const city = data.address.city || data.address.town || data.address.village || 
+                                    data.address.county || data.address.state || '';
+                        if (city) {
+                            document.getElementById('gpsCity').value = city;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.log('Could not fetch location name:', error);
+                });
+        }
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        function copyMetadata() {
+            if (!originalExifObj) {
+                showError('❌ No image loaded to copy metadata from');
+                return;
+            }
+
+            // Create a complete metadata object including all current edits
+            copiedMetadata = JSON.parse(JSON.stringify(originalExifObj));
+            
+            // Copy all edited values from form fields
+            document.querySelectorAll('[data-ifd]').forEach(input => {
+                const ifd = input.dataset.ifd;
+                const tag = parseInt(input.dataset.tag);
+                const value = input.value.trim();
+                
+                if (!copiedMetadata[ifd]) copiedMetadata[ifd] = {};
+                
+                if (value) {
+                    if (tag === piexif.ExifIFD.UserComment) {
+                        copiedMetadata[ifd][tag] = value; // Store as string for easy copying
+                    } else if (input.type === 'number') {
+                        copiedMetadata[ifd][tag] = parseFloat(value);
+                    } else {
+                        copiedMetadata[ifd][tag] = value;
+                    }
+                }
+            });
+
+            // Copy GPS data
+            const lat = document.getElementById('gpsLatitude').value;
+            const lon = document.getElementById('gpsLongitude').value;
+            const alt = document.getElementById('gpsAltitude').value;
+            const city = document.getElementById('gpsCity').value;
+            
+            copiedMetadata._gpsData = { lat, lon, alt, city };
+
+            showSuccess('✅ All EXIF metadata copied! You can now paste it to another image.');
+            
+            // Log to console for debugging
+            console.log('Copied metadata:', copiedMetadata);
+        }
+
+        function pasteMetadata() {
+            if (!copiedMetadata) {
+                showError('❌ No metadata to paste. Please copy metadata first.');
+                return;
+            }
+
+            if (!originalImage) {
+                showError('❌ Please load an image first');
+                return;
+            }
+
+            // Update the EXIF object
+            originalExifObj = JSON.parse(JSON.stringify(copiedMetadata));
+            
+            // Remove temporary GPS data if exists
+            delete originalExifObj._gpsData;
+            
+            // Update all form fields
+            document.querySelectorAll('[data-ifd]').forEach(input => {
+                const ifd = input.dataset.ifd;
+                const tag = parseInt(input.dataset.tag);
+                
+                if (copiedMetadata[ifd] && copiedMetadata[ifd][tag] !== undefined) {
+                    const value = copiedMetadata[ifd][tag];
+                    
+                    // Handle array values (like ratios)
+                    if (Array.isArray(value) && value.length === 2) {
+                        input.value = value[0] / value[1];
+                    } else {
+                        input.value = value;
+                    }
+                }
+            });
+
+            // Paste GPS data if available
+            if (copiedMetadata._gpsData) {
+                const gps = copiedMetadata._gpsData;
+                if (gps.lat) document.getElementById('gpsLatitude').value = gps.lat;
+                if (gps.lon) document.getElementById('gpsLongitude').value = gps.lon;
+                if (gps.alt) document.getElementById('gpsAltitude').value = gps.alt;
+                if (gps.city) document.getElementById('gpsCity').value = gps.city;
+            } else if (copiedMetadata.GPS) {
+                // Try to extract GPS from EXIF format
+                if (copiedMetadata.GPS[piexif.GPSIFD.GPSLatitude]) {
+                    const lat = convertDMSToDD(
+                        copiedMetadata.GPS[piexif.GPSIFD.GPSLatitude],
+                        copiedMetadata.GPS[piexif.GPSIFD.GPSLatitudeRef]
+                    );
+                    const lon = convertDMSToDD(
+                        copiedMetadata.GPS[piexif.GPSIFD.GPSLongitude],
+                        copiedMetadata.GPS[piexif.GPSIFD.GPSLongitudeRef]
+                    );
+                    document.getElementById('gpsLatitude').value = lat.toFixed(6);
+                    document.getElementById('gpsLongitude').value = lon.toFixed(6);
+                }
+                if (copiedMetadata.GPS[piexif.GPSIFD.GPSAltitude]) {
+                    const alt = copiedMetadata.GPS[piexif.GPSIFD.GPSAltitude];
+                    if (Array.isArray(alt)) {
+                        document.getElementById('gpsAltitude').value = (alt[0] / alt[1]).toFixed(1);
+                    }
+                }
+            }
+
+            showSuccess('✅ Metadata pasted successfully! You can now download the image with this metadata.');
+        }
+
+        function downloadImage() {
+            if (!originalImage) {
+                showError('No image loaded');
+                return;
+            }
+
+            try {
+                // Deep clone the original EXIF object
+                let exifObj = JSON.parse(JSON.stringify(originalExifObj));
+                
+                // Ensure all IFD sections exist
+                if (!exifObj["0th"]) exifObj["0th"] = {};
+                if (!exifObj["Exif"]) exifObj["Exif"] = {};
+                if (!exifObj["GPS"]) exifObj["GPS"] = {};
+                if (!exifObj["Interop"]) exifObj["Interop"] = {};
+
+                // Update with all edited values from form fields
+                document.querySelectorAll('[data-ifd]').forEach(input => {
+                    const ifd = input.dataset.ifd;
+                    const tag = parseInt(input.dataset.tag);
+                    const value = input.value.trim();
+                    
+                    if (value) {
+                        // Handle UserComment specially (needs byte encoding)
+                        if (tag === piexif.ExifIFD.UserComment) {
+                            exifObj[ifd][tag] = piexif.helper.convertStringToBytes(value);
+                        }
+                        // Handle numeric fields
+                        else if (input.type === 'number') {
+                            const numValue = parseFloat(value);
+                            if (!isNaN(numValue)) {
+                                exifObj[ifd][tag] = numValue;
+                            }
+                        }
+                        // Handle text fields
+                        else {
+                            exifObj[ifd][tag] = value;
+                        }
+                    }
+                });
+
+                // Update GPS data
+                const lat = parseFloat(document.getElementById('gpsLatitude').value);
+                const lon = parseFloat(document.getElementById('gpsLongitude').value);
+                const alt = parseFloat(document.getElementById('gpsAltitude').value);
+
+                if (!isNaN(lat) && !isNaN(lon)) {
+                    exifObj.GPS[piexif.GPSIFD.GPSLatitude] = convertDDToDMS(Math.abs(lat));
+                    exifObj.GPS[piexif.GPSIFD.GPSLatitudeRef] = lat >= 0 ? 'N' : 'S';
+                    exifObj.GPS[piexif.GPSIFD.GPSLongitude] = convertDDToDMS(Math.abs(lon));
+                    exifObj.GPS[piexif.GPSIFD.GPSLongitudeRef] = lon >= 0 ? 'E' : 'W';
+                    
+                    if (!isNaN(alt)) {
+                        exifObj.GPS[piexif.GPSIFD.GPSAltitude] = [Math.round(Math.abs(alt) * 100), 100];
+                        exifObj.GPS[piexif.GPSIFD.GPSAltitudeRef] = alt >= 0 ? 0 : 1;
+                    }
+                }
+
+                console.log('EXIF Object before dump:', exifObj);
+
+                // Dump EXIF data to binary
+                const exifBytes = piexif.dump(exifObj);
+                
+                // Insert EXIF into image
+                const newImage = piexif.insert(exifBytes, originalImage);
+                
+                // Update preview
+                document.getElementById('modifiedPreview').src = newImage;
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.href = newImage;
+                
+                // Generate filename with timestamp
+                const now = new Date();
+                const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                link.download = `image-exif-updated-${timestamp}.jpg`;
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showSuccess('✅ Image downloaded successfully with updated EXIF data!');
+
+            } catch (error) {
+                console.error('Error processing EXIF:', error);
+                showError('❌ Error updating EXIF data: ' + error.message + '. Please check your input values.');
+            }
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('active', show);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('active');
+            setTimeout(() => hideMessages(), 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.classList.add('active');
+            setTimeout(() => hideMessages(), 5000);
+        }
+
+        function hideMessages() {
+            document.getElementById('errorMessage').classList.remove('active');
+            document.getElementById('successMessage').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
