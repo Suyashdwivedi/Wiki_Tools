@@ -1171,32 +1171,47 @@
                 const exifBytes = piexif.dump(exifObj);
                 console.log('EXIF bytes generated:', exifBytes.length, 'bytes');
                 
-                // Insert EXIF into image
-                const newImage = piexif.insert(exifBytes, originalImage);
-                console.log('New image created with EXIF');
-                
-                // Update preview
-                document.getElementById('modifiedPreview').src = newImage;
-                
-                // Update the raw EXIF display with new data
-                updateRawExifDisplay(exifObj);
-                
-                // Create download link
-                const link = document.createElement('a');
-                link.href = newImage;
-                
-                // Generate filename with timestamp
-                const now = new Date();
-                const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
-                link.download = `image-exif-updated-${timestamp}.jpg`;
-                
-                // Trigger download
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                // For 100% quality, we need to re-encode the image
+                // Create a canvas to draw the image at 100% quality
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Convert to JPEG at 100% quality
+                    const base64Image = canvas.toDataURL('image/jpeg', 1.0); // 1.0 = 100% quality
+                    
+                    // Insert EXIF into the new 100% quality image
+                    const newImage = piexif.insert(exifBytes, base64Image);
+                    console.log('New image created with EXIF at 100% quality');
+                    
+                    // Update preview
+                    document.getElementById('modifiedPreview').src = newImage;
+                    
+                    // Update the raw EXIF display with new data
+                    updateRawExifDisplay(exifObj);
+                    
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.href = newImage;
+                    
+                    // Generate filename with timestamp
+                    const now = new Date();
+                    const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                    link.download = `image-exif-updated-${timestamp}.jpg`;
+                    
+                    // Trigger download
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
 
-                showSuccess('✅ Image downloaded successfully with updated EXIF data!');
-                console.log('Download triggered successfully');
+                    showSuccess('✅ Image downloaded at 100% quality with updated EXIF data!');
+                    console.log('Download triggered successfully at 100% quality');
+                };
+                img.src = originalImage;
 
             } catch (error) {
                 console.error('Error processing EXIF:', error);
@@ -1205,31 +1220,185 @@
             }
         }
 
+        // Map of tag numbers to human-readable names
+        const tagNames = {
+            // 0th IFD (Image)
+            256: 'ImageWidth',
+            257: 'ImageLength',
+            258: 'BitsPerSample',
+            259: 'Compression',
+            262: 'PhotometricInterpretation',
+            270: 'ImageDescription',
+            271: 'Make',
+            272: 'Model',
+            273: 'StripOffsets',
+            274: 'Orientation',
+            277: 'SamplesPerPixel',
+            278: 'RowsPerStrip',
+            279: 'StripByteCounts',
+            282: 'XResolution',
+            283: 'YResolution',
+            284: 'PlanarConfiguration',
+            296: 'ResolutionUnit',
+            305: 'Software',
+            306: 'DateTime',
+            315: 'Artist',
+            316: 'HostComputer',
+            318: 'WhitePoint',
+            319: 'PrimaryChromaticities',
+            33432: 'Copyright',
+            33434: 'ExposureTime',
+            34665: 'ExifOffset',
+            34853: 'GPSInfo',
+            40091: 'XPTitle',
+            40092: 'XPComment',
+            40093: 'XPAuthor',
+            40094: 'XPKeywords',
+            40095: 'XPSubject',
+            50341: 'PrintImageMatching',
+            
+            // Exif IFD
+            33434: 'ExposureTime',
+            33437: 'FNumber',
+            34850: 'ExposureProgram',
+            34852: 'SpectralSensitivity',
+            34855: 'ISOSpeedRatings',
+            34856: 'OECF',
+            36864: 'ExifVersion',
+            36867: 'DateTimeOriginal',
+            36868: 'DateTimeDigitized',
+            37121: 'ComponentsConfiguration',
+            37122: 'CompressedBitsPerPixel',
+            37377: 'ShutterSpeedValue',
+            37378: 'ApertureValue',
+            37379: 'BrightnessValue',
+            37380: 'ExposureBiasValue',
+            37381: 'MaxApertureValue',
+            37382: 'SubjectDistance',
+            37383: 'MeteringMode',
+            37384: 'LightSource',
+            37385: 'Flash',
+            37386: 'FocalLength',
+            37396: 'SubjectArea',
+            37500: 'MakerNote',
+            37510: 'UserComment',
+            37520: 'SubSecTime',
+            37521: 'SubSecTimeOriginal',
+            37522: 'SubSecTimeDigitized',
+            40960: 'FlashpixVersion',
+            40961: 'ColorSpace',
+            40962: 'PixelXDimension',
+            40963: 'PixelYDimension',
+            40964: 'RelatedSoundFile',
+            40965: 'InteroperabilityOffset',
+            41483: 'FlashEnergy',
+            41484: 'SpatialFrequencyResponse',
+            41486: 'FocalPlaneXResolution',
+            41487: 'FocalPlaneYResolution',
+            41488: 'FocalPlaneResolutionUnit',
+            41492: 'SubjectLocation',
+            41493: 'ExposureIndex',
+            41495: 'SensingMethod',
+            41728: 'FileSource',
+            41729: 'SceneType',
+            41730: 'CFAPattern',
+            41985: 'CustomRendered',
+            41986: 'ExposureMode',
+            41987: 'WhiteBalance',
+            41988: 'DigitalZoomRatio',
+            41989: 'FocalLengthIn35mmFilm',
+            41990: 'SceneCaptureType',
+            41991: 'GainControl',
+            41992: 'Contrast',
+            41993: 'Saturation',
+            41994: 'Sharpness',
+            41995: 'DeviceSettingDescription',
+            41996: 'SubjectDistanceRange',
+            42016: 'ImageUniqueID',
+            42032: 'CameraOwnerName',
+            42033: 'BodySerialNumber',
+            42034: 'LensSpecification',
+            42035: 'LensMake',
+            42036: 'LensModel',
+            42037: 'LensSerialNumber',
+            
+            // GPS IFD
+            0: 'GPSVersionID',
+            1: 'GPSLatitudeRef',
+            2: 'GPSLatitude',
+            3: 'GPSLongitudeRef',
+            4: 'GPSLongitude',
+            5: 'GPSAltitudeRef',
+            6: 'GPSAltitude',
+            7: 'GPSTimeStamp',
+            8: 'GPSSatellites',
+            9: 'GPSStatus',
+            10: 'GPSMeasureMode',
+            11: 'GPSDOP',
+            12: 'GPSSpeedRef',
+            13: 'GPSSpeed',
+            14: 'GPSTrackRef',
+            15: 'GPSTrack',
+            16: 'GPSImgDirectionRef',
+            17: 'GPSImgDirection',
+            18: 'GPSMapDatum',
+            19: 'GPSDestLatitudeRef',
+            20: 'GPSDestLatitude',
+            21: 'GPSDestLongitudeRef',
+            22: 'GPSDestLongitude',
+            23: 'GPSDestBearingRef',
+            24: 'GPSDestBearing',
+            25: 'GPSDestDistanceRef',
+            26: 'GPSDestDistance',
+            27: 'GPSProcessingMethod',
+            28: 'GPSAreaInformation',
+            29: 'GPSDateStamp',
+            30: 'GPSDifferential',
+            
+            // Interop IFD
+            1: 'InteroperabilityIndex',
+            2: 'InteroperabilityVersion',
+            
+            // 1st IFD (Thumbnail)
+            513: 'JPEGInterchangeFormat',
+            514: 'JPEGInterchangeFormatLength'
+        };
+
         function updateRawExifDisplay(exifObj) {
             // Convert EXIF object to readable format and update the display
             const container = document.getElementById('allExifData');
-            let html = '<table><thead><tr><th>IFD</th><th>Tag</th><th>Value</th></tr></thead><tbody>';
+            let html = '<table><thead><tr><th>IFD</th><th>Tag Name</th><th>Tag #</th><th>Value</th></tr></thead><tbody>';
             
             // Display all IFD sections
             for (let ifd in exifObj) {
                 if (exifObj[ifd] && typeof exifObj[ifd] === 'object' && ifd !== '_gpsData') {
                     for (let tag in exifObj[ifd]) {
                         let value = exifObj[ifd][tag];
+                        const tagNum = parseInt(tag);
+                        const tagName = tagNames[tagNum] || 'Unknown';
                         
                         // Format array values
                         if (Array.isArray(value)) {
                             if (value.length === 2 && typeof value[0] === 'number' && typeof value[1] === 'number') {
                                 value = `${value[0]}/${value[1]} (${(value[0]/value[1]).toFixed(2)})`;
+                            } else if (value.length <= 10) {
+                                value = `[${value.join(', ')}]`;
                             } else {
-                                value = JSON.stringify(value);
+                                value = `Array[${value.length}]`;
                             }
                         }
-                        // Format byte arrays
+                        // Format byte arrays and objects
                         else if (typeof value === 'object' && value !== null) {
-                            value = JSON.stringify(value);
+                            const str = JSON.stringify(value);
+                            value = str.length > 100 ? str.substring(0, 100) + '...' : str;
                         }
                         
-                        html += `<tr><td><strong>${ifd}</strong></td><td>${tag}</td><td>${value}</td></tr>`;
+                        html += `<tr>
+                            <td><strong>${ifd}</strong></td>
+                            <td style="color: #667eea; font-weight: 600;">${tagName}</td>
+                            <td style="color: #999;">${tag}</td>
+                            <td>${value}</td>
+                        </tr>`;
                     }
                 }
             }
@@ -1258,6 +1427,11 @@
                 if (value) {
                     if (tag === piexif.ExifIFD.UserComment) {
                         exifObj[ifd][tag] = value; // Show as string in display
+                    } else if (tag === piexif.ImageIFD.XResolution || tag === piexif.ImageIFD.YResolution) {
+                        const num = parseFloat(value);
+                        if (!isNaN(num)) {
+                            exifObj[ifd][tag] = [Math.round(num), 1];
+                        }
                     } else if (input.type === 'number') {
                         const numValue = parseFloat(value);
                         if (!isNaN(numValue)) {
