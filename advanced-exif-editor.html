@@ -26,10 +26,6 @@
         gtag('js', new Date());
         gtag('config', 'G-GC8PGC89NB');
     </script>
-    <script src="https://cdn.counter.dev/script.js"
-        data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
-        data-utcoffset="6">
-    </script>
     
     <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/piexifjs@1.0.6/piexif.min.js"></script>
@@ -442,8 +438,8 @@
                 <div class="upload-area" id="dropArea">
                     <div class="upload-icon">📁</div>
                     <div class="upload-text">Drag & Drop your image here</div>
-                    <div class="upload-subtext">or click to browse</div>
-                    <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-subtext">or click the button below</div>
+                    <button class="btn btn-primary" onclick="document.getElementById('fileInput').click(); event.stopPropagation();">
                         Choose File
                     </button>
                     <input type="file" id="fileInput" accept="image/jpeg,image/jpg">
@@ -457,6 +453,28 @@
                         placeholder="Or paste image URL here..."
                     >
                     <button class="btn btn-primary" onclick="loadFromUrl()">Load from URL</button>
+                </div>
+
+                <!-- Image Info Display -->
+                <div id="imageInfo" style="display: none; background: #e7f3ff; border: 2px solid #2196F3; border-radius: 10px; padding: 20px; margin-top: 20px;">
+                    <h3 style="color: #0d47a1; margin-bottom: 15px;">📊 Image Information</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; color: #0d47a1;">
+                        <div>
+                            <strong>Filename:</strong> <span id="infoFilename">-</span>
+                        </div>
+                        <div>
+                            <strong>Dimensions:</strong> <span id="infoDimensions">-</span>
+                        </div>
+                        <div>
+                            <strong>Megapixels:</strong> <span id="infoMegapixels">-</span>
+                        </div>
+                        <div>
+                            <strong>File Size:</strong> <span id="infoFileSize">-</span>
+                        </div>
+                        <div>
+                            <strong>Format:</strong> <span id="infoFormat">-</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -570,7 +588,7 @@
             <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid #e0e0e0; color: #666; font-size: 0.95em;">
                 Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" style="color: #667eea; text-decoration: none; font-weight: 600;">Suyash Dwivedi</a> | 
                 Project: <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank" style="color: #667eea; text-decoration: none; font-weight: 600;">Wiki's Lazy Coders</a> | 
-                Updated on: 29 January 2026
+                Updated on: 1 February 2026
             </div>
         </div>
     </div>
@@ -608,9 +626,8 @@
         });
 
         dropArea.addEventListener('drop', handleDrop, false);
-        dropArea.addEventListener('click', () => {
-            document.getElementById('fileInput').click();
-        });
+        
+        // Don't add click handler to entire dropArea - button handles it
 
         function handleDrop(e) {
             const dt = e.dataTransfer;
@@ -626,7 +643,7 @@
             if (files.length > 0) {
                 const file = files[0];
                 if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
-                    loadImage(file);
+                    loadImage(file, file.name, file.size);
                 } else {
                     showError('Please upload a JPEG image. EXIF editing only works with JPEG files.');
                 }
@@ -647,7 +664,8 @@
                 .then(response => response.blob())
                 .then(blob => {
                     if (blob.type === 'image/jpeg' || blob.type === 'image/jpg') {
-                        loadImage(blob);
+                        const filename = url.split('/').pop() || 'image.jpg';
+                        loadImage(blob, filename, blob.size);
                     } else {
                         showError('The URL must point to a JPEG image. EXIF editing only works with JPEG files.');
                         showLoading(false);
@@ -659,7 +677,7 @@
                 });
         }
 
-        function loadImage(file) {
+        function loadImage(file, filename, fileSize) {
             showLoading(true);
             hideMessages();
 
@@ -671,17 +689,34 @@
                 document.getElementById('originalPreview').src = originalImage;
                 document.getElementById('modifiedPreview').src = originalImage;
 
-                // Extract ALL EXIF data using piexif
-                try {
-                    originalExifObj = piexif.load(originalImage);
-                } catch (err) {
-                    originalExifObj = {"0th": {}, "Exif": {}, "GPS": {}, "Interop": {}, "1st": {}};
-                }
-
-                // Also use exif-js for easier reading
+                // Get image dimensions
                 const img = new Image();
                 img.onload = function() {
+                    const width = img.width;
+                    const height = img.height;
+                    const megapixels = ((width * height) / 1000000).toFixed(2);
+                    const fileSizeKB = (fileSize / 1024).toFixed(2);
+                    const fileSizeMB = (fileSize / (1024 * 1024)).toFixed(2);
+                    
+                    // Display image info
+                    document.getElementById('infoFilename').textContent = filename;
+                    document.getElementById('infoDimensions').textContent = `${width} × ${height} px`;
+                    document.getElementById('infoMegapixels').textContent = `${megapixels} MP`;
+                    document.getElementById('infoFileSize').textContent = fileSizeMB > 1 
+                        ? `${fileSizeMB} MB` 
+                        : `${fileSizeKB} KB`;
+                    document.getElementById('infoFormat').textContent = 'JPEG';
+                    document.getElementById('imageInfo').style.display = 'block';
+
+                    // Extract EXIF data
                     EXIF.getData(img, function() {
+                        try {
+                            originalExifObj = piexif.load(originalImage);
+                        } catch (err) {
+                            console.warn('Could not load EXIF with piexif:', err);
+                            originalExifObj = {"0th": {}, "Exif": {}, "GPS": {}, "Interop": {}, "1st": {}};
+                        }
+
                         const allTags = EXIF.getAllTags(this);
                         displayAllExifFields(allTags, originalExifObj);
                         document.getElementById('previewSection').style.display = 'block';
@@ -1097,6 +1132,8 @@
             }
 
             try {
+                console.log('Starting download process...');
+                
                 // Deep clone the original EXIF object
                 let exifObj = JSON.parse(JSON.stringify(originalExifObj));
                 
@@ -1105,8 +1142,9 @@
                 if (!exifObj["Exif"]) exifObj["Exif"] = {};
                 if (!exifObj["GPS"]) exifObj["GPS"] = {};
                 if (!exifObj["Interop"]) exifObj["Interop"] = {};
+                if (!exifObj["1st"]) exifObj["1st"] = {};
 
-                console.log('Original EXIF before updates:', JSON.parse(JSON.stringify(exifObj)));
+                console.log('Original EXIF:', exifObj);
 
                 // Update with all edited values from form fields
                 document.querySelectorAll('[data-ifd]').forEach(input => {
@@ -1115,12 +1153,42 @@
                     const value = input.value.trim();
                     
                     if (value) {
+                        console.log(`Updating ${ifd}[${tag}] = ${value}`);
+                        
                         // Handle UserComment specially (needs byte encoding)
                         if (tag === piexif.ExifIFD.UserComment) {
-                            const encoded = piexif.helper.convertStringToBytes(value);
-                            exifObj[ifd][tag] = encoded;
+                            try {
+                                const encoded = piexif.helper.convertStringToBytes(value);
+                                exifObj[ifd][tag] = encoded;
+                            } catch (e) {
+                                console.warn('Could not encode UserComment:', e);
+                                exifObj[ifd][tag] = value;
+                            }
                         }
-                        // Handle numeric fields that should be ratios [numerator, denominator]
+                        // Handle ExifVersion - must be bytes like "0220"
+                        else if (tag === piexif.ExifIFD.ExifVersion) {
+                            // Keep as string, piexif will handle it
+                            exifObj[ifd][tag] = value;
+                        }
+                        // Handle Orientation - must be integer 1-8
+                        else if (tag === piexif.ImageIFD.Orientation) {
+                            const orientation = parseInt(value);
+                            if (!isNaN(orientation) && orientation >= 1 && orientation <= 8) {
+                                exifObj[ifd][tag] = orientation;
+                            }
+                        }
+                        // Handle ColorSpace - must be integer (1 = sRGB, 65535 = Uncalibrated)
+                        else if (tag === piexif.ExifIFD.ColorSpace) {
+                            const colorSpace = parseInt(value);
+                            if (!isNaN(colorSpace)) {
+                                exifObj[ifd][tag] = colorSpace;
+                            } else if (value.toLowerCase() === 'srgb' || value === '1') {
+                                exifObj[ifd][tag] = 1;
+                            } else {
+                                exifObj[ifd][tag] = 1; // Default to sRGB
+                            }
+                        }
+                        // Handle Resolution - must be ratio [numerator, denominator]
                         else if (tag === piexif.ImageIFD.XResolution || tag === piexif.ImageIFD.YResolution) {
                             const num = parseFloat(value);
                             if (!isNaN(num)) {
@@ -1134,11 +1202,18 @@
                                 exifObj[ifd][tag] = iso;
                             }
                         }
+                        // Handle Rating
+                        else if (tag === piexif.ImageIFD.Rating) {
+                            const rating = parseInt(value);
+                            if (!isNaN(rating)) {
+                                exifObj[ifd][tag] = rating;
+                            }
+                        }
                         // Handle other numeric fields
                         else if (input.type === 'number') {
                             const numValue = parseFloat(value);
                             if (!isNaN(numValue)) {
-                                exifObj[ifd][tag] = Math.round(numValue);
+                                exifObj[ifd][tag] = numValue;
                             }
                         }
                         // Handle text fields - ensure they're strings
@@ -1154,6 +1229,8 @@
                 const alt = parseFloat(document.getElementById('gpsAltitude').value);
 
                 if (!isNaN(lat) && !isNaN(lon)) {
+                    console.log('Adding GPS data:', {lat, lon, alt});
+                    
                     exifObj.GPS[piexif.GPSIFD.GPSLatitude] = convertDDToDMS(Math.abs(lat));
                     exifObj.GPS[piexif.GPSIFD.GPSLatitudeRef] = lat >= 0 ? 'N' : 'S';
                     exifObj.GPS[piexif.GPSIFD.GPSLongitude] = convertDDToDMS(Math.abs(lon));
@@ -1165,58 +1242,66 @@
                     }
                 }
 
-                console.log('Updated EXIF before dump:', exifObj);
+                console.log('Final EXIF object:', exifObj);
 
                 // Dump EXIF data to binary
-                const exifBytes = piexif.dump(exifObj);
-                console.log('EXIF bytes generated:', exifBytes.length, 'bytes');
+                let exifBytes;
+                try {
+                    exifBytes = piexif.dump(exifObj);
+                    console.log('✅ EXIF bytes generated:', exifBytes.length, 'bytes');
+                } catch (dumpError) {
+                    console.error('❌ Error dumping EXIF:', dumpError);
+                    throw new Error('Failed to create EXIF data: ' + dumpError.message);
+                }
                 
-                // For 100% quality, we need to re-encode the image
-                // Create a canvas to draw the image at 100% quality
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    
-                    // Convert to JPEG at 100% quality
-                    const base64Image = canvas.toDataURL('image/jpeg', 1.0); // 1.0 = 100% quality
-                    
-                    // Insert EXIF into the new 100% quality image
-                    const newImage = piexif.insert(exifBytes, base64Image);
-                    console.log('New image created with EXIF at 100% quality');
-                    
-                    // Update preview
-                    document.getElementById('modifiedPreview').src = newImage;
-                    
-                    // Update the raw EXIF display with new data
-                    updateRawExifDisplay(exifObj);
-                    
-                    // Create download link
-                    const link = document.createElement('a');
-                    link.href = newImage;
-                    
-                    // Generate filename with timestamp
-                    const now = new Date();
-                    const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
-                    link.download = `image-exif-updated-${timestamp}.jpg`;
-                    
-                    // Trigger download
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                // Insert EXIF into image - use original image directly for best quality
+                let newImageDataUrl;
+                try {
+                    newImageDataUrl = piexif.insert(exifBytes, originalImage);
+                    console.log('✅ EXIF inserted into image');
+                } catch (insertError) {
+                    console.error('❌ Error inserting EXIF:', insertError);
+                    throw new Error('Failed to insert EXIF into image: ' + insertError.message);
+                }
+                
+                // Update preview
+                document.getElementById('modifiedPreview').src = newImageDataUrl;
+                console.log('✅ Preview updated');
+                
+                // Update the raw EXIF display with new data
+                updateRawExifDisplay(exifObj);
+                console.log('✅ Raw EXIF display updated');
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.href = newImageDataUrl;
+                
+                // Generate filename with timestamp
+                const now = new Date();
+                const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                link.download = `image-exif-updated-${timestamp}.jpg`;
+                
+                // Trigger download
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
 
-                    showSuccess('✅ Image downloaded at 100% quality with updated EXIF data!');
-                    console.log('Download triggered successfully at 100% quality');
-                };
-                img.src = originalImage;
+                console.log('✅ Download triggered successfully');
+                showSuccess('✅ Image downloaded successfully with updated EXIF data!');
 
             } catch (error) {
-                console.error('Error processing EXIF:', error);
+                console.error('❌ Error in downloadImage:', error);
                 console.error('Error stack:', error.stack);
-                showError('❌ Error updating EXIF data: ' + error.message + '. Please check the console for details.');
+                
+                // Show user-friendly error
+                let errorMsg = error.message || 'Unknown error occurred';
+                if (errorMsg.includes('dump')) {
+                    errorMsg = 'Failed to create EXIF data. Some field values may be invalid.';
+                } else if (errorMsg.includes('insert')) {
+                    errorMsg = 'Failed to add EXIF to image. The image format may not support EXIF.';
+                }
+                
+                showError('❌ Error: ' + errorMsg + '\n\nCheck browser console (F12) for details.');
             }
         }
 
