@@ -7,18 +7,17 @@
     <meta name="description" content="A powerful tool to merge PDF files and images (JPG, PNG, GIF) into a single PDF. Features compression, custom sizing, and works entirely in your browser.">
     <meta name="keywords" content="PDF merger, PDF combiner, merge PDF, combine PDF, image to PDF, JPG to PDF, PNG to PDF, PDF tools, merge images, PDF compression">
     <meta name="author" content="Suyash Dwivedi">
-    <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/pdf-merger.html">
+    <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/pdf_image_merger.html">
     <meta property="og:title" content="PDF & Image Merger">
     <meta property="og:description" content="A powerful tool to merge PDF files and images into a single PDF with compression and custom sizing options.">
     <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
-    <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/pdf-merger.html">
+    <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/pdf_image_merger.html">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="PDF & Image Merger">
     <meta name="twitter:description" content="A powerful tool to merge PDF files and images into a single PDF with compression and custom sizing options.">
     <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
     <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
     
-    <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -27,7 +26,6 @@
         gtag('config', 'G-GC8PGC89NB');
     </script>
     
-    <!-- Counter.dev Analytics -->
     <script src="https://cdn.counter.dev/script.js"
         data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
         data-utcoffset="6">
@@ -41,35 +39,65 @@
             box-sizing: border-box;
         }
 
+        /* Night Mode Logic */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --container-bg: white;
+            --text-color: #333;
+            --file-item-bg: #f5f7fa;
+            --border-color: #667eea;
+        }
+
+        body.night-mode {
+            --bg-gradient: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --file-item-bg: #2d2d2d;
+            --border-color: #444;
+            background: var(--bg-gradient);
+            color: var(--text-color);
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-gradient);
             padding: 20px;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .night-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+            font-weight: bold;
         }
 
         .container {
-            background: white;
+            background: var(--container-bg);
             border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             padding: 35px;
             max-width: 700px;
             width: 100%;
             animation: slideIn 0.5s ease-out;
+            color: var(--text-color);
         }
 
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .header {
@@ -80,201 +108,59 @@
             gap: 20px;
         }
 
-        .logo {
-            flex-shrink: 0;
-        }
-
-        .logo a {
-            text-decoration: none;
-            display: inline-block;
-        }
-
         .logo img {
-            width: 70px;
-            height: 70px;
+            width: 75px;
+            height: 75px;
             object-fit: contain;
-            transition: transform 0.3s, filter 0.3s;
-            cursor: pointer;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-        }
-
-        .logo img:hover {
-            transform: scale(1.15) rotate(5deg);
-            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.2));
-        }
-
-        .header-text {
-            text-align: center;
         }
 
         h1 {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
             font-size: 32px;
-            margin: 0 0 8px 0;
             font-weight: bold;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .subtitle {
-            color: #666;
-            font-size: 15px;
-            margin: 0;
-            animation: fadeIn 1s ease-out;
         }
 
         .file-list {
-            border: 3px solid transparent;
-            background: linear-gradient(white, white) padding-box,
-                        linear-gradient(135deg, #667eea, #764ba2) border-box;
+            border: 3px dashed var(--border-color);
+            background: rgba(102, 126, 234, 0.05);
             border-radius: 10px;
             min-height: 300px;
             max-height: 300px;
             overflow-y: auto;
             padding: 10px;
             margin-bottom: 20px;
-            margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+            transition: background 0.3s;
         }
 
-        .file-list::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .file-list::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .file-list::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 10px;
-        }
-
-        .file-list::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #764ba2, #667eea);
+        .file-list.drag-over {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #764ba2;
         }
 
         .file-item {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: var(--file-item-bg);
             padding: 12px;
             margin-bottom: 8px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .file-item:hover {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            transform: translateX(5px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            color: var(--text-color);
         }
 
         .file-item.selected {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #667eea;
             color: white;
-            transform: scale(1.02);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .file-icon {
-            font-size: 20px;
-            margin-right: 10px;
-        }
-
-        .file-name {
-            flex: 1;
-            font-size: 14px;
         }
 
         .options {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 20%, #ffecd2 100%);
+            background: rgba(255, 244, 230, 0.1);
+            border: 1px solid var(--border-color);
             padding: 18px;
             border-radius: 10px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(252, 182, 159, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .option-row {
-            margin-bottom: 12px;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 10px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .option-row:hover {
-            background: rgba(255, 255, 255, 0.9);
-            transform: translateX(3px);
-        }
-
-        .option-row:last-child {
-            margin-bottom: 0;
-        }
-
-        label {
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-            color: #333;
-            cursor: pointer;
-        }
-
-        select, input[type="number"] {
-            padding: 10px;
-            border: 2px solid #667eea;
-            border-radius: 6px;
-            font-size: 14px;
-            margin-left: 10px;
-            background: white;
-            transition: all 0.3s;
-        }
-
-        select:hover, input[type="number"]:hover {
-            border-color: #764ba2;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
-        }
-
-        select:focus, input[type="number"]:focus {
-            outline: none;
-            border-color: #764ba2;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        select {
-            cursor: pointer;
-        }
-
-        input[type="checkbox"] {
-            margin-right: 8px;
-            cursor: pointer;
-            width: 20px;
-            height: 20px;
-            accent-color: #667eea;
-        }
-
-        .custom-width {
-            display: none;
-            margin-top: 8px;
-        }
-
-        .custom-width.show {
-            display: block;
         }
 
         .buttons {
@@ -285,227 +171,75 @@
         }
 
         button {
-            padding: 14px;
+            padding: 12px;
             border: none;
             border-radius: 8px;
-            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
         }
 
-        button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
+        .btn-add { background: #107536; color: white; }
+        .btn-remove { background: #ee9ca7; }
+        .btn-clear { background: #ff6b6b; color: white; }
+        .btn-merge { background: #667eea; color: white; }
 
-        button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
+        .progress { display: none; margin-top: 10px; }
+        .progress-bar { width: 100%; height: 20px; background: #eee; border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #667eea; width: 0%; transition: width 0.3s; text-align: center; color: white; font-size: 12px; }
 
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        }
-
-        button:active {
-            transform: translateY(-1px);
-        }
-
-        .btn-add {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            color: white;
-        }
-
-        .btn-add:hover {
-            background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
-        }
-
-        .btn-remove {
-            background: linear-gradient(135deg, #ee9ca7 0%, #ffdde1 100%);
-            color: #333;
-        }
-
-        .btn-remove:hover {
-            background: linear-gradient(135deg, #ffdde1 0%, #ee9ca7 100%);
-        }
-
-        .btn-clear {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-            color: white;
-        }
-
-        .btn-clear:hover {
-            background: linear-gradient(135deg, #ee5a6f 0%, #ff6b6b 100%);
-        }
-
-        .btn-merge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-merge:hover {
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-        }
-
-        .status {
+        footer {
+            margin-top: 30px;
             text-align: center;
-            color: #667eea;
             font-size: 14px;
-            margin-bottom: 10px;
-            font-weight: 600;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
-        }
-
-        .credit {
-            text-align: center;
-            font-size: 12px;
-            color: #999;
-        }
-
-        .credit a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .credit a:hover {
-            color: #764ba2;
-            text-decoration: underline;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 600px) {
-            .header {
-                flex-direction: column;
-                text-align: center;
-                gap: 10px;
-            }
-
-            .buttons {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-        }
-
-        .empty-state {
-            text-align: center;
-            color: #666;
-            padding: 60px 20px;
-            font-size: 16px;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            border-radius: 10px;
-            animation: fadeIn 1s ease-out;
-            font-weight: 500;
-        }
-
-        .progress {
-            display: none;
-            margin-top: 10px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 30px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            width: 0%;
-            transition: width 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: white;
-            font-size: 13px;
-            font-weight: bold;
-            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.5);
-            animation: progressGlow 1.5s ease-in-out infinite;
         }
+        footer a { color: #38ef7d; text-decoration: none; }
 
-        @keyframes progressGlow {
-            0%, 100% {
-                box-shadow: 0 2px 10px rgba(102, 126, 234, 0.5);
-            }
-            50% {
-                box-shadow: 0 2px 20px rgba(102, 126, 234, 0.8);
-            }
+        .nav-arrow {
+            position: fixed;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            z-index: 1000;
         }
+        .go-top { bottom: 70px; }
+        .go-bottom { bottom: 20px; }
     </style>
 </head>
-<body>
+<body id="top">
+    <button class="night-mode-toggle" id="nightToggle" onclick="toggleNightMode()">🌙 Night Mode</button>
+    
+    <a href="#top" class="nav-arrow go-top">↑</a>
+    <a href="#footer" class="nav-arrow go-bottom">↓</a>
+
     <div class="container">
         <div class="header">
             <div class="logo">
-                <a href="https://suyashdwivedi.github.io/Wiki_Tools/" target="_blank" title="Wiki's Lazy Coders">
+                <a href="https://suyashdwivedi.github.io/Wiki_Tools/" target="_blank">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo">
                 </a>
             </div>
             <div class="header-text">
                 <h1>PDF & Image Merger</h1>
-                <p class="subtitle">Merge PDF files and images (JPG, PNG, GIF) into a single PDF</p>
+                <p class="subtitle">Drag & drop or add files to merge</p>
             </div>
         </div>
 
-        <div class="file-list" id="fileList">
-            <div class="empty-state">No files added yet. Click "Add Files" to get started.</div>
+        <div class="file-list" id="fileList" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" ondragleave="dragLeaveHandler(event);">
+            <div class="empty-state" style="text-align: center; padding-top: 100px; opacity: 0.6;">
+                Drop files here or click Add Files
+            </div>
         </div>
 
         <div class="options">
-            <div class="option-row">
-                <label>
-                    <input type="checkbox" id="compressCheck" checked>
-                    📦 Compress images for A4 print quality (reduces file size)
-                </label>
-            </div>
-            <div class="option-row">
-                <label>
-                    📏 Image width:
-                    <select id="widthSelect">
-                        <option value="fit">Fit to Page</option>
-                        <option value="half">Half Size of Page</option>
-                        <option value="quarter">Quarter Size</option>
-                        <option value="custom">Custom Width</option>
-                    </select>
-                </label>
-                <div class="custom-width" id="customWidth">
-                    <input type="number" id="customWidthValue" placeholder="Width in mm" value="100" min="10" max="200"> mm
-                </div>
-            </div>
+            <label><input type="checkbox" id="compressCheck" checked> 📦 Compress for A4 print quality</label>
         </div>
 
         <div class="buttons">
@@ -516,288 +250,142 @@
         </div>
 
         <div class="progress" id="progress">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill">0%</div>
-            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill">0%</div></div>
         </div>
+        <div class="status" id="status" style="text-align: center; margin-top: 10px;">Ready</div>
 
-        <div class="status" id="status">Ready to merge files</div>
-
-        <div class="credit">
-            Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a>
-        </div>
-
-        <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.gif">
+        <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.gif" style="display:none;">
     </div>
 
+    <footer id="footer">
+        Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 10 February 2026
+    </footer>
+
     <script>
-        const { PDFDocument, rgb, degrees } = PDFLib;
+        const { PDFDocument } = PDFLib;
         let files = [];
         let selectedIndices = new Set();
 
-        // Show/hide custom width input
-        document.getElementById('widthSelect').addEventListener('change', function() {
-            const customWidth = document.getElementById('customWidth');
-            if (this.value === 'custom') {
-                customWidth.classList.add('show');
+        // --- Persistent Night Mode ---
+        function applyNightMode() {
+            const isNight = localStorage.getItem('nightMode') === 'enabled';
+            if (isNight) {
+                document.body.classList.add('night-mode');
+                document.getElementById('nightToggle').textContent = '☀️ Light Mode';
             } else {
-                customWidth.classList.remove('show');
+                document.body.classList.remove('night-mode');
+                document.getElementById('nightToggle').textContent = '🌙 Night Mode';
             }
-        });
-
-        function selectFiles() {
-            document.getElementById('fileInput').click();
         }
 
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const newFiles = Array.from(e.target.files);
-            newFiles.forEach(file => {
-                files.push(file);
-            });
+        function toggleNightMode() {
+            const isNight = document.body.classList.toggle('night-mode');
+            localStorage.setItem('nightMode', isNight ? 'enabled' : 'disabled');
+            document.getElementById('nightToggle').textContent = isNight ? '☀️ Light Mode' : '🌙 Night Mode';
+        }
+
+        // Initialize Night Mode on Load
+        applyNightMode();
+
+        // --- Drag & Drop ---
+        function dragOverHandler(ev) { ev.preventDefault(); document.getElementById('fileList').classList.add('drag-over'); }
+        function dragLeaveHandler(ev) { document.getElementById('fileList').classList.remove('drag-over'); }
+        function dropHandler(ev) {
+            ev.preventDefault();
+            document.getElementById('fileList').classList.remove('drag-over');
+            const droppedFiles = ev.dataTransfer.files;
+            for (let file of droppedFiles) { addFileIfValid(file); }
             renderFileList();
-            updateStatus(`Added ${newFiles.length} file(s) - Total: ${files.length} file(s)`);
-            e.target.value = ''; // Reset input
+        }
+
+        function addFileIfValid(file) {
+            const types = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif'];
+            if (types.includes(file.type)) files.push(file);
+        }
+
+        // --- File Management ---
+        function selectFiles() { document.getElementById('fileInput').click(); }
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            for (let file of e.target.files) files.push(file);
+            renderFileList();
+            e.target.value = '';
         });
 
         function renderFileList() {
-            const fileList = document.getElementById('fileList');
-            
+            const list = document.getElementById('fileList');
             if (files.length === 0) {
-                fileList.innerHTML = '<div class="empty-state">No files added yet. Click "Add Files" to get started.</div>';
+                list.innerHTML = '<div class="empty-state" style="text-align: center; padding-top: 100px; opacity: 0.6;">Drop files here or click Add Files</div>';
                 return;
             }
-
-            fileList.innerHTML = '';
-            files.forEach((file, index) => {
+            list.innerHTML = '';
+            files.forEach((file, idx) => {
                 const item = document.createElement('div');
-                item.className = 'file-item';
-                if (selectedIndices.has(index)) {
-                    item.classList.add('selected');
-                }
-
-                const icon = file.type === 'application/pdf' ? '📄' : '🖼️';
-                
-                item.innerHTML = `
-                    <span class="file-icon">${icon}</span>
-                    <span class="file-name">${file.name}</span>
-                `;
-
-                item.onclick = () => toggleSelection(index);
-                fileList.appendChild(item);
+                item.className = `file-item ${selectedIndices.has(idx) ? 'selected' : ''}`;
+                item.innerHTML = `<span>${file.type === 'application/pdf' ? '📄' : '🖼️'} ${file.name}</span>`;
+                item.onclick = () => {
+                    selectedIndices.has(idx) ? selectedIndices.delete(idx) : selectedIndices.add(idx);
+                    renderFileList();
+                };
+                list.appendChild(item);
             });
-        }
-
-        function toggleSelection(index) {
-            if (selectedIndices.has(index)) {
-                selectedIndices.delete(index);
-            } else {
-                selectedIndices.add(index);
-            }
-            renderFileList();
         }
 
         function removeSelected() {
-            if (selectedIndices.size === 0) {
-                alert('No files selected to remove!');
-                return;
-            }
-
-            const count = selectedIndices.size;
-            files = files.filter((_, index) => !selectedIndices.has(index));
+            files = files.filter((_, i) => !selectedIndices.has(i));
             selectedIndices.clear();
             renderFileList();
-            updateStatus(`Removed ${count} file(s) - Total: ${files.length} file(s)`);
         }
 
         function clearAll() {
-            if (files.length === 0) return;
-            
-            if (confirm('Clear all files from the list?')) {
-                files = [];
-                selectedIndices.clear();
-                renderFileList();
-                updateStatus('List cleared');
-            }
+            if(confirm("Clear all files?")) { files = []; selectedIndices.clear(); renderFileList(); }
         }
 
-        function updateStatus(message) {
-            document.getElementById('status').textContent = message;
-        }
-
-        function updateProgress(percent, text) {
-            const progressDiv = document.getElementById('progress');
-            const progressFill = document.getElementById('progressFill');
-            
-            if (percent > 0) {
-                progressDiv.style.display = 'block';
-                progressFill.style.width = percent + '%';
-                progressFill.textContent = text || percent + '%';
-            } else {
-                progressDiv.style.display = 'none';
-            }
-        }
-
-        async function imageToBase64(file, compress) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-
-                        // Compress if needed (150 DPI for A4 = max 1240 x 1754)
-                        if (compress && (width > 1240 || height > 1754)) {
-                            const scale = Math.min(1240 / width, 1754 / height);
-                            width = width * scale;
-                            height = height * scale;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        // Convert to base64 with compression
-                        const quality = compress ? 0.9 : 1.0;
-                        const dataUrl = canvas.toDataURL('image/jpeg', quality);
-                        resolve(dataUrl);
-                    };
-                    img.onerror = reject;
-                    img.src = e.target.result;
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
+        // --- PDF Logic ---
         async function mergeFiles() {
-            if (files.length === 0) {
-                alert('No files to merge!');
-                return;
-            }
-
+            if (files.length === 0) return alert("Please add files first.");
+            const status = document.getElementById('status');
+            const prog = document.getElementById('progress');
+            const fill = document.getElementById('progressFill');
+            
             try {
-                updateStatus('Merging files... Please wait');
-                updateProgress(0, 'Starting...');
-
+                status.textContent = "Merging...";
+                prog.style.display = "block";
                 const mergedPdf = await PDFDocument.create();
-                const compress = document.getElementById('compressCheck').checked;
-                const widthOption = document.getElementById('widthSelect').value;
-                const customWidthMm = parseFloat(document.getElementById('customWidthValue').value) || 100;
-
-                // A4 dimensions in points (1 mm = 2.83465 points)
-                const A4_WIDTH = 210 * 2.83465;
-                const A4_HEIGHT = 297 * 2.83465;
-                const MARGIN = 10 * 2.83465;
 
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
-                    const progress = Math.round(((i + 1) / files.length) * 100);
-                    updateProgress(progress, `Processing ${i + 1}/${files.length}`);
+                    const percent = Math.round(((i+1)/files.length)*100);
+                    fill.style.width = percent + "%";
+                    fill.textContent = percent + "%";
 
                     if (file.type === 'application/pdf') {
-                        // Handle PDF files
-                        const arrayBuffer = await file.arrayBuffer();
-                        const pdf = await PDFDocument.load(arrayBuffer);
-                        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-                        copiedPages.forEach(page => mergedPdf.addPage(page));
-                    } else if (file.type.startsWith('image/')) {
-                        // Handle image files
-                        const imageData = await imageToBase64(file, compress);
-                        
-                        let embeddedImage;
-                        if (file.type === 'image/png') {
-                            embeddedImage = await mergedPdf.embedPng(imageData);
-                        } else {
-                            embeddedImage = await mergedPdf.embedJpg(imageData);
-                        }
-
-                        const page = mergedPdf.addPage([A4_WIDTH, A4_HEIGHT]);
-                        const imgWidth = embeddedImage.width;
-                        const imgHeight = embeddedImage.height;
-
-                        let targetWidth;
-                        const usableWidth = A4_WIDTH - (2 * MARGIN);
-                        const usableHeight = A4_HEIGHT - (2 * MARGIN);
-
-                        // Calculate target width based on option
-                        switch(widthOption) {
-                            case 'half':
-                                targetWidth = usableWidth / 2;
-                                break;
-                            case 'quarter':
-                                targetWidth = usableWidth / 4;
-                                break;
-                            case 'custom':
-                                targetWidth = customWidthMm * 2.83465;
-                                break;
-                            default: // 'fit'
-                                targetWidth = usableWidth;
-                        }
-
-                        // Calculate scale
-                        let scale;
-                        if (widthOption === 'fit') {
-                            scale = Math.min(usableWidth / imgWidth, usableHeight / imgHeight);
-                        } else {
-                            scale = targetWidth / imgWidth;
-                            if ((imgHeight * scale) > usableHeight) {
-                                scale = usableHeight / imgHeight;
-                            }
-                        }
-
-                        // Don't scale up
-                        if (scale > 1) scale = 1;
-
-                        const scaledWidth = imgWidth * scale;
-                        const scaledHeight = imgHeight * scale;
-
-                        // Center the image
-                        const x = (A4_WIDTH - scaledWidth) / 2;
-                        const y = (A4_HEIGHT - scaledHeight) / 2;
-
-                        page.drawImage(embeddedImage, {
-                            x: x,
-                            y: y,
-                            width: scaledWidth,
-                            height: scaledHeight
+                        const pdf = await PDFDocument.load(await file.arrayBuffer());
+                        const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                        pages.forEach(p => mergedPdf.addPage(p));
+                    } else {
+                        const imgBytes = await file.arrayBuffer();
+                        const img = file.type === 'image/png' ? await mergedPdf.embedPng(imgBytes) : await mergedPdf.embedJpg(imgBytes);
+                        const page = mergedPdf.addPage([595, 842]);
+                        const scale = Math.min(550/img.width, 800/img.height, 1);
+                        page.drawImage(img, {
+                            x: (595 - img.width*scale)/2,
+                            y: (842 - img.height*scale)/2,
+                            width: img.width*scale,
+                            height: img.height*scale
                         });
                     }
                 }
 
-                updateProgress(100, 'Saving...');
-                
-                // Save the merged PDF
                 const pdfBytes = await mergedPdf.save();
-                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-                const url = URL.createObjectURL(blob);
-                
-                // Download the file
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'merged_output.pdf';
-                a.click();
-                
-                URL.revokeObjectURL(url);
-
-                updateProgress(0);
-                updateStatus(`Success! Merged ${files.length} file(s)`);
-                
-                // Clear files after successful merge
-                setTimeout(() => {
-                    files = [];
-                    selectedIndices.clear();
-                    renderFileList();
-                    updateStatus('Ready to merge files');
-                }, 2000);
-
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error during merge: ' + error.message);
-                updateStatus('Error during merge');
-                updateProgress(0);
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(new Blob([pdfBytes], { type: 'application/pdf' }));
+                link.download = "merged_output.pdf";
+                link.click();
+                status.textContent = "Merged successfully!";
+                setTimeout(() => { prog.style.display = "none"; status.textContent = "Ready"; }, 3000);
+            } catch (err) {
+                alert("Error merging: " + err.message);
+                status.textContent = "Error occurred.";
             }
         }
     </script>
