@@ -354,7 +354,10 @@ svg{display:block}
   <strong>// ENGINE</strong> — Uses your browser's <strong>native MediaRecorder + captureStream APIs</strong>
   — zero external libraries, zero WASM, zero server headers required.
   Encodes <code>VP9 + Opus</code> (Chrome/Edge) or <code>VP8 + Opus</code> (Firefox) directly in .webm container.
-  Conversion runs at real-time speed. Works on local files, GitHub Pages, and any web host.
+  Works on local files, GitHub Pages, and any web host.
+  <br><span style="color:var(--amber);font-size:12px">⚡ <strong>Speed vs quality:</strong> Real-time CBR encoding (1× speed) — much faster than HandBrake/KDenlive which use multi-pass CRF.
+  Trade-off: browser CBR gives consistent file size; FFmpeg CRF gives better quality-per-bit.
+  Bitrates here scale with resolution — 480p will always produce a smaller file than 1080p at the same quality tier.</span>
 </div>
 <div class="notice notice-wiki">
   <strong>// WIKIMEDIA COMMONS</strong> — Output is a <strong>.webm file (VP8/VP9 + Opus)</strong>
@@ -474,19 +477,19 @@ svg{display:block}
     <div class="quality-options" id="qualityOptions">
       <div class="quality-item" data-q="low">
         <div class="q-left"><div class="q-radio"></div><div class="q-name">Low</div></div>
-        <div class="q-crf">500 kbps · Small file</div>
+        <div class="q-crf">~0.05 bpp · scales with resolution</div>
       </div>
       <div class="quality-item" data-q="medium">
         <div class="q-left"><div class="q-radio"></div><div class="q-name">Medium</div></div>
-        <div class="q-crf">2 Mbps · Balanced</div>
+        <div class="q-crf">~0.12 bpp · scales with resolution</div>
       </div>
       <div class="quality-item" data-q="high">
         <div class="q-left"><div class="q-radio"></div><div class="q-name">High</div></div>
-        <div class="q-crf">6 Mbps · Large file</div>
+        <div class="q-crf">~0.25 bpp · scales with resolution</div>
       </div>
       <div class="quality-item lossless-item active" data-q="lossless">
         <div class="q-left"><div class="q-radio"></div><div class="q-name">Lossless</div></div>
-        <div class="q-crf">25 Mbps · Max bitrate</div>
+        <div class="q-crf">~0.60 bpp · max quality, up to 80 Mbps</div>
       </div>
     </div>
   </div>
@@ -578,6 +581,16 @@ svg{display:block}
   </button>
 </div>
 <div class="save-loc-display" id="saveLocDisplay">Output folder: <span>Browser default downloads</span></div>
+<div id="folderReauthBar" style="display:none;margin-top:6px;padding:8px 14px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.3);border-radius:7px;font-family:var(--mono);font-size:11px;color:var(--amber);align-items:center;gap:10px;flex-wrap:wrap">
+  <span>&#9888; Folder access needs re-authorisation (browser restarted)</span>
+  <button onclick="regrantFolderAccess()" style="background:var(--amber);color:#07080d;border:none;border-radius:5px;padding:4px 12px;font-family:var(--mono);font-size:10px;font-weight:700;cursor:pointer">Re-grant &#8599;</button>
+  <button onclick="clearFolderChoice()" style="background:none;border:1px solid rgba(245,166,35,.4);border-radius:5px;padding:4px 10px;font-family:var(--mono);font-size:10px;color:var(--amber);cursor:pointer">Clear folder</button>
+</div>
+<div id="folderReauthBar" style="display:none;margin-top:6px;padding:8px 14px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.3);border-radius:7px;font-family:var(--mono);font-size:11px;color:var(--amber);display:none;align-items:center;gap:10px">
+  <span>⚠ Folder access needs re-authorisation (browser restarted)</span>
+  <button onclick="regrantFolderAccess()" style="background:var(--amber);color:#07080d;border:none;border-radius:5px;padding:4px 12px;font-family:var(--mono);font-size:10px;font-weight:700;cursor:pointer">Re-grant ↗</button>
+  <button onclick="clearFolderChoice()" style="background:none;border:1px solid rgba(245,166,35,.4);border-radius:5px;padding:4px 10px;font-family:var(--mono);font-size:10px;color:var(--amber);cursor:pointer">Clear</button>
+</div>
 <div class="batch-overall" id="batchOverall" style="display:none">
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
   <span>Batch: </span>
@@ -697,12 +710,28 @@ let selectedRes  = 'original';
 let selectedQuality = 'lossless';
 let audioEnabled = true;
 
-const bitrateMap = {
-  low:      {video:500_000,  audio:64_000 },
-  medium:   {video:2_000_000,audio:128_000},
-  high:     {video:6_000_000,audio:192_000},
-  lossless: {video:25_000_000,audio:320_000},
+// Resolution-aware bitrate: scales with pixel count so
+// 480p is always smaller than 1080p at the same quality tier.
+// Budget = bits-per-pixel × pixels × fps (assuming 30fps baseline)
+const qualityBudget = {
+  low:      {bpp:0.05,  audio:64_000 },
+  medium:   {bpp:0.12,  audio:128_000},
+  high:     {bpp:0.25,  audio:192_000},
+  lossless: {bpp:0.60,  audio:320_000},
 };
+const MIN_VBR = 200_000;   // floor: 200 kbps
+const MAX_VBR = 80_000_000; // cap:  80 Mbps
+
+function calcVideoBitrate(quality, outW, outH){
+  const {bpp} = qualityBudget[quality] || qualityBudget.medium;
+  const pixels = outW * outH;
+  const fps = 30; // conservative baseline
+  const vbr = Math.round(bpp * pixels * fps);
+  return Math.max(MIN_VBR, Math.min(MAX_VBR, vbr));
+}
+function calcAudioBitrate(quality){
+  return (qualityBudget[quality] || qualityBudget.medium).audio;
+}
 
 // ─────────────────────────────────────────────────
 //  Browser support
@@ -1075,8 +1104,9 @@ async function convertOne(item){
   else log('No audio track');
   const finalStream=new MediaStream(tracks);
 
-  const{video:vbr,audio:abr}=bitrateMap[selectedQuality];
-  log(`Codec: ${detectedMime} | ${(vbr/1000).toFixed(0)}kbps video`);
+  const vbr = calcVideoBitrate(selectedQuality, cW, cH);
+  const abr = calcAudioBitrate(selectedQuality);
+  log(`Codec: ${detectedMime} | Video ${(vbr/1000).toFixed(0)}kbps (${cW}×${cH} @ ${selectedQuality}) | Audio ${(abr/1000).toFixed(0)}kbps`);
 
   const chunks=[];
   mediaRecorder=new MediaRecorder(finalStream,{mimeType:detectedMime,videoBitsPerSecond:vbr,audioBitsPerSecond:abr});
@@ -1402,22 +1432,50 @@ async function chooseOutputFolder(){
   }
   try{
     outputDirHandle=await window.showDirectoryPicker({mode:'readwrite'});
-    await dbSet('outputDirHandle',outputDirHandle); // persist across reloads
+    await dbSet('outputDirHandle',outputDirHandle);
+    showFolderReauthBar(false);
     updateFolderDisplay();
     log(`✓ Output folder set: ${outputDirHandle.name}`,'ok');
   }catch(e){if(e.name!=='AbortError')console.error(e);}
 }
 
+// Called directly from the Re-grant button — must be synchronous user gesture
+async function regrantFolderAccess(){
+  if(!outputDirHandle)return;
+  try{
+    const perm=await outputDirHandle.requestPermission({mode:'readwrite'});
+    if(perm==='granted'){
+      showFolderReauthBar(false);
+      updateFolderDisplay();
+      log(`✓ Folder access restored: ${outputDirHandle.name}`,'ok');
+    }else{
+      log('Folder access denied by user','err');
+    }
+  }catch(e){log('Re-grant failed: '+e.message,'err');}
+}
+
+async function clearFolderChoice(){
+  outputDirHandle=null;
+  await dbSet('outputDirHandle',null);
+  showFolderReauthBar(false);
+  updateFolderDisplay();
+}
+
+function showFolderReauthBar(show){
+  const bar=document.getElementById('folderReauthBar');
+  if(bar)bar.style.display=show?'flex':'none';
+}
+
 async function verifyDirPermission(){
   if(!outputDirHandle)return false;
   try{
-    const opts={mode:'readwrite'};
-    let perm=await outputDirHandle.queryPermission(opts);
+    const perm=await outputDirHandle.queryPermission({mode:'readwrite'});
     if(perm==='granted')return true;
-    // Permission lapsed — re-request (needs to be called in user-gesture context or
-    // within an async chain originating from one; this works here)
-    perm=await outputDirHandle.requestPermission(opts);
-    return perm==='granted';
+    // Permission not granted — show reauth bar, don't attempt requestPermission
+    // here (async chain, not direct user gesture — Chrome will reject it silently)
+    showFolderReauthBar(true);
+    log('⚠ Folder access expired — click "Re-grant" button to restore','err');
+    return false;
   }catch(e){
     log('Folder permission check failed: '+e.message,'err');
     return false;
@@ -1559,17 +1617,17 @@ async function loadPrefs(){
   const storedHandle=await dbGet('outputDirHandle');
   if(storedHandle){
     try{
-      // Verify we can still reach it (might need user gesture to re-grant)
       const perm=await storedHandle.queryPermission({mode:'readwrite'});
       outputDirHandle=storedHandle;
-      updateFolderDisplay();
-      if(perm!=='granted'){
-        // Mark as needs-reauth but keep stored
-        document.getElementById('saveLocDisplay').innerHTML=
-          `Output folder: <span>📁 ${storedHandle.name}</span> <span style="color:var(--amber);font-size:10px">⚠ click Convert to re-authorise</span>`;
+      if(perm==='granted'){
+        updateFolderDisplay();
+      }else{
+        // Need re-grant — show the dedicated button (can't call requestPermission here,
+        // it must come directly from a user click, not an async load chain)
+        updateFolderDisplay();
+        showFolderReauthBar(true);
       }
     }catch(e){
-      // Handle gone (drive unplugged etc)
       outputDirHandle=null;
       await dbSet('outputDirHandle',null);
     }
