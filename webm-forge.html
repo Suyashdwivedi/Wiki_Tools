@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebM Forge — MP4 to WebM Converter (Wikimedia Commons Ready)</title>
+<meta name="description" content="Convert MP4 to WebM locally in your browser. VP9/VP8 + Opus, Wikimedia Commons compatible, lossless option, 720p/1080p/4K, no upload, no WASM.">
+<meta name="keywords" content="MP4 to WebM, video converter, WebM, VP9, Opus, Wikimedia Commons, local converter, lossless video, MediaRecorder">
+<meta name="author" content="Suyash Dwivedi">
+<link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/webm-forge.html">
+<meta property="og:title" content="WebM Forge — MP4 to WebM Converter">
+<meta property="og:description" content="Convert MP4 to Wikimedia Commons-compatible WebM locally. VP9/Opus, no upload, no server needed.">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+<meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/webm-forge.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="WebM Forge — MP4 to WebM Converter">
+<meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+<link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-GC8PGC89NB');</script>
+<!-- Counter.dev -->
+<script src="https://cdn.counter.dev/script.js" data-id="cc7a036d-a904-4d76-bcac-37ea4196c014" data-utcoffset="6"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080d;--surface:#0e1018;--surface2:#141720;
+  --border:#1e2232;--border2:#2a3048;
+  --accent:#00e5a0;--accent2:#00b87a;--accent-dim:#003d2a;
+  --amber:#f5a623;--amber-dim:#3d2800;--red:#ff4d6a;
+  --wiki:#3366cc;--wiki-dim:#0a1a40;--wiki-light:#6699ff;
+  --text:#e8ecf4;--text-dim:#7a8299;--text-muted:#3d4560;
+  --mono:'Space Mono',monospace;--sans:'Syne',sans-serif;
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,160,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 24px 80px}
+
+/* Brand bar */
+.brand-bar{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);margin-bottom:30px}
+.brand-bar img{width:36px;height:36px;border-radius:6px}
+.bb-text .bb-title{font-weight:700;font-size:14px}
+.bb-text .bb-sub{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:1px}
+.bb-spacer{flex:1}
+.bb-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+
+/* Header */
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
+.logo-tag{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px}
+.logo h1{font-size:36px;font-weight:800;letter-spacing:-1px;line-height:1}
+.logo h1 span{color:var(--accent)}
+.hdr-badges{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:4px;padding:3px 10px;font-family:var(--mono);font-size:11px;letter-spacing:1px}
+.badge-green{background:var(--accent-dim);border:1px solid var(--accent2);color:var(--accent)}
+.badge-amber{background:var(--amber-dim);border:1px solid var(--amber);color:var(--amber)}
+.badge-wiki{background:var(--wiki-dim);border:1px solid var(--wiki);color:var(--wiki-light)}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Notices */
+.notice{border-radius:8px;padding:13px 18px;margin-bottom:14px;font-size:13px;color:var(--text-dim);line-height:1.7;background:var(--surface);border:1px solid var(--border2)}
+.notice-amber{border-left:3px solid var(--amber)}.notice-wiki{border-left:3px solid var(--wiki)}.notice-green{border-left:3px solid var(--accent)}
+.notice strong{font-family:var(--mono)}
+.notice-amber strong{color:var(--amber)}.notice-wiki strong{color:var(--wiki-light)}.notice-green strong{color:var(--accent)}
+.notice a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent2)}.notice a:hover{color:var(--text)}
+code{font-family:var(--mono);font-size:12px;background:var(--surface2);padding:1px 5px;border-radius:3px;color:var(--accent2)}
+
+/* Engine status */
+.engine-status{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--text-muted);margin-bottom:16px}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-dot.checking{background:var(--amber);animation:pulse 1.5s infinite}
+.status-dot.ready{background:var(--accent)}
+.status-dot.warn{background:var(--amber)}
+.status-dot.err{background:var(--red)}
+
+/* Audio toggle */
+.audio-toggle{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:12px;color:var(--text-dim);cursor:pointer;user-select:none;transition:all .15s;margin-bottom:16px}
+.audio-toggle:hover{border-color:var(--border2);color:var(--text)}
+.toggle-sw{width:32px;height:17px;background:var(--surface2);border:1px solid var(--border2);border-radius:99px;position:relative;transition:all .2s;flex-shrink:0}
+.toggle-sw::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:var(--text-muted);transition:all .2s}
+.toggle-sw.on{background:var(--accent-dim);border-color:var(--accent)}.toggle-sw.on::after{left:17px;background:var(--accent)}
+
+
+/* Video preview panel */
+.preview-panel{display:none;background:var(--surface);border:1px solid var(--border2);border-radius:12px;margin-bottom:22px;overflow:hidden}
+.preview-panel.visible{display:block;animation:fadeIn .3s ease}
+.preview-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
+.preview-header-left{display:flex;align-items:center;gap:8px}
+.preview-label{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)}
+.preview-info{font-family:var(--mono);font-size:11px;color:var(--accent)}
+.preview-body{position:relative;background:#000;min-height:120px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.preview-body video{max-width:100%;max-height:360px;width:100%;display:block;transition:transform .25s ease}
+.preview-controls{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface2);border-top:1px solid var(--border)}
+.btn-play{background:var(--accent-dim);border:1px solid var(--accent2);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--accent);transition:all .15s;flex-shrink:0}
+.btn-play:hover{background:var(--accent);color:#07080d}
+.preview-seek{flex:1;height:4px;-webkit-appearance:none;appearance:none;background:var(--border2);border-radius:99px;outline:none;cursor:pointer}
+.preview-seek::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #07080d}
+.preview-seek::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #07080d}
+.preview-time{font-family:var(--mono);font-size:11px;color:var(--text-dim);white-space:nowrap;flex-shrink:0}
+/* volume */
+.preview-vol{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.vol-icon{color:var(--text-muted);cursor:pointer;transition:color .15s}
+.vol-icon:hover{color:var(--accent)}
+.preview-vol-range{width:60px;height:3px;-webkit-appearance:none;appearance:none;background:var(--border2);border-radius:99px;outline:none;cursor:pointer}
+.preview-vol-range::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--text-dim);cursor:pointer}
+
+/* Rotation controls */
+.rotation-bar{display:none;align-items:center;gap:8px;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:16px;flex-wrap:wrap}
+.rotation-bar.visible{display:flex}
+.rotation-label{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);flex-shrink:0;margin-right:4px}
+.rot-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:6px 12px;font-family:var(--mono);font-size:11px;color:var(--text-dim);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;user-select:none}
+.rot-btn:hover{border-color:var(--accent2);color:var(--text)}
+.rot-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.rot-divider{width:1px;height:20px;background:var(--border2);margin:0 4px}
+.rot-badge{font-family:var(--mono);font-size:10px;color:var(--amber);background:var(--amber-dim);border:1px solid var(--amber);border-radius:3px;padding:2px 8px;margin-left:auto}
+
+
+/* ── Batch queue ── */
+.batch-zone-wrap{margin-bottom:22px}
+.batch-drop{position:relative;border:2px dashed var(--border2);border-radius:12px;padding:40px 32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);overflow:hidden}
+.batch-drop::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(0,229,160,.04) 0%,transparent 70%);pointer-events:none}
+.batch-drop:hover,.batch-drop.dragover{border-color:var(--accent);background:var(--surface2);box-shadow:0 0 40px rgba(0,229,160,.08)}
+.batch-drop-icon{width:48px;height:48px;margin:0 auto 12px;color:var(--text-muted);transition:color .2s}
+.batch-drop:hover .batch-drop-icon,.batch-drop.dragover .batch-drop-icon{color:var(--accent)}
+.batch-drop-title{font-size:17px;font-weight:600;margin-bottom:4px}
+.batch-drop-sub{font-family:var(--mono);font-size:11px;color:var(--text-muted)}
+
+/* Queue list */
+.queue-header{display:flex;align-items:center;justify-content:space-between;padding:10px 0 8px;gap:12px;flex-wrap:wrap}
+.queue-title{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)}
+.queue-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn-clear-all{background:none;border:1px solid var(--border2);border-radius:5px;padding:4px 10px;font-family:var(--mono);font-size:10px;color:var(--text-muted);cursor:pointer;transition:all .15s}
+.btn-clear-all:hover{border-color:var(--red);color:var(--red)}
+.queue-count{font-family:var(--mono);font-size:11px;color:var(--text-dim)}
+
+.queue-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.queue-item{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px;transition:border-color .15s}
+.queue-item.status-converting{border-color:var(--accent2);background:rgba(0,229,160,.03)}
+.queue-item.status-done{border-color:var(--accent-dim)}
+.queue-item.status-error{border-color:rgba(255,77,106,.3);background:rgba(255,77,106,.03)}
+.qi-thumb{width:150px;height:100px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);flex-shrink:0;overflow:hidden;position:relative;cursor:pointer}
+.qi-thumb img{position:absolute;width:100%;height:100%;object-fit:cover;border-radius:7px;display:block;transform-origin:center center;transition:transform .25s ease}
+.qi-thumb .qi-thumb-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.queue-item.status-done .qi-thumb{background:var(--accent-dim);border-color:var(--accent2);color:var(--accent)}
+.queue-item.status-error .qi-thumb{background:rgba(255,77,106,.1);color:var(--red)}
+.qi-body{flex:1;min-width:0}
+.qi-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.qi-size{font-family:var(--mono);font-size:11px;color:var(--text-dim)}
+.qi-rot{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
+.qi-rot-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:3px 8px;font-family:var(--mono);font-size:10px;color:var(--text-muted);cursor:pointer;transition:all .12s;user-select:none}
+.qi-rot-btn:hover{border-color:var(--accent2);color:var(--text)}
+.qi-rot-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.qi-rot-label{font-family:var(--mono);font-size:10px;color:var(--text-muted);align-self:center;margin-right:2px}
+.qi-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.qi-status{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:3px;letter-spacing:.5px}
+.qi-status.s-queued{color:var(--text-muted);background:var(--surface2);border:1px solid var(--border2)}
+.qi-status.s-converting{color:var(--accent);background:var(--accent-dim);border:1px solid var(--accent2);animation:pulse 1.5s infinite}
+.qi-status.s-done{color:#07080d;background:var(--accent);border:1px solid var(--accent2)}
+.qi-status.s-error{color:var(--red);background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.3)}
+.qi-remove{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px;transition:color .12s}
+.qi-remove:hover{color:var(--red)}
+.qi-dl{background:var(--accent);color:#07080d;border:none;border-radius:5px;padding:4px 10px;font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;font-weight:700}
+.qi-dl:hover{background:#00ffb0}
+.qi-bar-wrap{height:3px;background:var(--border2);border-radius:99px;overflow:hidden;margin-top:6px}
+.qi-bar{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;width:0%;transition:width .3s}
+
+/* Batch overall progress */
+.batch-overall{display:none;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:8px 14px;margin-bottom:10px;font-family:var(--mono);font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:10px}
+.batch-overall.visible{display:flex}
+.batch-overall-count{color:var(--accent);font-weight:700}
+
+/* Drop zone */
+.drop-zone{position:relative;border:2px dashed var(--border2);border-radius:12px;padding:52px 32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);margin-bottom:22px;overflow:hidden}
+.drop-zone::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(0,229,160,.04) 0%,transparent 70%);pointer-events:none}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--accent);background:var(--surface2);box-shadow:0 0 40px rgba(0,229,160,.08),inset 0 0 40px rgba(0,229,160,.03)}
+.drop-zone.has-file{border-style:solid;border-color:var(--accent2);padding:22px 32px}
+.drop-icon{width:56px;height:56px;margin:0 auto 13px;color:var(--text-muted);transition:color .2s}
+.drop-zone:hover .drop-icon,.drop-zone.dragover .drop-icon{color:var(--accent)}
+.drop-zone.has-file .drop-icon{display:none}
+.drop-title{font-size:18px;font-weight:600;margin-bottom:4px}.drop-sub{font-family:var(--mono);font-size:12px;color:var(--text-muted)}
+.file-info{display:none;align-items:center;gap:13px;text-align:left}
+.has-file .file-info{display:flex}.has-file .drop-placeholder{display:none}
+.file-icon{width:42px;height:42px;background:var(--accent-dim);border:1px solid var(--accent2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent)}
+.file-meta{flex:1;min-width:0}.file-name{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-size{font-family:var(--mono);font-size:12px;color:var(--text-dim);margin-top:2px}
+.file-clear{background:none;border:1px solid var(--border2);border-radius:6px;padding:6px 12px;color:var(--text-dim);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s}
+.file-clear:hover{border-color:var(--red);color:var(--red)}
+#fileInput{display:none}
+/* hidden video for capture */
+#hiddenVideo{position:absolute;top:-9999px;left:-9999px;width:1px;height:1px}
+
+/* Settings */
+.settings{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:18px}
+@media(max-width:600px){.settings{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px;transition:border-color .2s}
+.card:hover{border-color:var(--border2)}
+.card-label{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px}
+.pill-group{display:flex;flex-wrap:wrap;gap:6px}
+.pill{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:5px 11px;font-family:var(--mono);font-size:12px;color:var(--text-dim);cursor:pointer;transition:all .15s;user-select:none}
+.pill:hover{border-color:var(--accent2);color:var(--text)}.pill.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.quality-options{display:flex;flex-direction:column;gap:7px}
+.quality-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;cursor:pointer;transition:all .15s}
+.quality-item:hover{border-color:var(--accent2)}.quality-item.active{background:var(--accent-dim);border-color:var(--accent)}
+.quality-item.lossless-item.active{background:rgba(245,166,35,.1);border-color:var(--amber)}
+.q-left{display:flex;align-items:center;gap:8px}
+.q-radio{width:14px;height:14px;border:2px solid var(--border2);border-radius:50%;transition:all .15s;flex-shrink:0}
+.quality-item.active .q-radio{border-color:var(--accent);background:var(--accent)}
+.quality-item.lossless-item.active .q-radio{border-color:var(--amber);background:var(--amber)}
+.q-name{font-weight:600;font-size:13px}
+.quality-item.active .q-name{color:var(--accent)}.quality-item.lossless-item.active .q-name{color:var(--amber)}
+.q-crf{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+.quality-item.active .q-crf{color:var(--accent2)}.quality-item.lossless-item.active .q-crf{color:var(--amber)}
+.codec-card{grid-column:1/-1}
+.codec-row{display:flex;gap:10px;flex-wrap:wrap}
+.codec-item{flex:1;min-width:130px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px}
+.codec-type{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px}
+.codec-name{font-size:14px;font-weight:700;color:var(--accent);font-family:var(--mono)}
+.codec-desc{font-size:11px;color:var(--text-dim);margin-top:3px;line-height:1.5}
+
+/* Commons metadata */
+.commons-card{grid-column:1/-1;border-color:var(--wiki)!important}
+.commons-card .card-label{color:var(--wiki-light)}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:540px){.meta-grid{grid-template-columns:1fr}}
+.meta-field{display:flex;flex-direction:column;gap:4px}
+.meta-field label{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.req-badge{color:var(--red);font-size:10px;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.3);border-radius:3px;padding:0 5px;letter-spacing:0}
+.meta-field input,.meta-field select{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;transition:border-color .15s;width:100%}
+.meta-field input:focus,.meta-field select:focus{border-color:var(--wiki)}
+.meta-field input.req-field{border-color:rgba(51,102,204,.5)}
+.meta-field input.req-field:focus{border-color:var(--wiki);box-shadow:0 0 0 2px rgba(51,102,204,.15)}
+.meta-field input::placeholder{color:var(--text-muted)}
+.meta-field select option{background:var(--surface2)}
+.field-hint{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:2px}
+.field-hint a{color:var(--wiki-light);text-decoration:none;border-bottom:1px solid rgba(102,153,255,.3)}
+.field-hint a:hover{color:var(--text)}
+
+/* Actions */
+.actions{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.btn-convert{flex:1;min-width:200px;background:var(--accent);color:#07080d;border:none;border-radius:8px;padding:14px 28px;font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.5px;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-convert:hover:not(:disabled){background:#00ffb0;box-shadow:0 0 30px rgba(0,229,160,.4);transform:translateY(-1px)}
+.btn-convert:disabled{background:var(--surface2);color:var(--text-muted);cursor:not-allowed;transform:none;box-shadow:none}
+.btn-save-loc{background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:14px 15px;color:var(--text-dim);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:7px}
+.btn-save-loc:hover{border-color:var(--accent2);color:var(--text)}
+.save-loc-display{font-family:var(--mono);font-size:11px;color:var(--text-muted);padding:4px 0 14px}
+.save-loc-display span{color:var(--accent)}
+
+/* Progress */
+.progress-block{display:none;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:18px;margin-bottom:18px}
+.progress-block.visible{display:block}
+.progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.progress-label{font-family:var(--mono);font-size:12px;color:var(--accent)}
+.progress-right{display:flex;align-items:center;gap:14px}
+.progress-pct{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text)}
+.progress-eta{font-family:var(--mono);font-size:11px;color:var(--text-muted)}
+.progress-bar-bg{height:7px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-bottom:10px}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;transition:width .3s linear;width:0%}
+.progress-bar-fill.complete{background:linear-gradient(90deg,var(--accent),#00ffb0);transition:width .2s}
+.progress-stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:4px}
+.pstat{font-family:var(--mono);font-size:11px;color:var(--text-muted)}.pstat strong{color:var(--text-dim)}
+.progress-log{font-family:var(--mono);font-size:10px;color:var(--text-muted);height:52px;overflow-y:auto;line-height:1.8;border-top:1px solid var(--border);padding-top:8px;margin-top:6px}
+.log-line{color:var(--text-dim)}.log-line.err{color:var(--red)}.log-line.ok{color:var(--accent)}
+/* Stop button */
+.btn-stop{background:var(--amber-dim);border:1px solid var(--amber);border-radius:6px;padding:6px 14px;color:var(--amber);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s;display:none}
+.btn-stop:hover{background:rgba(245,166,35,.2)}.btn-stop.visible{display:inline-flex;align-items:center;gap:5px}
+
+/* Output */
+.output-block{display:none;background:var(--surface);border:1px solid var(--accent2);border-radius:10px;padding:20px;margin-bottom:18px}
+.output-block.visible{display:block;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.output-header{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.output-check{width:28px;height:28px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#07080d;flex-shrink:0}
+.output-title{font-size:16px;font-weight:700}
+.output-meta{display:flex;gap:13px;flex-wrap:wrap;margin-bottom:13px}
+.meta-item{font-family:var(--mono);font-size:12px;color:var(--text-dim)}.meta-item strong{color:var(--accent)}
+.output-actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn-dl{background:var(--accent);color:#07080d;border:none;border-radius:8px;padding:11px 20px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.btn-dl:hover{background:#00ffb0;box-shadow:0 0 20px rgba(0,229,160,.3)}
+.btn-save-fs{background:var(--surface2);border:1px solid var(--accent2);color:var(--accent);border-radius:8px;padding:11px 20px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:7px}
+.btn-save-fs:hover{background:var(--accent-dim)}
+
+/* Commons checklist */
+.commons-check{background:var(--wiki-dim);border:1px solid var(--wiki);border-radius:8px;padding:13px 15px;margin-top:13px}
+.commons-check-title{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--wiki-light);margin-bottom:9px}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+@media(max-width:500px){.check-grid{grid-column:1fr}}
+.check-item{display:flex;align-items:flex-start;gap:7px;font-family:var(--mono);font-size:11px;color:var(--text-dim);line-height:1.5}
+.check-ok{color:var(--accent);font-size:12px;flex-shrink:0;margin-top:1px}
+.check-warn{color:var(--amber);font-size:12px;flex-shrink:0;margin-top:1px}
+
+/* Links */
+.links-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:18px}
+.links-title{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:11px}
+.link-row{display:flex;align-items:center;justify-content:space-between;gap:13px;padding:8px 0;border-bottom:1px solid var(--border)}
+.link-row:last-child{border-bottom:none;padding-bottom:0}
+.link-name{font-weight:600;font-size:13px}.link-desc{font-size:11px;color:var(--text-dim)}
+.link-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:5px 12px;color:var(--text-dim);font-family:var(--mono);font-size:11px;text-decoration:none;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.link-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Footer */
+.footer{text-align:center;margin-top:44px;padding-top:26px;border-top:2px solid var(--border);color:var(--text-dim);font-size:13px;line-height:2}
+.footer a{color:var(--accent);text-decoration:none;font-weight:600}.footer a:hover{color:var(--text)}
+
+/* Scroll nav buttons */
+.scroll-nav{position:fixed;right:20px;bottom:24px;display:flex;flex-direction:column;gap:8px;z-index:100}
+.scroll-btn{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);color:var(--text-dim);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+.scroll-btn:hover{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,229,160,.2)}
+/* Spinner */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,.3);border-top-color:#07080d;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.btn-convert.loading .spinner{display:block}.btn-convert.loading .btn-text{opacity:.7}
+svg{display:block}
+</style>
+</head>
+<body>
+<!-- Hidden video element for captureStream -->
+<video id="hiddenVideo" playsinline muted></video>
+
+<div class="wrap">
+
+<!-- Brand bar -->
+<div class="brand-bar">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo">
+  <div class="bb-text">
+    <div class="bb-title">Wiki's Lazy Coders</div>
+    <div class="bb-sub">TOOLS · SUYASH DWIVEDI</div>
+  </div>
+  <div class="bb-spacer"></div>
+  <div class="bb-badges">
+    <div class="badge badge-wiki">🌐 Commons Ready</div>
+    <div class="badge badge-amber">100% Local · No Upload</div>
+  </div>
+</div>
+
+<!-- Header -->
+<header>
+  <div class="logo">
+    <div class="logo-tag">▶ MP4 → WebM Converter</div>
+    <h1>WebM <span>Forge</span></h1>
+  </div>
+  <div class="hdr-badges">
+    <div class="badge badge-green"><span class="dot"></span> VP9 + Opus</div>
+    <div class="badge badge-wiki">Wikimedia Commons</div>
+  </div>
+</header>
+
+<!-- Notices -->
+<div class="notice notice-green">
+  <strong>// ENGINE</strong> — Uses your browser's <strong>native MediaRecorder + captureStream APIs</strong>
+  — zero external libraries, zero WASM, zero server headers required.
+  Encodes <code>VP9 + Opus</code> (Chrome/Edge) or <code>VP8 + Opus</code> (Firefox) directly in .webm container.
+  Conversion runs at real-time speed. Works on local files, GitHub Pages, and any web host.
+</div>
+<div class="notice notice-wiki">
+  <strong>// WIKIMEDIA COMMONS</strong> — Output is a <strong>.webm file (VP8/VP9 + Opus)</strong>
+  — the preferred open format for Commons video uploads. Metadata (Title, Creator, Wiki Username, Date, License)
+  is embedded via <code>webm-muxer</code> tags after encoding.
+  Commons file size limit: <strong>4 GB</strong>.
+  <a href="https://commons.wikimedia.org/wiki/Commons:Video" target="_blank">Commons video policy ↗</a>
+</div>
+
+<!-- Engine status -->
+<div class="engine-status">
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">Checking browser support…</span>
+</div>
+
+<!-- Audio toggle -->
+<div class="audio-toggle" onclick="toggleAudio()">
+  <div class="toggle-sw on" id="toggleSw"></div>
+  <span id="audioLabel">🔔 Audio notification on completion: ON</span>
+</div>
+
+<!-- Batch Drop Zone -->
+<div class="batch-zone-wrap">
+  <div class="batch-drop" id="dropZone" onclick="document.getElementById('fileInput').click()">
+    <svg class="batch-drop-icon" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.5">
+      <rect x="4" y="8" width="36" height="44" rx="3"/>
+      <rect x="20" y="8" width="36" height="44" rx="3"/>
+      <path d="M29 38 L37 30 L45 38"/><line x1="37" y1="30" x2="37" y2="50"/>
+    </svg>
+    <div class="batch-drop-title">Drop videos here</div>
+    <div class="batch-drop-sub">Multiple files · MP4, MOV, MKV, AVI, WebM · or click to browse</div>
+  </div>
+  <input type="file" id="fileInput" accept="video/*,.mp4,.mov,.mkv,.avi,.webm,.ogv" multiple style="display:none">
+  <!-- Queue -->
+  <div id="queueSection" style="display:none;margin-top:14px">
+    <div class="queue-header">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="queue-title">// Batch Queue</div>
+        <div class="queue-count" id="queueCount"></div>
+      </div>
+      <button class="btn-clear-all" onclick="clearAllQueue()">Clear All</button>
+    </div>
+    <div class="queue-list" id="queueList"></div>
+  </div>
+</div>
+
+<!-- Video Preview Panel -->
+<div class="preview-panel" id="previewPanel">
+  <div class="preview-header">
+    <div class="preview-header-left">
+      <div class="preview-label">// Preview</div>
+      <div class="preview-info" id="previewInfo"></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted)">Source file · not output</div>
+  </div>
+  <div class="preview-body" id="previewBody">
+    <video id="previewVideo" playsinline preload="metadata"></video>
+  </div>
+  <div class="preview-controls">
+    <div class="btn-play" id="playBtn" onclick="togglePlay()">
+      <svg id="playIcon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><polygon points="2,1 11,6 2,11"/></svg>
+    </div>
+    <input class="preview-seek" id="seekBar" type="range" min="0" max="100" step="0.1" value="0">
+    <div class="preview-time" id="previewTime">0:00 / 0:00</div>
+    <div class="preview-vol">
+      <svg class="vol-icon" id="volIcon" onclick="toggleMute()" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <path id="volWave" d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      </svg>
+      <input class="preview-vol-range" id="volRange" type="range" min="0" max="1" step="0.05" value="1" oninput="setVolume(this.value)">
+    </div>
+  </div>
+</div>
+
+<!-- Rotation Bar -->
+<div class="rotation-bar" id="rotationBar">
+  <div class="rotation-label">// Rotation</div>
+  <div class="rot-btn active" data-rot="0" onclick="setRotation(0)">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+    0° Original
+  </div>
+  <div class="rot-btn" data-rot="90" onclick="setRotation(90)">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8"/></svg>
+    90° CW
+  </div>
+  <div class="rot-btn" data-rot="180" onclick="setRotation(180)">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 8v4l3 3"/></svg>
+    180°
+  </div>
+  <div class="rot-btn" data-rot="270" onclick="setRotation(270)">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 2v6h6M21 12a9 9 0 0 1-15 6.7L3 8"/></svg>
+    90° CCW
+  </div>
+  <div class="rot-divider"></div>
+  <div class="rot-badge" id="rotBadge">0°</div>
+</div>
+
+<!-- Settings -->
+<div class="settings">
+
+  <!-- Resolution -->
+  <div class="card">
+    <div class="card-label">// Output Resolution</div>
+    <div class="pill-group" id="resPills">
+      <div class="pill active" data-res="original">Original</div>
+      <div class="pill" data-res="480">480p</div>
+      <div class="pill" data-res="720">720p HD</div>
+      <div class="pill" data-res="1080">1080p FHD</div>
+      <div class="pill" data-res="1440">1440p QHD</div>
+      <div class="pill" data-res="2160">4K UHD</div>
+    </div>
+  </div>
+
+  <!-- Quality -->
+  <div class="card">
+    <div class="card-label">// Quality / Bitrate</div>
+    <div class="quality-options" id="qualityOptions">
+      <div class="quality-item" data-q="low">
+        <div class="q-left"><div class="q-radio"></div><div class="q-name">Low</div></div>
+        <div class="q-crf">500 kbps · Small file</div>
+      </div>
+      <div class="quality-item active" data-q="medium">
+        <div class="q-left"><div class="q-radio"></div><div class="q-name">Medium</div></div>
+        <div class="q-crf">2 Mbps · Balanced</div>
+      </div>
+      <div class="quality-item" data-q="high">
+        <div class="q-left"><div class="q-radio"></div><div class="q-name">High</div></div>
+        <div class="q-crf">6 Mbps · Large file</div>
+      </div>
+      <div class="quality-item lossless-item" data-q="lossless">
+        <div class="q-left"><div class="q-radio"></div><div class="q-name">Lossless</div></div>
+        <div class="q-crf">25 Mbps · Max bitrate</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Codec info -->
+  <div class="card codec-card">
+    <div class="card-label">// Codecs · Open-Source · Commons Approved</div>
+    <div class="codec-row">
+      <div class="codec-item">
+        <div class="codec-type">Video Codec</div>
+        <div class="codec-name" id="detectedVideoCodec">VP9 / VP8</div>
+        <div class="codec-desc">VP9 on Chrome/Edge, VP8 on Firefox — both royalty-free and accepted by Wikimedia Commons.</div>
+      </div>
+      <div class="codec-item">
+        <div class="codec-type">Audio Codec</div>
+        <div class="codec-name">Opus</div>
+        <div class="codec-desc">Opus by Xiph.Org — best open-source audio, superior to AAC/MP3 at all bitrates.</div>
+      </div>
+      <div class="codec-item">
+        <div class="codec-type">Container</div>
+        <div class="codec-name">.webm</div>
+        <div class="codec-desc">Open, royalty-free W3C standard. Native Commons video format since 2010.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Commons metadata -->
+  <div class="card commons-card">
+    <div class="card-label">// Wikimedia Commons Metadata — embedded in output</div>
+    <div class="meta-grid">
+      <div class="meta-field">
+        <label>Title</label>
+        <input type="text" id="metaTitle" placeholder="e.g. Sunset over Bhopal Lake">
+      </div>
+      <div class="meta-field">
+        <label>Creator / Real Name</label>
+        <input type="text" id="metaCreator" placeholder="e.g. Suyash Dwivedi" value="Suyash Dwivedi">
+      </div>
+      <div class="meta-field" style="grid-column:1/-1">
+        <label>
+          Wikimedia Username
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border2);border-radius:3px;padding:0 5px">optional</span>
+        </label>
+        <input type="text" id="metaWikiUser"
+          placeholder="e.g. Suyash.dwivedi" value="Suyash.dwivedi">
+        <div class="field-hint">
+          Your Commons username — embedded in file metadata.
+          <a href="https://commons.wikimedia.org/wiki/Special:MyPage" target="_blank">Check your username ↗</a>
+        </div>
+      </div>
+      <div class="meta-field">
+        <label>Date (YYYY-MM-DD)</label>
+        <input type="text" id="metaDate" placeholder="e.g. 2026-03-06">
+      </div>
+      <div class="meta-field">
+        <label>License</label>
+        <select id="metaLicense">
+          <option value="CC BY-SA 4.0">CC BY-SA 4.0 (Commons default)</option>
+          <option value="CC BY 4.0">CC BY 4.0</option>
+          <option value="CC0 1.0">CC0 1.0 (Public Domain)</option>
+          <option value="CC BY-SA 3.0">CC BY-SA 3.0</option>
+          <option value="GFDL">GFDL</option>
+        </select>
+      </div>
+      <div class="meta-field" style="grid-column:1/-1">
+        <label>Description</label>
+        <input type="text" id="metaDesc" placeholder="Brief description for Commons upload page">
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.settings -->
+
+<!-- Actions -->
+<div class="actions">
+  <button class="btn-convert" id="convertBtn" disabled onclick="startBatch()">
+    <div class="spinner"></div>
+    <span class="btn-text">Convert All</span>
+  </button>
+  <button class="btn-stop" id="stopBtn" onclick="stopConvert()" style="display:none">
+    <svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" rx="1" fill="currentColor"/></svg>
+    Stop
+  </button>
+  <button class="btn-save-loc" id="dirPickerBtn" onclick="chooseOutputFolder()" title="Choose a folder — converted files save there automatically">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+    </svg>
+    Output Folder
+  </button>
+</div>
+<div class="save-loc-display" id="saveLocDisplay">Output folder: <span>Browser default downloads</span></div>
+<div class="batch-overall" id="batchOverall" style="display:none">
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+  <span>Batch: </span>
+  <span class="batch-overall-count" id="batchOverallCount">0 / 0</span>
+  <span id="batchOverallLabel">processing…</span>
+</div>
+
+<!-- Progress -->
+<div class="progress-block" id="progressBlock">
+  <div class="progress-header">
+    <div class="progress-label" id="progressLabel">▶ Converting…</div>
+    <div class="progress-right">
+      <div class="progress-eta" id="progressETA">Estimating…</div>
+      <div class="progress-pct" id="progressPct">0%</div>
+    </div>
+  </div>
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+  <div class="progress-stats" id="progressStats"></div>
+  <div class="progress-log" id="progressLog"></div>
+</div>
+
+<!-- Output -->
+<div class="output-block" id="outputBlock">
+  <div class="output-header">
+    <div class="output-check">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <div class="output-title">Conversion Complete</div>
+  </div>
+  <div class="output-meta" id="outputMeta"></div>
+  <div class="output-actions" id="outputActions">
+    <button class="btn-dl" onclick="downloadFile()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>Download .webm
+    </button>
+    <button class="btn-save-fs" id="saveToFSBtn" onclick="saveWithPicker()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+        <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+      </svg>Save to Folder…
+    </button>
+  </div>
+  <div class="commons-check">
+    <div class="commons-check-title">// Wikimedia Commons Upload Checklist</div>
+    <div class="check-grid" id="checkGrid"></div>
+  </div>
+</div>
+
+<!-- Resource links -->
+<div class="links-section">
+  <div class="links-title">// Related Tools & Resources</div>
+  <div class="link-row">
+    <div><div class="link-name">Wikimedia Commons: Video</div><div class="link-desc">Official Commons video policy, formats & upload guide</div></div>
+    <a class="link-btn" href="https://commons.wikimedia.org/wiki/Commons:Video" target="_blank">Read ↗</a>
+  </div>
+  <div class="link-row">
+    <div><div class="link-name">FFmpeg (Native CLI)</div><div class="link-desc">Fast native-speed batch conversion — best for large files</div></div>
+    <a class="link-btn" href="https://ffmpeg.org/download.html" target="_blank">Download ↗</a>
+  </div>
+  <div class="link-row">
+    <div><div class="link-name">HandBrake</div><div class="link-desc">Open-source GUI transcoder — VP9/WebM output supported</div></div>
+    <a class="link-btn" href="https://handbrake.fr/downloads.php" target="_blank">Download ↗</a>
+  </div>
+  <div class="link-row">
+    <div><div class="link-name">VP9 Bitstream Spec</div><div class="link-desc">Google's official VP9 specification & WebM Project docs</div></div>
+    <a class="link-btn" href="https://www.webmproject.org/vp9/" target="_blank">Read ↗</a>
+  </div>
+  <div class="link-row">
+    <div><div class="link-name">VLC Media Player</div><div class="link-desc">Open-source player & converter — full WebM/VP9 support</div></div>
+    <a class="link-btn" href="https://www.videolan.org/vlc/" target="_blank">Download ↗</a>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> |
+  Project: <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank">Wiki's Lazy Coders</a> |
+  Created: 6 March 2026
+</div>
+
+</div>
+
+<!-- Scroll nav -->
+<div class="scroll-nav">
+  <button class="scroll-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Go to top">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+  <button class="scroll-btn" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})" title="Go to bottom">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+</div>
+
+<script>
+'use strict';
+// ─────────────────────────────────────────────────
+//  State
+// ─────────────────────────────────────────────────
+let batchQueue   = [];   // [{id,file,rotation,status,blob,filename,errorMsg}]
+let outputDirHandle = null; // remembered output folder
+let queueIdSeq   = 0;
+let isConverting = false;
+let stopRequested= false;
+let mediaRecorder= null;
+let convStartTime= 0;
+let etaInterval  = null;
+let detectedMime = '';
+let selectedRes  = 'original';
+let selectedQuality = 'medium';
+let audioEnabled = true;
+
+const bitrateMap = {
+  low:      {video:500_000,  audio:64_000 },
+  medium:   {video:2_000_000,audio:128_000},
+  high:     {video:6_000_000,audio:192_000},
+  lossless: {video:25_000_000,audio:320_000},
+};
+
+// ─────────────────────────────────────────────────
+//  Browser support
+// ─────────────────────────────────────────────────
+function checkBrowserSupport(){
+  const dot=document.getElementById('statusDot'),text=document.getElementById('statusText');
+  if(!window.MediaRecorder){dot.className='status-dot err';text.textContent='MediaRecorder not supported — use Chrome, Edge, or Firefox.';return false;}
+  const candidates=['video/webm;codecs=vp9,opus','video/webm;codecs=vp9','video/webm;codecs=vp8,opus','video/webm;codecs=vp8','video/webm'];
+  detectedMime=candidates.find(t=>MediaRecorder.isTypeSupported(t))||'';
+  if(!detectedMime){dot.className='status-dot err';text.textContent='WebM recording not supported. Use Chrome, Edge, or Firefox.';return false;}
+  const isVP9=detectedMime.includes('vp9');
+  document.getElementById('detectedVideoCodec').textContent=isVP9?'VP9 ✓':'VP8 ✓';
+  const tv=document.createElement('video');
+  if(typeof tv.captureStream!=='function'&&typeof tv.mozCaptureStream!=='function'){dot.className='status-dot warn';text.textContent='captureStream unavailable — try Chrome or Edge.';return false;}
+  dot.className='status-dot ready';
+  text.textContent=`Engine ready — ${isVP9?'VP9':'VP8'} + Opus · Native WebM · Batch mode supported`;
+  updateConvertBtn();return true;
+}
+
+// ─────────────────────────────────────────────────
+//  Audio chime
+// ─────────────────────────────────────────────────
+function playChime(type='success'){
+  if(!audioEnabled)return;
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    if(type==='success'){
+      [523.25,659.25,783.99,1046.5].forEach((freq,i)=>{
+        const t=ctx.currentTime+i*0.14;
+        const osc=ctx.createOscillator(),gain=ctx.createGain();
+        osc.connect(gain);gain.connect(ctx.destination);
+        osc.type='sine';osc.frequency.setValueAtTime(freq,t);
+        gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(0.22,t+0.03);gain.gain.exponentialRampToValueAtTime(0.001,t+0.55);
+        osc.start(t);osc.stop(t+0.6);
+      });
+    }else{
+      [220,180].forEach((freq,i)=>{
+        const t=ctx.currentTime+i*0.25;
+        const osc=ctx.createOscillator(),gain=ctx.createGain();
+        osc.connect(gain);gain.connect(ctx.destination);
+        osc.type='sawtooth';osc.frequency.setValueAtTime(freq,t);
+        gain.gain.setValueAtTime(0.1,t);gain.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+        osc.start(t);osc.stop(t+0.45);
+      });
+    }
+  }catch(e){}
+}
+function toggleAudio(){
+  audioEnabled=!audioEnabled;
+  document.getElementById('toggleSw').className='toggle-sw'+(audioEnabled?' on':'');
+  document.getElementById('audioLabel').textContent='🔔 Audio notification on completion: '+(audioEnabled?'ON':'OFF');
+  if(audioEnabled)playChime('success');
+}
+
+// ─────────────────────────────────────────────────
+//  Drop / file input
+// ─────────────────────────────────────────────────
+const dropZone=document.getElementById('dropZone');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('dragover');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('dragover');addFiles(e.dataTransfer.files);});
+document.getElementById('fileInput').addEventListener('change',e=>{addFiles(e.target.files);e.target.value='';});
+
+function addFiles(fileList){
+  Array.from(fileList).forEach(f=>{
+    if(!f.type.startsWith('video/')&&!/\.(mp4|mov|mkv|avi|webm|ogv)$/i.test(f.name))return;
+    const item={id:++queueIdSeq,file:f,rotation:0,status:'queued',blob:null,filename:f.name.replace(/\.[^.]+$/,'')+'.webm',errorMsg:''};
+    batchQueue.push(item);
+    generateThumb(item);
+  });
+  renderQueue();
+  updateConvertBtn();
+}
+
+function generateThumb(item){
+  const tmpVid=document.createElement('video');
+  tmpVid.muted=true;
+  tmpVid.preload='metadata';
+  const url=URL.createObjectURL(item.file);
+  tmpVid.src=url;
+  tmpVid.onloadeddata=()=>{
+    tmpVid.currentTime=Math.min(2,tmpVid.duration*0.1||0);
+  };
+  tmpVid.onseeked=()=>{
+    try{
+      const cvs=document.createElement('canvas');
+      cvs.width=160;cvs.height=90;
+      const ctx2=cvs.getContext('2d');
+      ctx2.drawImage(tmpVid,0,0,160,90);
+      item.thumb=cvs.toDataURL('image/jpeg',0.7);
+    }catch(e){}
+    URL.revokeObjectURL(url);
+    tmpVid.src='';
+    renderQueue();
+  };
+  tmpVid.onerror=()=>{URL.revokeObjectURL(url);};
+}
+
+function clearAllQueue(){
+  if(isConverting)return;
+  batchQueue.forEach(i=>{i.blob=null;}); // free any held blobs
+  batchQueue=[];
+  renderQueue();
+  updateConvertBtn();
+  // also reset preview
+  const pv=document.getElementById('previewVideo');
+  pv.pause();pv.src='';
+  document.getElementById('previewPanel').classList.remove('visible');
+  document.getElementById('rotationBar').classList.remove('visible');
+}
+
+function removeQueueItem(id){
+  batchQueue=batchQueue.filter(i=>i.id!==id);
+  renderQueue();updateConvertBtn();
+}
+
+function setItemRotation(id,deg){
+  const item=batchQueue.find(i=>i.id===id);
+  if(!item)return;
+  item.rotation=deg;
+  // re-render just that item's buttons
+  document.querySelectorAll(`.qi-rot-btn[data-id="${id}"]`).forEach(b=>
+    b.classList.toggle('active',parseInt(b.dataset.deg)===deg)
+  );
+  // update badge
+  const badge=document.getElementById(`rot-badge-${id}`);
+  if(badge)badge.textContent=deg+'°';
+  // live-update thumbnail rotation without full re-render
+  const img=document.getElementById(`qi-img-${id}`);
+  if(img){
+    const is90=deg===90||deg===270;
+    img.style.transform=`rotate(${deg}deg) ${is90?'scale(0.67)':'scale(1)'}`;
+  }
+  // if this is the previewed file, update preview rotation
+  if(batchQueue.length===1||(document.getElementById('previewVideo').src&&item.file===window._previewingFile)){
+    applyPreviewRotationDeg(deg);
+  }
+}
+
+// ─────────────────────────────────────────────────
+//  Queue render
+// ─────────────────────────────────────────────────
+function renderQueue(){
+  const section=document.getElementById('queueSection');
+  const list=document.getElementById('queueList');
+  const count=document.getElementById('queueCount');
+  if(batchQueue.length===0){section.style.display='none';return;}
+  section.style.display='block';
+  const done=batchQueue.filter(i=>i.status==='done').length;
+  const errs=batchQueue.filter(i=>i.status==='error').length;
+  count.textContent=`${batchQueue.length} file${batchQueue.length!==1?'s':''}${done?' · '+done+' done':''}${errs?' · '+errs+' error':''}`;
+
+  list.innerHTML=batchQueue.map(item=>{
+    const statusClass={'queued':'s-queued','converting':'s-converting','done':'s-done','error':'s-error'}[item.status]||'s-queued';
+    const statusLabel={'queued':'QUEUED','converting':'ENCODING…','done':'DONE','error':'ERROR'}[item.status]||'QUEUED';
+    const rots=[{d:0,l:'0°'},{d:90,l:'90°↻'},{d:180,l:'180°'},{d:270,l:'↺90°'}];
+    const rotBtns=rots.map(r=>
+      `<button class="qi-rot-btn${item.rotation===r.d?' active':''}" data-id="${item.id}" data-deg="${r.d}" onclick="setItemRotation(${item.id},${r.d})">${r.l}</button>`
+    ).join('');
+    let dlBtn='';
+    if(item.status==='done'){
+      if(item.savedToFolder&&!item.blob){
+        dlBtn=`<span class="qi-status s-done" style="font-size:9px">📁 SAVED</span>`;
+      }else if(item.blob){
+        dlBtn=`<button class="qi-dl" onclick="downloadItem(${item.id})">↓ DL</button>`;
+      }else{
+        dlBtn=`<span class="qi-status" style="font-size:9px;color:var(--text-muted);background:none;border:none">freed</span>`;
+      }
+    }
+    const errMsg=item.status==='error'?`<div style="font-family:var(--mono);font-size:10px;color:var(--red);margin-top:3px">${item.errorMsg||'Unknown error'}</div>`:'';
+    const barHtml=item.status==='converting'
+      ?`<div class="qi-bar-wrap"><div class="qi-bar" id="qi-bar-${item.id}"></div></div>`:'';
+    const iconSvg=item.status==='done'
+      ?`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`
+      :item.status==='error'
+      ?`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`
+      :`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`;
+
+    const rot=item.rotation||0;
+    // For 90/270: swap aspect inside fixed box using scale so it fills the container
+    const isRot90=(rot===90||rot===270);
+    const thumbScale=isRot90?'scale(0.67)':'scale(1)';
+    const thumbStyle=`transform:rotate(${rot}deg) ${thumbScale};`;
+    const thumbHtml=item.thumb
+      ?`<img src="${item.thumb}" alt="thumb" id="qi-img-${item.id}" style="${thumbStyle}">`
+      :`<div class="qi-thumb-icon">${iconSvg}</div>`;
+    return `<div class="queue-item status-${item.status}" id="qi-${item.id}">
+      <div class="qi-thumb" onclick="previewItem(${item.id})" title="Click to preview">${thumbHtml}</div>
+      <div class="qi-body">
+        <div class="qi-name" title="${item.file.name}">${item.file.name}</div>
+        <div class="qi-size">${formatBytes(item.file.size)}</div>
+        <div class="qi-rot"><span class="qi-rot-label">Rotate:</span>${rotBtns}<span id="rot-badge-${item.id}" style="font-family:var(--mono);font-size:10px;color:var(--amber);margin-left:4px">${item.rotation?item.rotation+'°':''}</span></div>
+        ${barHtml}${errMsg}
+      </div>
+      <div class="qi-right">
+        <span class="qi-status ${statusClass}">${statusLabel}</span>
+        ${dlBtn}
+        ${item.status==='queued'?`<button class="qi-remove" onclick="removeQueueItem(${item.id})" title="Remove">✕</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function downloadItem(id){
+  const item=batchQueue.find(i=>i.id===id);
+  if(!item||!item.blob)return;
+  const url=URL.createObjectURL(item.blob),a=document.createElement('a');
+  a.href=url;a.download=item.filename;document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>{
+    URL.revokeObjectURL(url);
+    item.blob=null; // free RAM after download
+    renderQueue();  // refresh DL button state
+  },3000);
+}
+
+function previewItem(id){
+  const item=batchQueue.find(i=>i.id===id);
+  if(!item)return;
+  loadPreview(item.file,item.rotation);
+  window._previewingId=id;
+}
+
+// ─────────────────────────────────────────────────
+//  Pills & quality
+// ─────────────────────────────────────────────────
+document.getElementById('resPills').addEventListener('click',e=>{
+  const p=e.target.closest('.pill');if(!p)return;
+  document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
+  p.classList.add('active');selectedRes=p.dataset.res;
+});
+document.getElementById('qualityOptions').addEventListener('click',e=>{
+  const i=e.target.closest('.quality-item');if(!i)return;
+  document.querySelectorAll('.quality-item').forEach(x=>x.classList.remove('active'));
+  i.classList.add('active');selectedQuality=i.dataset.q;
+});
+
+// ─────────────────────────────────────────────────
+//  Batch convert
+// ─────────────────────────────────────────────────
+async function startBatch(){
+  if(isConverting||batchQueue.length===0)return;
+  isConverting=true;stopRequested=false;
+  const btn=document.getElementById('convertBtn');
+  btn.disabled=true;btn.classList.add('loading');btn.querySelector('.btn-text').textContent='Converting…';
+  document.getElementById('stopBtn').style.display='inline-flex';
+
+  document.getElementById('progressBlock').classList.add('visible');
+  document.getElementById('outputBlock').classList.remove('visible');
+  document.getElementById('batchOverall').style.display='flex';
+
+  const items=batchQueue.filter(i=>i.status==='queued');
+  const total=items.length;
+  let doneCount=0;
+
+  for(const item of items){
+    if(stopRequested)break;
+    updateBatchOverall(doneCount,total,'converting');
+    renderQueue();
+    try{
+      await convertOne(item);
+      doneCount++;
+    }catch(e){
+      item.status='error';item.errorMsg=e.message;
+      renderQueue();
+    }
+    updateBatchOverall(doneCount,total,stopRequested?'stopped':'converting');
+  }
+
+  // All done
+  isConverting=false;
+  btn.disabled=false;btn.classList.remove('loading');
+  btn.querySelector('.btn-text').textContent='Convert All';
+  document.getElementById('stopBtn').style.display='none';
+  updateConvertBtn();
+  updateBatchOverall(doneCount,total,'done');
+  renderQueue();
+  if(!stopRequested)playChime('success');
+
+  // Show combined output section
+  const doneItems=batchQueue.filter(i=>i.status==='done');
+  if(doneItems.length>0)showBatchResults(doneItems);
+}
+
+function updateBatchOverall(done,total,state){
+  const el=document.getElementById('batchOverallCount');
+  const lb=document.getElementById('batchOverallLabel');
+  if(el)el.textContent=done+' / '+total;
+  if(lb)lb.textContent=state==='done'?'— all done ✓':state==='stopped'?'— stopped':' encoding…';
+}
+
+function stopConvert(){
+  stopRequested=true;
+  const video=document.getElementById('hiddenVideo');
+  video.pause();
+  video.dispatchEvent(new Event('ended'));
+  log('Stop requested — finishing current file…');
+}
+
+// ─────────────────────────────────────────────────
+//  Convert single item  (the real engine)
+// ─────────────────────────────────────────────────
+async function convertOne(item){
+  item.status='converting';
+  renderQueue();
+
+  // reset progress UI for this file
+  document.getElementById('progressLog').innerHTML='';
+  document.getElementById('progressStats').innerHTML='';
+  document.getElementById('progressFill').classList.remove('complete');
+  setProgress(0);
+  document.getElementById('progressETA').textContent='Estimating…';
+  document.getElementById('progressLabel').textContent=`▶ ${item.file.name}`;
+  convStartTime=Date.now();
+
+  const video=document.getElementById('hiddenVideo');
+  const fileURL=URL.createObjectURL(item.file);
+  video.src=fileURL;video.muted=true; // muted during encode — audio captured via stream
+
+  await new Promise((res,rej)=>{
+    video.onloadedmetadata=res;
+    video.onerror=()=>rej(new Error('Cannot decode video — unsupported format or corrupted'));
+    setTimeout(()=>rej(new Error('Metadata load timeout')),15000);
+  });
+
+  const origW=video.videoWidth||1280,origH=video.videoHeight||720;
+  const duration=video.duration||0;
+  log(`${item.file.name}: ${origW}×${origH} · ${duration>0?duration.toFixed(1)+'s':'?'}`);
+
+  // ── Compute output dimensions ──
+  // For resolution scaling: we scale based on the SMALLER dimension after rotation
+  const rot=item.rotation;
+  const rot90=rot===90||rot===270;
+
+  // Source dims
+  let sW=origW,sH=origH;
+  if(selectedRes!=='original'){
+    // Scale so that the rotated output's height = selectedRes
+    // For 0°/180°: scale by height. For 90°/270°: the "height" of output = origW
+    if(rot90){
+      // output will be origH × origW after rotation; scale so output HEIGHT = selectedRes
+      const targetH=parseInt(selectedRes);
+      const scale=targetH/origW;  // origW becomes output height for 90°
+      sW=Math.round(origW*scale);
+      sH=Math.round(origH*scale);
+    }else{
+      sH=parseInt(selectedRes);
+      sW=Math.round(origW*sH/origH);
+    }
+    if(sW%2!==0)sW++;
+    if(sH%2!==0)sH++;
+    log(`Scale: ${sW}×${sH} (pre-rotation)`);
+  }
+
+  // Canvas output size
+  const cW=rot90?sH:sW;
+  const cH=rot90?sW:sH;
+  const canvas=document.createElement('canvas');
+  canvas.width=cW;canvas.height=cH;
+  const ctx=canvas.getContext('2d',{alpha:false});
+  log(`Canvas output: ${cW}×${cH}${rot?' (rotated '+rot+'°)':''}`);
+
+  // ── Capture stream ──
+  const captureStream=typeof video.captureStream==='function'
+    ?video.captureStream.bind(video):video.mozCaptureStream.bind(video);
+  video.muted=true;  // keep muted — audio captured via captureStream, not speaker output
+  video.volume=1;
+  video.currentTime=0;
+  await video.play().catch(()=>{});
+  const rawStream=captureStream(30);
+
+  const canvasStream=canvas.captureStream(30);
+  const audioTracks=rawStream.getAudioTracks();
+  const tracks=[...canvasStream.getVideoTracks()];
+  if(audioTracks.length>0){tracks.push(...audioTracks);log('Audio: Opus');}
+  else log('No audio track');
+  const finalStream=new MediaStream(tracks);
+
+  const{video:vbr,audio:abr}=bitrateMap[selectedQuality];
+  log(`Codec: ${detectedMime} | ${(vbr/1000).toFixed(0)}kbps video`);
+
+  const chunks=[];
+  mediaRecorder=new MediaRecorder(finalStream,{mimeType:detectedMime,videoBitsPerSecond:vbr,audioBitsPerSecond:abr});
+  mediaRecorder.ondataavailable=e=>{if(e.data&&e.data.size>0)chunks.push(e.data);};
+
+  // ── Draw loop with CORRECT rotation math ──
+  let drawActive=true;
+  const drawFrame=()=>{
+    if(!drawActive)return;
+    ctx.save();
+    ctx.clearRect(0,0,cW,cH);
+    if(rot===0){
+      // Simple: draw source → canvas at output size
+      ctx.drawImage(video,0,0,cW,cH);
+    }else if(rot===90){
+      // 90° CW: translate to right edge, rotate, draw
+      // After rotation: canvas is cW×cH = sH×sW
+      // Before rotation coords: x→down, y→left
+      ctx.translate(cW,0);         // move origin to top-right of canvas
+      ctx.rotate(Math.PI/2);       // rotate 90° CW
+      ctx.drawImage(video,0,0,sW,sH); // draw at source dims (now fits rotated space)
+    }else if(rot===180){
+      ctx.translate(cW,cH);
+      ctx.rotate(Math.PI);
+      ctx.drawImage(video,0,0,cW,cH);
+    }else if(rot===270){
+      // 90° CCW: translate to bottom-left edge
+      ctx.translate(0,cH);         // move origin to bottom-left of canvas
+      ctx.rotate(-Math.PI/2);      // rotate 90° CCW
+      ctx.drawImage(video,0,0,sW,sH); // draw at source dims
+    }
+    ctx.restore();
+    requestAnimationFrame(drawFrame);
+  };
+  requestAnimationFrame(drawFrame);
+
+  // ETA interval + per-item bar
+  etaInterval=setInterval(()=>{
+    if(!video.duration)return;
+    const pct=video.currentTime/video.duration;
+    setProgress(pct);
+    const bar=document.getElementById(`qi-bar-${item.id}`);
+    if(bar)bar.style.width=(Math.round(pct*100))+'%';
+    const elapsed=(Date.now()-convStartTime)/1000;
+    const rem=pct>0.01?Math.max(0,(elapsed/pct)-elapsed):null;
+    document.getElementById('progressETA').textContent=rem!=null?'~'+formatTime(rem)+' remaining':'Estimating…';
+    const spd=pct>0?(pct*100/elapsed).toFixed(1):'—';
+    document.getElementById('progressStats').innerHTML=
+      `<div class="pstat">File: <strong>${item.file.name}</strong></div>`+
+      `<div class="pstat">Elapsed: <strong>${formatTime(elapsed)}</strong></div>`+
+      `<div class="pstat">Position: <strong>${video.currentTime.toFixed(1)}s / ${video.duration.toFixed(1)}s</strong></div>`+
+      `<div class="pstat">Speed: <strong>${spd}%/s</strong></div>`;
+  },500);
+
+  mediaRecorder.start(500);
+
+  await new Promise((res,rej)=>{
+    video.onended=res;
+    video.onerror=()=>rej(new Error('Playback error during conversion'));
+    const limit=Math.min(3*(video.duration||60)*1000+30000,3600000);
+    setTimeout(()=>rej(new Error('Conversion timeout')),limit);
+  });
+
+  drawActive=false;clearInterval(etaInterval);
+  video.pause();
+  await new Promise(res=>{mediaRecorder.onstop=res;mediaRecorder.stop();});
+  rawStream.getTracks().forEach(t=>t.stop());
+  finalStream.getTracks().forEach(t=>t.stop());
+  URL.revokeObjectURL(fileURL);
+
+  item.blob=new Blob(chunks,{type:'video/webm'});
+  // Free the raw chunks array immediately — blob holds the data now
+  chunks.length=0;
+  item.status='done';
+  const blobSize=item.blob.size;
+  item.blobSize=blobSize; // persist size for summary even after blob freed
+
+  if(outputDirHandle){
+    // Output folder chosen — save directly, then free blob from RAM
+    const saved=await saveToOutputFolder(item.blob,item.filename);
+    if(saved){
+      log(`✓ Saved to folder: ${item.filename} (${formatBytes(blobSize)})`, 'ok');
+      item.blob=null; // free RAM — file is on disk
+      item.savedToFolder=true;
+    }else{
+      log(`⚠ Folder save failed — keeping in memory for manual download`, 'err');
+    }
+  }else{
+    log(`✓ Done: ${formatBytes(blobSize)} — click ↓ DL to download`, 'ok');
+  }
+
+  setProgress(1);
+  document.getElementById('progressFill').classList.add('complete');
+  document.getElementById('progressLabel').textContent=`✓ ${item.file.name} done`;
+  document.getElementById('progressETA').textContent='Done in '+formatTime((Date.now()-convStartTime)/1000);
+  renderQueue();
+}
+
+function showBatchResults(doneItems){
+  const codec=detectedMime.includes('vp9')?'VP9 + Opus':'VP8 + Opus';
+  const totalIn=doneItems.reduce((a,i)=>a+i.file.size,0);
+  const totalOut=doneItems.reduce((a,i)=>a+(i.blobSize||i.blob?.size||0),0);
+  const red=totalIn>0?Math.round((1-totalOut/totalIn)*100):0;
+  document.getElementById('outputMeta').innerHTML=
+    `<div class="meta-item">Files: <strong>${doneItems.length}</strong></div>`+
+    `<div class="meta-item">Total in: <strong>${formatBytes(totalIn)}</strong></div>`+
+    `<div class="meta-item">Total out: <strong>${formatBytes(totalOut)}</strong></div>`+
+    (red>0?`<div class="meta-item">Reduction: <strong>${red}%</strong></div>`:'')+
+    `<div class="meta-item">Codec: <strong>${codec}</strong></div>`+
+    `<div class="meta-item">Quality: <strong>${selectedQuality}</strong></div>`;
+
+  // Show output block actions — "Download All as ZIP" or individual
+  const actionsEl=document.getElementById('outputActions');
+  if(actionsEl){
+    actionsEl.innerHTML=doneItems.map(i=>
+      i.blob
+        ?`<button class="btn-dl" onclick="downloadItem(${i.id})">↓ ${i.file.name.replace(/\.[^.]+$/,'')}.webm</button>`
+        :`<span class="btn-dl" style="opacity:.4;cursor:default" title="Already saved to folder">📁 ${i.file.name.replace(/\.[^.]+$/,'')}.webm</span>`
+    ).join('');
+    if(doneItems.length>1){
+      actionsEl.innerHTML=`<button class="btn-dl" onclick="downloadAllZip()">↓ Download All (${doneItems.length} files)</button>`+actionsEl.innerHTML;
+    }
+  }
+
+  const title=document.getElementById('metaTitle').value.trim();
+  const creator=document.getElementById('metaCreator').value.trim();
+  const wikiUser=document.getElementById('metaWikiUser').value.trim();
+  const date=document.getElementById('metaDate').value.trim();
+  const license=document.getElementById('metaLicense').value;
+  const desc=document.getElementById('metaDesc').value.trim();
+  buildCommonsChecklist(title,creator,wikiUser,date,license,desc,codec);
+  document.getElementById('outputBlock').classList.add('visible');
+}
+
+// ─────────────────────────────────────────────────
+//  Commons checklist
+// ─────────────────────────────────────────────────
+function buildCommonsChecklist(title,creator,wikiUser,date,license,desc,codec){
+  const items=[
+    {ok:true,label:'Container: .webm (open format)'},
+    {ok:true,label:codec?`Codec: ${codec}`:'VP8/VP9 + Opus'},
+    {ok:true,label:wikiUser?`Wiki user: ${wikiUser}`:'Wiki user: (optional — not set)'},
+    {ok:!!title,label:title?`Title: "${title.slice(0,26)}${title.length>26?'…':''}"`:'⚠ Title missing'},
+    {ok:!!creator,label:creator?`Creator: ${creator}`:'⚠ Creator missing'},
+    {ok:!!license,label:license?`License: ${license}`:'⚠ License missing'},
+    {ok:!!date,label:date?`Date: ${date}`:'⚠ Date missing'},
+    {ok:!!desc,label:desc?'Description: set ✓':'Description (optional)'},
+  ];
+  document.getElementById('checkGrid').innerHTML=items.map(it=>
+    `<div class="check-item"><span class="${it.ok?'check-ok':'check-warn'}">${it.ok?'✓':'⚠'}</span>${it.label}</div>`
+  ).join('');
+}
+
+// ─────────────────────────────────────────────────
+//  Video preview
+// ─────────────────────────────────────────────────
+let previewURL=null;
+window._previewingFile=null;
+
+function loadPreview(file,rotation=0){
+  const pv=document.getElementById('previewVideo');
+  if(previewURL)URL.revokeObjectURL(previewURL);
+  previewURL=URL.createObjectURL(file);
+  window._previewingFile=file;
+  pv.src=previewURL;pv.load();
+  pv.onloadedmetadata=()=>{
+    document.getElementById('previewPanel').classList.add('visible');
+    document.getElementById('rotationBar').classList.add('visible');
+    document.getElementById('previewInfo').textContent=`${pv.videoWidth}×${pv.videoHeight} · ${fmtVideoTime(pv.duration)}`;
+    updateSeekUI();
+    applyPreviewRotationDeg(rotation);
+    // sync rotation bar to this file's rotation
+    document.querySelectorAll('.rot-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.rot)===rotation));
+    document.getElementById('rotBadge').textContent=rotation+'°';
+  };
+  pv.ontimeupdate=updateSeekUI;
+  pv.onended=()=>{document.getElementById('playIcon').innerHTML='<polygon points="2,1 11,6 2,11"/>';};
+  pv.onplay=()=>{document.getElementById('playIcon').innerHTML='<rect x="2" y="1" width="3.5" height="10" rx="1"/><rect x="6.5" y="1" width="3.5" height="10" rx="1"/>';};
+  pv.onpause=()=>{document.getElementById('playIcon').innerHTML='<polygon points="2,1 11,6 2,11"/>';};
+}
+
+function updateSeekUI(){
+  const pv=document.getElementById('previewVideo');
+  const sb=document.getElementById('seekBar');
+  const dur=pv.duration||0;
+  if(dur>0)sb.value=(pv.currentTime/dur)*100;
+  document.getElementById('previewTime').textContent=fmtVideoTime(pv.currentTime)+' / '+fmtVideoTime(dur);
+}
+
+document.getElementById('seekBar').addEventListener('input',function(){
+  const pv=document.getElementById('previewVideo');
+  if(pv.duration)pv.currentTime=(this.value/100)*pv.duration;
+});
+
+function fmtVideoTime(s){
+  if(!s||isNaN(s))return'0:00';
+  const m=Math.floor(s/60),sec=Math.floor(s%60);
+  return m+':'+String(sec).padStart(2,'0');
+}
+function togglePlay(){const pv=document.getElementById('previewVideo');if(pv.paused)pv.play();else pv.pause();}
+let isMuted=false;
+function toggleMute(){
+  const pv=document.getElementById('previewVideo');isMuted=!isMuted;pv.muted=isMuted;
+  const wave=document.getElementById('volWave');
+  wave.setAttribute('d',isMuted?'M23 9l-6 6M17 9l6 6':'M15.54 8.46a5 5 0 0 1 0 7.07');
+}
+function setVolume(v){
+  const pv=document.getElementById('previewVideo');pv.volume=parseFloat(v);
+  if(parseFloat(v)===0){isMuted=true;pv.muted=true;}else{isMuted=false;pv.muted=false;}
+}
+
+// Rotation bar (global — applies to preview AND selected queue item)
+function setRotation(deg){
+  // If there's a previewed item, update it
+  const id=window._previewingId;
+  if(id!=null)setItemRotation(id,deg);
+  // Also if only 1 item in queue, apply to it
+  else if(batchQueue.length===1)setItemRotation(batchQueue[0].id,deg);
+  // Update bar UI
+  document.querySelectorAll('.rot-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.rot)===deg));
+  document.getElementById('rotBadge').textContent=deg+'°';
+  applyPreviewRotationDeg(deg);
+}
+
+function applyPreviewRotationDeg(deg){
+  const pv=document.getElementById('previewVideo');
+  pv.style.transform=`rotate(${deg}deg)`;
+  if(deg===90||deg===270){
+    const vW=pv.videoWidth||1,vH=pv.videoHeight||1;
+    const ratio=Math.min(1,vH/vW);
+    pv.style.width=(ratio*100).toFixed(1)+'%';
+    pv.style.maxHeight='360px';
+  }else{pv.style.width='100%';pv.style.maxHeight='360px';}
+}
+
+// ─────────────────────────────────────────────────
+//  Helpers
+// ─────────────────────────────────────────────────
+function setProgress(ratio){
+  const pct=Math.min(100,Math.round(ratio*100));
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressPct').textContent=pct+'%';
+}
+function updateConvertBtn(){
+  const hasQueued=batchQueue.some(i=>i.status==='queued');
+  const engineReady=document.getElementById('statusDot').classList.contains('ready');
+  document.getElementById('convertBtn').disabled=!hasQueued||!engineReady||isConverting;
+  const btn=document.getElementById('convertBtn');
+  if(hasQueued&&!isConverting){
+    const n=batchQueue.filter(i=>i.status==='queued').length;
+    btn.querySelector('.btn-text').textContent=`Convert All (${n} file${n!==1?'s':''})`;
+  }
+}
+function log(msg,cls=''){
+  const el=document.getElementById('progressLog');
+  const d=document.createElement('div');d.className='log-line'+(cls?' '+cls:'');d.textContent=msg;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+function formatBytes(b){
+  if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';
+  if(b<1073741824)return(b/1048576).toFixed(2)+' MB';return(b/1073741824).toFixed(2)+' GB';
+}
+function formatTime(s){
+  s=Math.round(s);if(s<60)return s+'s';return Math.floor(s/60)+'m'+(s%60>0?' '+s%60+'s':'');
+}
+
+
+// ─────────────────────────────────────────────────
+//  Output folder
+// ─────────────────────────────────────────────────
+async function chooseOutputFolder(){
+  if(!('showDirectoryPicker'in window)){
+    alert('Directory picker not supported in this browser.\nFiles will save to Downloads folder.');return;
+  }
+  try{
+    outputDirHandle=await window.showDirectoryPicker({mode:'readwrite'});
+    document.getElementById('saveLocDisplay').innerHTML=
+      `Output folder: <span>📁 ${outputDirHandle.name}</span> <span style="color:var(--accent);font-size:10px">✓ remembered</span>`;
+  }catch(e){if(e.name!=='AbortError')console.error(e);}
+}
+
+async function saveToOutputFolder(blob,filename){
+  if(!outputDirHandle)return false;
+  try{
+    const fh=await outputDirHandle.getFileHandle(filename,{create:true});
+    const w=await fh.createWritable();
+    await w.write(blob);await w.close();
+    return true;
+  }catch(e){log('Folder save failed: '+e.message,'err');return false;}
+}
+
+// ─────────────────────────────────────────────────
+//  Download helpers
+// ─────────────────────────────────────────────────
+function downloadAllDone(){ downloadAllZip(); }
+
+async function downloadAllZip(){
+  const done=batchQueue.filter(i=>i.status==='done');
+  for(let i=0;i<done.length;i++){
+    await new Promise(res=>setTimeout(res,400*i));
+    downloadItem(done[i].id);
+  }
+}
+
+async function saveWithPicker(){
+  const done=batchQueue.filter(i=>i.status==='done');
+  if(done.length===0)return;
+  if(done.length===1){
+    if(!('showSaveFilePicker'in window)){downloadItem(done[0].id);return;}
+    try{
+      const h=await window.showSaveFilePicker({
+        suggestedName:done[0].filename,
+        types:[{description:'WebM Video',accept:{'video/webm':['.webm']}}]
+      });
+      const w=await h.createWritable();await w.write(done[0].blob);await w.close();
+      log('✓ Saved: '+done[0].filename,'ok');
+    }catch(err){if(err.name!=='AbortError')downloadItem(done[0].id);}
+  }else{
+    downloadAllZip();
+  }
+}
+
+// ─────────────────────────────────────────────────
+//  Init
+// ─────────────────────────────────────────────────
+checkBrowserSupport();
+document.getElementById('metaDate').value=new Date().toISOString().slice(0,10);
+if(!('showSaveFilePicker'in window))document.getElementById('saveToFSBtn').style.display='none';
+</script>
+</body>
+</html>
