@@ -281,6 +281,8 @@ code{font-family:var(--mono);font-size:12px;background:var(--surface2);padding:1
 .btn-dl:hover{background:#00ffb0;box-shadow:0 0 20px rgba(0,229,160,.3)}
 .btn-save-fs{background:var(--surface2);border:1px solid var(--accent2);color:var(--accent);border-radius:8px;padding:11px 20px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:7px}
 .btn-save-fs:hover{background:var(--accent-dim)}
+.btn-reconvert{background:var(--surface2);border:1px solid var(--border2);color:var(--text-dim);border-radius:8px;padding:11px 20px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:7px}
+.btn-reconvert:hover{border-color:var(--accent2);color:var(--accent);background:var(--accent-dim)}
 
 /* Commons checklist */
 .commons-check{background:var(--wiki-dim);border:1px solid var(--wiki);border-radius:8px;padding:13px 15px;margin-top:13px}
@@ -474,7 +476,7 @@ svg{display:block}
         <div class="q-left"><div class="q-radio"></div><div class="q-name">Low</div></div>
         <div class="q-crf">500 kbps · Small file</div>
       </div>
-      <div class="quality-item active" data-q="medium">
+      <div class="quality-item" data-q="medium">
         <div class="q-left"><div class="q-radio"></div><div class="q-name">Medium</div></div>
         <div class="q-crf">2 Mbps · Balanced</div>
       </div>
@@ -482,7 +484,7 @@ svg{display:block}
         <div class="q-left"><div class="q-radio"></div><div class="q-name">High</div></div>
         <div class="q-crf">6 Mbps · Large file</div>
       </div>
-      <div class="quality-item lossless-item" data-q="lossless">
+      <div class="quality-item lossless-item active" data-q="lossless">
         <div class="q-left"><div class="q-radio"></div><div class="q-name">Lossless</div></div>
         <div class="q-crf">25 Mbps · Max bitrate</div>
       </div>
@@ -609,7 +611,7 @@ svg{display:block}
   </div>
   <div class="output-meta" id="outputMeta"></div>
   <div class="output-actions" id="outputActions">
-    <button class="btn-dl" onclick="downloadFile()">
+    <button class="btn-dl" onclick="downloadAllDone()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
         <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
@@ -620,6 +622,11 @@ svg{display:block}
         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
         <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
       </svg>Save to Folder…
+    </button>
+    <button class="btn-reconvert" id="reconvertBtn" onclick="requeueForReconvert()" style="display:none">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.96"/>
+      </svg>Re-convert (change settings)
     </button>
   </div>
   <div class="commons-check">
@@ -687,7 +694,7 @@ let convStartTime= 0;
 let etaInterval  = null;
 let detectedMime = '';
 let selectedRes  = 'original';
-let selectedQuality = 'medium';
+let selectedQuality = 'lossless';
 let audioEnabled = true;
 
 const bitrateMap = {
@@ -748,6 +755,7 @@ function toggleAudio(){
   document.getElementById('toggleSw').className='toggle-sw'+(audioEnabled?' on':'');
   document.getElementById('audioLabel').textContent='🔔 Audio notification on completion: '+(audioEnabled?'ON':'OFF');
   if(audioEnabled)playChime('success');
+  savePrefs();
 }
 
 // ─────────────────────────────────────────────────
@@ -921,16 +929,7 @@ function previewItem(id){
 // ─────────────────────────────────────────────────
 //  Pills & quality
 // ─────────────────────────────────────────────────
-document.getElementById('resPills').addEventListener('click',e=>{
-  const p=e.target.closest('.pill');if(!p)return;
-  document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
-  p.classList.add('active');selectedRes=p.dataset.res;
-});
-document.getElementById('qualityOptions').addEventListener('click',e=>{
-  const i=e.target.closest('.quality-item');if(!i)return;
-  document.querySelectorAll('.quality-item').forEach(x=>x.classList.remove('active'));
-  i.classList.add('active');selectedQuality=i.dataset.q;
-});
+// Listeners moved to persist-settings block below
 
 // ─────────────────────────────────────────────────
 //  Batch convert
@@ -1066,7 +1065,10 @@ async function convertOne(item){
   await video.play().catch(()=>{});
   const rawStream=captureStream(30);
 
-  const canvasStream=canvas.captureStream(30);
+  // captureStream(0): manual frame delivery — we call requestFrame() each time
+  // we draw, so the encoder only gets exactly one frame per source frame.
+  const canvasStream=canvas.captureStream(0);
+  const canvasTrack=canvasStream.getVideoTracks()[0];
   const audioTracks=rawStream.getAudioTracks();
   const tracks=[...canvasStream.getVideoTracks()];
   if(audioTracks.length>0){tracks.push(...audioTracks);log('Audio: Opus');}
@@ -1080,36 +1082,61 @@ async function convertOne(item){
   mediaRecorder=new MediaRecorder(finalStream,{mimeType:detectedMime,videoBitsPerSecond:vbr,audioBitsPerSecond:abr});
   mediaRecorder.ondataavailable=e=>{if(e.data&&e.data.size>0)chunks.push(e.data);};
 
-  // ── Draw loop with CORRECT rotation math ──
+  // ── Draw loop — requestVideoFrameCallback for perfect A/V sync ──
+  // rVFC fires exactly when a new decoded video frame is ready:
+  // • eliminates duplicate frame draws (no encoder overload at Original/Lossless)
+  // • canvas timestamp matches audio timestamp → no drift
+  // Falls back to rAF with frame-change guard for older browsers.
   let drawActive=true;
-  const drawFrame=()=>{
-    if(!drawActive)return;
+
+  const drawOneFrame=()=>{
     ctx.save();
     ctx.clearRect(0,0,cW,cH);
     if(rot===0){
-      // Simple: draw source → canvas at output size
       ctx.drawImage(video,0,0,cW,cH);
     }else if(rot===90){
-      // 90° CW: translate to right edge, rotate, draw
-      // After rotation: canvas is cW×cH = sH×sW
-      // Before rotation coords: x→down, y→left
-      ctx.translate(cW,0);         // move origin to top-right of canvas
-      ctx.rotate(Math.PI/2);       // rotate 90° CW
-      ctx.drawImage(video,0,0,sW,sH); // draw at source dims (now fits rotated space)
+      ctx.translate(cW,0);
+      ctx.rotate(Math.PI/2);
+      ctx.drawImage(video,0,0,sW,sH);
     }else if(rot===180){
       ctx.translate(cW,cH);
       ctx.rotate(Math.PI);
       ctx.drawImage(video,0,0,cW,cH);
     }else if(rot===270){
-      // 90° CCW: translate to bottom-left edge
-      ctx.translate(0,cH);         // move origin to bottom-left of canvas
-      ctx.rotate(-Math.PI/2);      // rotate 90° CCW
-      ctx.drawImage(video,0,0,sW,sH); // draw at source dims
+      ctx.translate(0,cH);
+      ctx.rotate(-Math.PI/2);
+      ctx.drawImage(video,0,0,sW,sH);
     }
     ctx.restore();
-    requestAnimationFrame(drawFrame);
+    // Push this exact frame to the MediaRecorder — one call per source frame
+    if(canvasTrack && canvasTrack.readyState==='live'){
+      canvasTrack.requestFrame();
+    }
   };
-  requestAnimationFrame(drawFrame);
+
+  if('requestVideoFrameCallback' in HTMLVideoElement.prototype){
+    // ✓ Chrome 83+, Edge 83+, Safari 15.4+
+    const onVideoFrame=(now,meta)=>{
+      if(!drawActive)return;
+      drawOneFrame();
+      video.requestVideoFrameCallback(onVideoFrame);
+    };
+    video.requestVideoFrameCallback(onVideoFrame);
+    log('Draw: requestVideoFrameCallback (frame-perfect sync)');
+  }else{
+    // Fallback: rAF but only draw when video timestamp actually advances
+    let lastPts=-1;
+    const rafLoop=()=>{
+      if(!drawActive)return;
+      if(video.currentTime!==lastPts){
+        lastPts=video.currentTime;
+        drawOneFrame();
+      }
+      requestAnimationFrame(rafLoop);
+    };
+    requestAnimationFrame(rafLoop);
+    log('Draw: rAF fallback (upgrade Chrome/Edge for best results)');
+  }
 
   // ETA interval + per-item bar
   etaInterval=setInterval(()=>{
@@ -1173,6 +1200,27 @@ async function convertOne(item){
   renderQueue();
 }
 
+
+function requeueForReconvert(){
+  // Reset all done/error items back to queued — keep files and thumbnails and rotation
+  batchQueue.forEach(item=>{
+    if(item.status==='done'||item.status==='error'){
+      item.status='queued';
+      item.blob=null;
+      item.blobSize=null;
+      item.savedToFolder=false;
+      item.errorMsg='';
+    }
+  });
+  // Hide output block, show queue ready to convert again
+  document.getElementById('outputBlock').classList.remove('visible');
+  document.getElementById('batchOverall').style.display='none';
+  renderQueue();
+  updateConvertBtn();
+  // Scroll up to settings so user can change quality/resolution
+  document.querySelector('.settings')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
 function showBatchResults(doneItems){
   const codec=detectedMime.includes('vp9')?'VP9 + Opus':'VP8 + Opus';
   const totalIn=doneItems.reduce((a,i)=>a+i.file.size,0);
@@ -1207,6 +1255,9 @@ function showBatchResults(doneItems){
   const desc=document.getElementById('metaDesc').value.trim();
   buildCommonsChecklist(title,creator,wikiUser,date,license,desc,codec);
   document.getElementById('outputBlock').classList.add('visible');
+  // Show re-convert button if any source files still available
+  const reconvertBtn=document.getElementById('reconvertBtn');
+  if(reconvertBtn)reconvertBtn.style.display=batchQueue.length>0?'inline-flex':'none';
 }
 
 // ─────────────────────────────────────────────────
@@ -1351,19 +1402,54 @@ async function chooseOutputFolder(){
   }
   try{
     outputDirHandle=await window.showDirectoryPicker({mode:'readwrite'});
-    document.getElementById('saveLocDisplay').innerHTML=
-      `Output folder: <span>📁 ${outputDirHandle.name}</span> <span style="color:var(--accent);font-size:10px">✓ remembered</span>`;
+    await dbSet('outputDirHandle',outputDirHandle); // persist across reloads
+    updateFolderDisplay();
+    log(`✓ Output folder set: ${outputDirHandle.name}`,'ok');
   }catch(e){if(e.name!=='AbortError')console.error(e);}
+}
+
+async function verifyDirPermission(){
+  if(!outputDirHandle)return false;
+  try{
+    const opts={mode:'readwrite'};
+    let perm=await outputDirHandle.queryPermission(opts);
+    if(perm==='granted')return true;
+    // Permission lapsed — re-request (needs to be called in user-gesture context or
+    // within an async chain originating from one; this works here)
+    perm=await outputDirHandle.requestPermission(opts);
+    return perm==='granted';
+  }catch(e){
+    log('Folder permission check failed: '+e.message,'err');
+    return false;
+  }
 }
 
 async function saveToOutputFolder(blob,filename){
   if(!outputDirHandle)return false;
+  const hasPermission=await verifyDirPermission();
+  if(!hasPermission){
+    log('⚠ No write permission for output folder — choose folder again','err');
+    outputDirHandle=null;
+    updateFolderDisplay();
+    return false;
+  }
   try{
     const fh=await outputDirHandle.getFileHandle(filename,{create:true});
     const w=await fh.createWritable();
     await w.write(blob);await w.close();
     return true;
-  }catch(e){log('Folder save failed: '+e.message,'err');return false;}
+  }catch(e){
+    log('Folder save failed: '+e.message,'err');
+    return false;
+  }
+}
+
+function updateFolderDisplay(){
+  const el=document.getElementById('saveLocDisplay');
+  if(!el)return;
+  el.innerHTML=outputDirHandle
+    ?`Output folder: <span>📁 ${outputDirHandle.name}</span> <span style="color:var(--accent);font-size:10px">✓ set</span>`
+    :`Output folder: <span>Browser default downloads</span>`;
 }
 
 // ─────────────────────────────────────────────────
@@ -1397,12 +1483,125 @@ async function saveWithPicker(){
   }
 }
 
+
+// ─────────────────────────────────────────────────
+//  Persistent settings — IndexedDB
+//  Stores: outputDirHandle, selectedRes, selectedQuality,
+//          metaCreator, metaWikiUser, metaLicense, audioEnabled
+// ─────────────────────────────────────────────────
+const DB_NAME='webmforge',DB_VER=1,DB_STORE='settings';
+let _db=null;
+
+function openDB(){
+  return new Promise((res,rej)=>{
+    if(_db){res(_db);return;}
+    const req=indexedDB.open(DB_NAME,DB_VER);
+    req.onupgradeneeded=e=>{e.target.result.createObjectStore(DB_STORE);};
+    req.onsuccess=e=>{_db=e.target.result;res(_db);};
+    req.onerror=e=>rej(e.target.error);
+  });
+}
+async function dbSet(key,val){
+  try{const db=await openDB();const tx=db.transaction(DB_STORE,'readwrite');tx.objectStore(DB_STORE).put(val,key);}catch(e){console.warn('dbSet',e);}
+}
+async function dbGet(key){
+  try{const db=await openDB();return new Promise((res,rej)=>{const req=db.transaction(DB_STORE,'readonly').objectStore(DB_STORE).get(key);req.onsuccess=e=>res(e.target.result);req.onerror=e=>rej(e.target.error);});}catch(e){return undefined;}
+}
+
+async function savePrefs(){
+  await dbSet('selectedRes',selectedRes);
+  await dbSet('selectedQuality',selectedQuality);
+  await dbSet('audioEnabled',audioEnabled);
+  const creator=document.getElementById('metaCreator')?.value;
+  const wikiUser=document.getElementById('metaWikiUser')?.value;
+  const license=document.getElementById('metaLicense')?.value;
+  if(creator!==undefined)await dbSet('metaCreator',creator);
+  if(wikiUser!==undefined)await dbSet('metaWikiUser',wikiUser);
+  if(license!==undefined)await dbSet('metaLicense',license);
+}
+
+async function loadPrefs(){
+  const res   = await dbGet('selectedRes')    ?? 'original';
+  const qual  = await dbGet('selectedQuality')?? 'lossless';
+  const audio = await dbGet('audioEnabled')   ?? true;
+  const creator=await dbGet('metaCreator');
+  const wiki  = await dbGet('metaWikiUser');
+  const lic   = await dbGet('metaLicense');
+
+  // Apply resolution pill
+  selectedRes=res;
+  document.querySelectorAll('.pill').forEach(p=>{
+    p.classList.toggle('active',p.dataset.res===res);
+  });
+
+  // Apply quality
+  selectedQuality=qual;
+  document.querySelectorAll('.quality-item').forEach(i=>{
+    i.classList.toggle('active',i.dataset.q===qual);
+  });
+
+  // Apply metadata fields
+  const creatorEl=document.getElementById('metaCreator');
+  if(creatorEl&&creator!==undefined)creatorEl.value=creator;
+  const wikiEl=document.getElementById('metaWikiUser');
+  if(wikiEl&&wiki!==undefined)wikiEl.value=wiki;
+  const licEl=document.getElementById('metaLicense');
+  if(licEl&&lic!==undefined)licEl.value=lic;
+
+  // Audio toggle
+  audioEnabled=audio;
+  const sw=document.getElementById('toggleSw');
+  if(sw)sw.className='toggle-sw'+(audio?' on':'');
+  const lbl=document.getElementById('audioLabel');
+  if(lbl)lbl.textContent='🔔 Audio notification on completion: '+(audio?'ON':'OFF');
+
+  // Restore folder handle
+  const storedHandle=await dbGet('outputDirHandle');
+  if(storedHandle){
+    try{
+      // Verify we can still reach it (might need user gesture to re-grant)
+      const perm=await storedHandle.queryPermission({mode:'readwrite'});
+      outputDirHandle=storedHandle;
+      updateFolderDisplay();
+      if(perm!=='granted'){
+        // Mark as needs-reauth but keep stored
+        document.getElementById('saveLocDisplay').innerHTML=
+          `Output folder: <span>📁 ${storedHandle.name}</span> <span style="color:var(--amber);font-size:10px">⚠ click Convert to re-authorise</span>`;
+      }
+    }catch(e){
+      // Handle gone (drive unplugged etc)
+      outputDirHandle=null;
+      await dbSet('outputDirHandle',null);
+    }
+  }
+}
+
+// Auto-save prefs whenever settings change
+document.getElementById('resPills').addEventListener('click',e=>{
+  const p=e.target.closest('.pill');if(!p)return;
+  document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
+  p.classList.add('active');selectedRes=p.dataset.res;
+  savePrefs();
+});
+document.getElementById('qualityOptions').addEventListener('click',e=>{
+  const i=e.target.closest('.quality-item');if(!i)return;
+  document.querySelectorAll('.quality-item').forEach(x=>x.classList.remove('active'));
+  i.classList.add('active');selectedQuality=i.dataset.q;
+  savePrefs();
+});
+['metaCreator','metaWikiUser','metaLicense'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('change',savePrefs);
+});
+
 // ─────────────────────────────────────────────────
 //  Init
 // ─────────────────────────────────────────────────
 checkBrowserSupport();
 document.getElementById('metaDate').value=new Date().toISOString().slice(0,10);
 if(!('showSaveFilePicker'in window))document.getElementById('saveToFSBtn').style.display='none';
+// Load persisted settings (async — runs after DOM is ready)
+loadPrefs();
 </script>
 </body>
 </html>
