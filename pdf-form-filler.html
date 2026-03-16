@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Form Filler</title>
+
+<!-- SEO Meta Tags -->
+<meta name="description" content="PDF Form Filler.">
+<meta name="keywords" content=" PDF Form Filler">
+<meta name="author" content="Suyash Dwivedi">
+<link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/pdf-form-filler.html">
+
+<!-- Open Graph Meta Tags -->
+<meta property="og:title" content="PDF Form Filler">
+<meta property="og:description" content="PDF Form Filler.">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+<meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/pdf-form-filler.html">
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="PDF Form Filler">
+<meta name="twitter:title" content="PDF Form Filler">
+<meta name="twitter:description" content="PDF Form Filler.">
+<meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GC8PGC89NB');
+</script>
+
+<!-- Counter Script -->
+<script src="https://cdn.counter.dev/script.js"
+  data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+  data-utcoffset="6">
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #0b0e14;
+  --sidebar:    #111520;
+  --surface:    #1a1f2e;
+  --surface2:   #232838;
+  --border:     #2a3045;
+  --border2:    #3a4060;
+  --text:       #e2e8f8;
+  --muted:      #6b7699;
+  --accent:     #5b8af7;
+  --accent-dim: rgba(91,138,247,0.1);
+  --green:      #4ade80;
+  --green-dim:  rgba(74,222,128,0.12);
+  --red:        #f87171;
+  --footer-h:   38px;
+  --radius:     8px;
+}
+
+html { height: 100%; }
+
+body {
+  height: 100%;
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#shell { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+
+/* ── FOOTER ─────────────────── */
+footer {
+  height: var(--footer-h);
+  min-height: var(--footer-h);
+  background: var(--sidebar);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+footer p { font-size: 11.5px; color: var(--muted); }
+footer a { color: var(--accent); text-decoration: none; font-weight: 600; transition: color .15s; }
+footer a:hover { color: #7aa4fa; text-decoration: underline; }
+
+/* ── SIDEBAR ─────────────────── */
+#sidebar {
+  width: 244px;
+  min-width: 244px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.sidebar-logo { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.logo-row { display: flex; align-items: center; gap: 9px; margin-bottom: 5px; }
+.logo-row img { width: 30px; height: 30px; object-fit: contain; border-radius: 6px; flex-shrink: 0; }
+.logo-row h1 { font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: -.3px; line-height: 1.25; }
+.sub-row { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); margin-top: 2px; }
+.dot-green { width: 5px; height: 5px; background: var(--green); border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+.s-section { padding: 11px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.s-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.3px; color: var(--muted); margin-bottom: 8px; }
+
+#open-btn {
+  width: 100%; padding: 9px 14px;
+  background: var(--accent); color: #fff;
+  border: none; border-radius: var(--radius);
+  font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: all .15s; box-shadow: 0 4px 14px rgba(91,138,247,.3);
+}
+#open-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(91,138,247,.4); }
+
+.tool-group { display: flex; flex-direction: column; gap: 3px; }
+.tool-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 9px; border-radius: 6px;
+  border: 1px solid transparent; background: transparent; color: var(--muted);
+  font-family: 'Sora', sans-serif; font-size: 12px;
+  cursor: pointer; transition: all .12s; width: 100%; text-align: left;
+}
+.tool-btn:hover { background: var(--surface); color: var(--text); }
+.tool-btn.active { background: var(--accent-dim); border-color: rgba(91,138,247,.4); color: var(--accent); }
+.t-icon { width: 21px; height: 21px; background: var(--surface2); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
+.tool-btn.active .t-icon { background: var(--accent-dim); }
+.t-kbd { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); background: var(--surface2); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; }
+
+.style-row { display: flex; align-items: center; gap: 6px; }
+.style-row label { font-size: 10.5px; color: var(--muted); }
+.style-row select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 3px 5px; border-radius: 5px; cursor: pointer; outline: none; flex: 1; }
+.style-row select:focus { border-color: var(--accent); }
+
+.fmt-group { display: flex; gap: 4px; margin-top: 7px; }
+.fmt-btn {
+  flex: 1; padding: 5px 0; border-radius: 5px;
+  border: 1px solid var(--border); background: var(--surface2); color: var(--muted);
+  font-size: 13px; font-family: Georgia, serif; cursor: pointer;
+  transition: all .12s; text-align: center; user-select: none;
+}
+.fmt-btn:hover { border-color: var(--border2); color: var(--text); }
+.fmt-btn.active { background: var(--accent-dim); border-color: rgba(91,138,247,.5); color: var(--accent); }
+#fmt-bold   { font-weight: 900; }
+#fmt-italic { font-style: italic; }
+#fmt-under  { text-decoration: underline; }
+
+.act-btn {
+  width: 100%; padding: 7px 11px; border-radius: 6px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all .12s; display: flex; align-items: center; gap: 7px; margin-bottom: 4px;
+}
+.act-btn:hover:not(:disabled) { border-color: var(--border2); background: var(--surface2); }
+.act-btn:disabled { opacity: .35; cursor: not-allowed; }
+.act-btn.primary { background: var(--green-dim); border-color: rgba(74,222,128,.35); color: var(--green); font-weight: 600; }
+.act-btn.primary:hover:not(:disabled) { background: rgba(74,222,128,.18); border-color: rgba(74,222,128,.55); box-shadow: 0 3px 10px rgba(74,222,128,.15); }
+.act-btn.danger { color: var(--red); }
+
+#info-panel { margin-top: auto; padding: 11px 14px; border-top: 1px solid var(--border); flex-shrink: 0; }
+#file-name { font-size: 11px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#file-meta { font-size: 10px; color: var(--muted); margin-top: 2px; }
+#anno-badge { display: none; align-items: center; gap: 4px; margin-top: 5px; font-size: 10px; color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(91,138,247,.2); padding: 2px 7px; border-radius: 20px; width: fit-content; }
+
+/* ── MAIN ─────────────────────── */
+#main { flex: 1; overflow-y: auto; overflow-x: hidden; background: #14171f; position: relative; }
+#main::-webkit-scrollbar { width: 6px; }
+#main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+#upload-screen { height: 100%; display: flex; align-items: center; justify-content: center; padding: 40px; }
+#drop-zone {
+  width: 100%; max-width: 460px;
+  border: 2px dashed var(--border2); border-radius: 20px;
+  padding: 52px 48px; text-align: center;
+  cursor: pointer; transition: all .2s; background: var(--surface);
+}
+#drop-zone:hover, #drop-zone.dragover { border-color: var(--accent); background: var(--accent-dim); }
+.dz-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -.5px; }
+.dz-sub { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.55; }
+.dz-badge { display: inline-flex; align-items: center; gap: 5px; margin-top: 16px; font-size: 11px; color: var(--green); background: var(--green-dim); border: 1px solid rgba(74,222,128,.2); padding: 4px 12px; border-radius: 20px; }
+
+#pdf-viewer { display: none; padding: 24px 28px 60px; }
+#pdf-viewer.visible { display: block; }
+
+.page-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; }
+.page-num-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 7px; }
+.page-frame { position: relative; display: inline-block; box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04); border-radius: 2px; user-select: none; }
+.page-frame canvas { display: block; }
+
+.anno-layer { position: absolute; inset: 0; pointer-events: none; }
+.anno-layer.interactive { pointer-events: auto; }
+.anno-layer.tool-text  { cursor: text; }
+.anno-layer.tool-check { cursor: crosshair; }
+.anno-layer.tool-erase { cursor: not-allowed; }
+
+/* Annotation element — visual centre at (cx, cy) */
+.anno-el {
+  position: absolute;
+  pointer-events: auto;
+  transform: translate(0, -50%);
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  color: #000;
+  white-space: nowrap;
+  line-height: 1;
+  cursor: pointer;
+}
+.anno-el.type-text { background: rgba(91,138,247,.06); padding: 0 1px; }
+.anno-el.type-check { transform: translate(-50%, -50%); }
+.anno-el:hover::after {
+  content: '✕';
+  position: absolute; top: -8px; right: -8px;
+  width: 14px; height: 14px;
+  background: var(--red); color: #fff;
+  font-size: 8px; font-weight: 700;
+  font-family: sans-serif; font-style: normal; text-decoration: none;
+  border-radius: 50%; line-height: 14px; text-align: center;
+}
+
+.anno-input {
+  position: absolute;
+  transform: translate(0, -50%);
+  border: none;
+  border-bottom: 1.5px dashed var(--accent);
+  outline: none;
+  background: rgba(91,138,247,.06);
+  color: #000;
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  padding: 0 2px;
+  min-width: 80px;
+  z-index: 10;
+  caret-color: #1d4ed8;
+}
+
+#zoom-bar {
+  position: fixed; bottom: calc(var(--footer-h) + 10px); right: 16px;
+  display: flex; align-items: center; gap: 2px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 3px 5px; z-index: 50;
+  box-shadow: 0 4px 16px rgba(0,0,0,.4);
+}
+.zm-btn { width: 27px; height: 27px; border: none; border-radius: 7px; background: transparent; color: var(--text); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .1s; }
+.zm-btn:hover { background: var(--surface2); }
+#zoom-val { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); padding: 0 5px; min-width: 40px; text-align: center; }
+
+#loader { position: fixed; inset: 0; background: rgba(11,14,20,.75); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px; z-index: 999; }
+#loader.show { display: flex; }
+.spin { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+#loader p { font-size: 13px; color: var(--muted); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#toast {
+  position: fixed; bottom: calc(var(--footer-h) + 14px); left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text); font-size: 12.5px;
+  padding: 8px 18px; border-radius: 8px; z-index: 999;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+  pointer-events: none; white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<input type="file" id="file-input" accept=".pdf" style="display:none">
+
+<div id="shell">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-row">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Logo">
+        <h1>PDF Form Filler</h1>
+      </div>
+      <div class="sub-row"><span class="dot-green"></span> PDF Form Filler · 100% local</div>
+      <div style="font-size:9.5px;color:var(--muted);margin-top:2px;">by Suyash Dwivedi</div>
+    </div>
+
+    <div class="s-section">
+      <button id="open-btn">📂 Open PDF File</button>
+    </div>
+
+    <div class="s-section">
+      <div class="s-label">Tools</div>
+      <div class="tool-group">
+        <button class="tool-btn active" data-tool="text">
+          <span class="t-icon">T</span> Text Field <span class="t-kbd">T</span>
+        </button>
+        <button class="tool-btn" data-tool="check">
+          <span class="t-icon">✔</span> Checkmark <span class="t-kbd">C</span>
+        </button>
+        <button class="tool-btn" data-tool="erase">
+          <span class="t-icon">✕</span> Erase <span class="t-kbd">E</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="s-section">
+      <div class="s-label">Text Formatting</div>
+      <div class="style-row">
+        <label>Size</label>
+        <select id="font-size-sel">
+          <option value="7">7 pt</option>
+          <option value="8">8 pt</option>
+          <option value="9">9 pt</option>
+          <option value="10" selected>10 pt</option>
+          <option value="11">11 pt</option>
+          <option value="12">12 pt</option>
+          <option value="14">14 pt</option>
+          <option value="16">16 pt</option>
+        </select>
+      </div>
+      <div class="fmt-group">
+        <button class="fmt-btn" id="fmt-bold"   title="Bold (Ctrl+B)"><b>B</b></button>
+        <button class="fmt-btn" id="fmt-italic" title="Italic (Ctrl+I)"><i>I</i></button>
+        <button class="fmt-btn" id="fmt-under"  title="Underline (Ctrl+U)"><u>U</u></button>
+      </div>
+    </div>
+
+    <div class="s-section">
+      <div class="s-label">Actions</div>
+      <button class="act-btn" id="undo-btn" disabled>↩ Undo Last</button>
+      <button class="act-btn danger" id="clear-btn" disabled>🗑 Clear All</button>
+      <button class="act-btn primary" id="save-btn" disabled>💾 Save Filled PDF</button>
+    </div>
+
+    <div id="info-panel">
+      <div id="file-name" style="color:var(--muted)">No file open</div>
+      <div id="file-meta"></div>
+      <div id="anno-badge"><span>✏️</span> <span id="anno-count">0</span> annotations</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div id="upload-screen">
+      <div id="drop-zone">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png"
+             alt="Logo" style="width:56px;height:56px;object-fit:contain;margin:0 auto 14px;display:block;">
+        <div class="dz-title">Drop your PDF here</div>
+        <div class="dz-sub">or click to browse · supports any PDF form</div>
+        <div class="dz-badge"><span class="dot-green"></span> 100% local — never leaves your device</div>
+        <div style="margin-top:10px;font-size:10px;color:var(--muted);">PDF Form Filler · by Suyash Dwivedi</div>
+      </div>
+    </div>
+    <div id="pdf-viewer"></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>✨ <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Created by Suyash Dwivedi</a> | 🚀 Updated on: March 16, 2026</p>
+</footer>
+
+<div id="zoom-bar">
+  <button class="zm-btn" id="zm-out">−</button>
+  <span id="zoom-val">150%</span>
+  <button class="zm-btn" id="zm-in">+</button>
+</div>
+
+<div id="loader"><div class="spin"></div><p id="loader-msg">Loading…</p></div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script>
+'use strict';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ── State ──────────────────────────────────────────────────────────────────────
+const app = {
+  pdfBytes:    null,
+  pdfJsDoc:    null,
+  numPages:    0,
+  scale:       1.5,
+  tool:        'text',
+  fontSize:    10,
+  bold:        false,
+  italic:      false,
+  underline:   false,
+  annotations: [],   // { id, pageIndex(int), cx, cy, pdfX, pdfY, type, value, fontSize, bold, italic, underline }
+  pageSizes:   {},   // key = pageIndex(int) → { w, h } in PDF pts at scale=1
+  fileName:    ''
+};
+
+let annoIdCounter = 0;
+function nextId() { return ++annoIdCounter; }
+
+// ── DOM ───────────────────────────────────────────────────────────────────────
+const $         = id => document.getElementById(id);
+const fileInput = $('file-input');
+const openBtn   = $('open-btn');
+const dropZone  = $('drop-zone');
+const pdfViewer = $('pdf-viewer');
+const undoBtn   = $('undo-btn');
+const clearBtn  = $('clear-btn');
+const saveBtn   = $('save-btn');
+const fmtBold   = $('fmt-bold');
+const fmtItalic = $('fmt-italic');
+const fmtUnder  = $('fmt-under');
+const loaderMsg = $('loader-msg');
+const toastEl   = $('toast');
+
+// ── File open ──────────────────────────────────────────────────────────────────
+openBtn.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if (e.target.files[0]) loadPDF(e.target.files[0]); e.target.value=''; });
+
+['dragover','dragenter'].forEach(ev =>
+  dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
+['dragleave','dragend'].forEach(ev =>
+  dropZone.addEventListener(ev, () => dropZone.classList.remove('dragover')));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  const f = e.dataTransfer.files[0];
+  if (f?.type === 'application/pdf') loadPDF(f);
+});
+$('main').addEventListener('dragover', e => e.preventDefault());
+$('main').addEventListener('drop', e => {
+  e.preventDefault();
+  const f = e.dataTransfer.files[0];
+  if (f?.type === 'application/pdf') loadPDF(f);
+});
+
+// ── Load PDF ───────────────────────────────────────────────────────────────────
+async function loadPDF(file) {
+  showLoader('Loading PDF…');
+  app.annotations = [];
+  app.fileName    = file.name;
+  try {
+    const buf      = await file.arrayBuffer();
+    app.pdfBytes   = new Uint8Array(buf);
+    app.pdfJsDoc   = await pdfjsLib.getDocument({ data: app.pdfBytes.slice() }).promise;
+    app.numPages   = app.pdfJsDoc.numPages;
+
+    // Cache natural page sizes (scale = 1)
+    for (let i = 0; i < app.numPages; i++) {
+      const pg = await app.pdfJsDoc.getPage(i + 1);
+      const vp = pg.getViewport({ scale: 1 });
+      app.pageSizes[i] = { w: vp.width, h: vp.height };
+    }
+
+    await renderAllPages();
+
+    $('upload-screen').style.display = 'none';
+    pdfViewer.classList.add('visible');
+    $('file-name').textContent = file.name;
+    $('file-meta').textContent = `${app.numPages} page${app.numPages > 1 ? 's' : ''} · ${(file.size/1024).toFixed(1)} KB`;
+    updateUI();
+    toast('✅ PDF loaded — click anywhere on the form to fill it');
+  } catch (err) {
+    console.error(err);
+    alert('Could not load PDF: ' + err.message);
+  } finally {
+    hideLoader();
+  }
+}
+
+// ── Render pages ───────────────────────────────────────────────────────────────
+async function renderAllPages() {
+  pdfViewer.innerHTML = '';
+  for (let i = 0; i < app.numPages; i++) {
+    const pg = await app.pdfJsDoc.getPage(i + 1);
+    const vp = pg.getViewport({ scale: app.scale });
+
+    const wrap   = document.createElement('div');  wrap.className = 'page-wrap';
+    const lbl    = document.createElement('div');  lbl.className  = 'page-num-label';
+    lbl.textContent = `Page ${i + 1} of ${app.numPages}`;
+
+    const frame  = document.createElement('div');
+    frame.className   = 'page-frame';
+    frame.style.width  = vp.width  + 'px';
+    frame.style.height = vp.height + 'px';
+
+    const canvas  = document.createElement('canvas');
+    canvas.width  = vp.width;
+    canvas.height = vp.height;
+    await pg.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+
+    const layer         = document.createElement('div');
+    layer.className     = 'anno-layer interactive tool-text';
+    layer.dataset.page  = String(i);   // always a string in dataset; we parseInt on read
+    layer.addEventListener('click', onLayerClick);
+
+    frame.appendChild(canvas);
+    frame.appendChild(layer);
+    wrap.appendChild(lbl);
+    wrap.appendChild(frame);
+    pdfViewer.appendChild(wrap);
+  }
+  redrawAnnotations();
+}
+
+function updateLayerCursors() {
+  document.querySelectorAll('.anno-layer').forEach(l => {
+    l.classList.remove('tool-text', 'tool-check', 'tool-erase');
+    l.classList.add('tool-' + app.tool);
+  });
+}
+
+// ── Click on layer ─────────────────────────────────────────────────────────────
+function onLayerClick(e) {
+  if (e.target.classList.contains('anno-el') ||
+      e.target.classList.contains('anno-input')) return;
+
+  const layer     = e.currentTarget;
+  const pageIndex = parseInt(layer.dataset.page, 10);
+  if (isNaN(pageIndex)) return;
+
+  const rect = layer.getBoundingClientRect();
+  const cx   = e.clientX - rect.left;
+  const cy   = e.clientY - rect.top;
+
+  if (app.tool === 'text') {
+    commitAllInputs();
+    createTextInput(layer, pageIndex, cx, cy);
+  } else if (app.tool === 'check') {
+    commitAllInputs();
+    addCheckmark(pageIndex, cx, cy);
+  }
+}
+
+// ── Text input ─────────────────────────────────────────────────────────────────
+function applyInputStyles(el, opts) {
+  el.style.fontSize       = opts.fontSize + 'px';
+  el.style.fontWeight     = opts.bold      ? '700'       : '400';
+  el.style.fontStyle      = opts.italic    ? 'italic'    : 'normal';
+  el.style.textDecoration = opts.underline ? 'underline' : 'none';
+}
+
+function createTextInput(layer, pageIndex, cx, cy) {
+  // Prevent double-input if already one active in same spot
+  if (layer.querySelector('.anno-input')) return;
+
+  const inp = document.createElement('input');
+  inp.type         = 'text';
+  inp.className    = 'anno-input';
+  inp.style.left   = cx + 'px';
+  inp.style.top    = cy + 'px';
+  applyInputStyles(inp, app);
+
+  // Store originals as data attrs — do NOT rely on reading back from el
+  inp.dataset.pageIndex = String(pageIndex);
+  inp.dataset.cx        = String(cx);
+  inp.dataset.cy        = String(cy);
+  inp.dataset.fontSize  = String(app.fontSize);
+  inp.dataset.bold      = String(app.bold);
+  inp.dataset.italic    = String(app.italic);
+  inp.dataset.underline = String(app.underline);
+
+  let committed = false;
+  function doCommit() {
+    if (committed) return;
+    committed = true;
+    commitInput(inp);
+  }
+
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter')  { e.stopPropagation(); doCommit(); }
+    if (e.key === 'Escape') { e.stopPropagation(); inp.remove(); }
+  });
+  inp.addEventListener('blur', () => setTimeout(doCommit, 150));
+  inp.addEventListener('click', e => e.stopPropagation());
+
+  layer.appendChild(inp);
+  inp.focus();
+}
+
+function commitInput(inp) {
+  const val = inp.value.trim();
+  if (document.contains(inp)) inp.remove();
+  if (!val) return;
+
+  const pageIndex = parseInt(inp.dataset.pageIndex, 10);
+  const cx        = parseFloat(inp.dataset.cx);
+  const cy        = parseFloat(inp.dataset.cy);
+  const fontSize  = parseInt(inp.dataset.fontSize, 10) || app.fontSize;
+  const bold      = inp.dataset.bold      === 'true';
+  const italic    = inp.dataset.italic    === 'true';
+  const underline = inp.dataset.underline === 'true';
+
+  // Guard all values
+  if (isNaN(pageIndex) || isNaN(cx) || isNaN(cy)) return;
+
+  const pdf = toPdfCoords(pageIndex, cx, cy, fontSize);
+  pushAnnotation({ pageIndex, cx, cy, pdfX: pdf.x, pdfY: pdf.y,
+    type: 'text', value: val, fontSize, bold, italic, underline });
+}
+
+function commitAllInputs() {
+  document.querySelectorAll('.anno-input').forEach(inp => {
+    let committed = false;
+    inp._commit = inp._commit || function() {
+      if (committed) return; committed = true;
+      commitInput(inp);
+    };
+    inp._commit();
+  });
+}
+
+// ── Checkmark ──────────────────────────────────────────────────────────────────
+function addCheckmark(pageIndex, cx, cy) {
+  if (isNaN(pageIndex)) return;
+  const fontSize = app.fontSize + 2;
+  const pdf      = toPdfCoords(pageIndex, cx, cy, fontSize);
+  pushAnnotation({ pageIndex, cx, cy, pdfX: pdf.x, pdfY: pdf.y,
+    type: 'check', value: '✔', fontSize, bold: false, italic: false, underline: false });
+}
+
+// ── Annotation management ──────────────────────────────────────────────────────
+function pushAnnotation(ann) {
+  // Ensure all numeric fields are proper numbers
+  ann.id        = nextId();                        // safe integer counter
+  ann.pageIndex = parseInt(ann.pageIndex, 10);
+  ann.pdfX      = parseFloat(ann.pdfX);
+  ann.pdfY      = parseFloat(ann.pdfY);
+  ann.cx        = parseFloat(ann.cx);
+  ann.cy        = parseFloat(ann.cy);
+  ann.fontSize  = parseInt(ann.fontSize, 10) || 10;
+
+  // Drop if any critical value is NaN
+  if ([ann.pageIndex, ann.pdfX, ann.pdfY, ann.cx, ann.cy].some(isNaN)) return;
+
+  app.annotations.push(ann);
+  redrawAnnotations();
+  updateUI();
+}
+
+function removeAnnotation(id) {
+  app.annotations = app.annotations.filter(a => a.id !== id);
+  redrawAnnotations();
+  updateUI();
+}
+
+function redrawAnnotations() {
+  document.querySelectorAll('.anno-el').forEach(el => el.remove());
+
+  for (const ann of app.annotations) {
+    const layer = document.querySelector(`.anno-layer[data-page="${ann.pageIndex}"]`);
+    if (!layer) continue;
+
+    const el          = document.createElement('div');
+    el.className      = `anno-el type-${ann.type}`;
+    el.dataset.id     = String(ann.id);
+    el.style.left     = ann.cx + 'px';
+    el.style.top      = ann.cy + 'px';
+    el.style.fontSize = ann.fontSize + 'px';
+    el.textContent    = ann.value;
+
+    if (ann.type === 'text') {
+      el.style.fontWeight      = ann.bold      ? '700'       : '400';
+      el.style.fontStyle       = ann.italic    ? 'italic'    : 'normal';
+      el.style.textDecoration  = ann.underline ? 'underline' : 'none';
+    }
+
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      if (app.tool === 'erase') {
+        removeAnnotation(ann.id);
+      } else if (app.tool === 'text' && ann.type === 'text') {
+        startEditAnnotation(ann, el, layer);
+      }
+    });
+
+    layer.appendChild(el);
+  }
+}
+
+function startEditAnnotation(ann, el, layer) {
+  if (layer.querySelector('.anno-input')) return;
+  el.style.display = 'none';
+
+  const inp = document.createElement('input');
+  inp.type      = 'text';
+  inp.value     = ann.value;
+  inp.className = 'anno-input';
+  inp.style.left = ann.cx + 'px';
+  inp.style.top  = ann.cy + 'px';
+  applyInputStyles(inp, ann);
+
+  inp.dataset.pageIndex = String(ann.pageIndex);
+  inp.dataset.cx        = String(ann.cx);
+  inp.dataset.cy        = String(ann.cy);
+  inp.dataset.fontSize  = String(ann.fontSize);
+  inp.dataset.bold      = String(ann.bold);
+  inp.dataset.italic    = String(ann.italic);
+  inp.dataset.underline = String(ann.underline);
+
+  let committed = false;
+  const finish = () => {
+    if (committed) return; committed = true;
+    const newVal = inp.value.trim();
+    inp.remove();
+    if (newVal) { ann.value = newVal; }
+    else        { app.annotations = app.annotations.filter(a => a.id !== ann.id); }
+    redrawAnnotations();
+    updateUI();
+  };
+
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter')  { e.stopPropagation(); finish(); }
+    if (e.key === 'Escape') { e.stopPropagation(); inp.remove(); el.style.display = ''; }
+  });
+  inp.addEventListener('blur',  () => setTimeout(finish, 150));
+  inp.addEventListener('click', e => e.stopPropagation());
+
+  layer.appendChild(inp);
+  inp.focus();
+  inp.select();
+}
+
+// ── Coordinate conversion ──────────────────────────────────────────────────────
+// .anno-el uses `top: cy; transform: translateY(-50%)`
+// → visual CENTRE of text is at cy on screen.
+// PDF drawText places baseline at y.
+// Cap-height ≈ 70% of fontSize, so centre ≈ baseline + fontSize*0.35
+// → baseline_pdf = (pageH - cy/scale) - fontSize*0.35
+function toPdfCoords(pageIndex, cx, cy, fontSize) {
+  const ps = app.pageSizes[pageIndex] || { w: 595, h: 842 };
+  return {
+    x: cx / app.scale,
+    y: ps.h - (cy / app.scale) - (fontSize || 10) * 0.35
+  };
+}
+
+// ── Tool switching ─────────────────────────────────────────────────────────────
+document.querySelectorAll('.tool-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    app.tool = btn.dataset.tool;
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    updateLayerCursors();
+    commitAllInputs();
+  });
+});
+
+$('font-size-sel').addEventListener('change', e => {
+  app.fontSize = parseInt(e.target.value, 10) || 10;
+});
+
+fmtBold.addEventListener('click', () => {
+  app.bold = !app.bold; fmtBold.classList.toggle('active', app.bold);
+});
+fmtItalic.addEventListener('click', () => {
+  app.italic = !app.italic; fmtItalic.classList.toggle('active', app.italic);
+});
+fmtUnder.addEventListener('click', () => {
+  app.underline = !app.underline; fmtUnder.classList.toggle('active', app.underline);
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement.tagName;
+  if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+  if (e.key === 't' || e.key === 'T') document.querySelector('[data-tool="text"]').click();
+  if (e.key === 'c' || e.key === 'C') document.querySelector('[data-tool="check"]').click();
+  if (e.key === 'e' || e.key === 'E') document.querySelector('[data-tool="erase"]').click();
+  if ((e.ctrlKey||e.metaKey) && e.key === 'b') { e.preventDefault(); fmtBold.click(); }
+  if ((e.ctrlKey||e.metaKey) && e.key === 'i') { e.preventDefault(); fmtItalic.click(); }
+  if ((e.ctrlKey||e.metaKey) && e.key === 'u') { e.preventDefault(); fmtUnder.click(); }
+  if ((e.ctrlKey||e.metaKey) && e.key === 'z') { e.preventDefault(); undoBtn.click(); }
+  if ((e.ctrlKey||e.metaKey) && e.key === 's') { e.preventDefault(); saveBtn.click(); }
+});
+
+// ── Undo / Clear ───────────────────────────────────────────────────────────────
+undoBtn.addEventListener('click', () => {
+  commitAllInputs();
+  if (!app.annotations.length) return;
+  app.annotations.pop();
+  redrawAnnotations();
+  updateUI();
+  toast('Undone');
+});
+
+clearBtn.addEventListener('click', () => {
+  commitAllInputs();
+  if (!app.annotations.length) return;
+  if (!confirm(`Clear all ${app.annotations.length} annotation(s)?`)) return;
+  app.annotations = [];
+  redrawAnnotations();
+  updateUI();
+  toast('All annotations cleared');
+});
+
+// ── Save PDF ───────────────────────────────────────────────────────────────────
+saveBtn.addEventListener('click', async () => {
+  if (!app.pdfBytes) return;
+  commitAllInputs();
+
+  // Small delay so any pending blur-commit fires first
+  await new Promise(r => setTimeout(r, 200));
+
+  showLoader('Generating filled PDF…');
+  try {
+    const { PDFDocument, rgb, StandardFonts } = PDFLib;
+    const doc = await PDFDocument.load(app.pdfBytes);
+
+    // Embed Helvetica variants (standard-font proxy for Arial)
+    const fonts = {
+      normal:     await doc.embedFont(StandardFonts.Helvetica),
+      bold:       await doc.embedFont(StandardFonts.HelveticaBold),
+      italic:     await doc.embedFont(StandardFonts.HelveticaOblique),
+      boldItalic: await doc.embedFont(StandardFonts.HelveticaBoldOblique),
+    };
+
+    function pickFont(ann) {
+      if (ann.bold && ann.italic) return fonts.boldItalic;
+      if (ann.bold)               return fonts.bold;
+      if (ann.italic)             return fonts.italic;
+      return fonts.normal;
+    }
+
+    const totalPages = doc.getPageCount();
+
+    for (const ann of app.annotations) {
+      // Strict type checks — this is where the NaN error was thrown
+      const pageIndex = parseInt(ann.pageIndex, 10);
+      const x         = parseFloat(ann.pdfX);
+      const y         = parseFloat(ann.pdfY);
+      const fs        = parseInt(ann.fontSize, 10) || 10;
+
+      if (isNaN(pageIndex) || isNaN(x) || isNaN(y)) continue;
+      if (pageIndex < 0 || pageIndex >= totalPages)  continue;
+
+      const page = doc.getPage(pageIndex);
+
+      if (ann.type === 'text') {
+        const font = pickFont(ann);
+        page.drawText(ann.value || '', { x, y, size: fs, font, color: rgb(0,0,0) });
+
+        // Manual underline (pdf-lib doesn't have a native underline option)
+        if (ann.underline) {
+          const textW = font.widthOfTextAtSize(ann.value || '', fs);
+          const lineY = y - fs * 0.10;
+          page.drawLine({
+            start: { x, y: lineY },
+            end:   { x: x + textW, y: lineY },
+            thickness: Math.max(0.5, fs * 0.07),
+            color: rgb(0, 0, 0),
+          });
+        }
+
+      } else if (ann.type === 'check') {
+        // Draw ✔ as two vector lines (avoids font encoding / glyph issues)
+        const s = fs * 0.6;
+        const lw = Math.max(0.8, fs * 0.10);
+        page.drawLine({ start: { x: x,            y: y + s * 0.45 }, end: { x: x + s * 0.38, y: y         }, thickness: lw, color: rgb(0,0,0) });
+        page.drawLine({ start: { x: x + s * 0.38, y: y            }, end: { x: x + s,         y: y + s     }, thickness: lw, color: rgb(0,0,0) });
+      }
+    }
+
+    const bytes    = await doc.save();
+    const blob     = new Blob([bytes], { type: 'application/pdf' });
+    const url      = URL.createObjectURL(blob);
+    const dlName   = app.fileName.replace(/\.pdf$/i, '') + '_filled.pdf';
+    const a        = Object.assign(document.createElement('a'), { href: url, download: dlName });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast(`✅ Saved as "${dlName}"`);
+
+  } catch (err) {
+    console.error(err);
+    alert('Save failed: ' + err.message);
+  } finally {
+    hideLoader();
+  }
+});
+
+// ── Zoom ───────────────────────────────────────────────────────────────────────
+$('zm-in').addEventListener('click',  () => changeZoom(+0.25));
+$('zm-out').addEventListener('click', () => changeZoom(-0.25));
+
+async function changeZoom(delta) {
+  const ns = Math.min(3, Math.max(0.5, app.scale + delta));
+  if (ns === app.scale) return;
+  app.scale = ns;
+  $('zoom-val').textContent = Math.round(app.scale * 100) + '%';
+  if (!app.pdfJsDoc) return;
+
+  // Remap cx/cy from stored pdfX/pdfY (inverse of toPdfCoords)
+  app.annotations = app.annotations.map(ann => {
+    const ps  = app.pageSizes[ann.pageIndex] || { w: 595, h: 842 };
+    const fs  = ann.fontSize || 10;
+    return {
+      ...ann,
+      cx: ann.pdfX * app.scale,
+      cy: (ps.h - ann.pdfY - fs * 0.35) * app.scale
+    };
+  });
+
+  showLoader('Re-rendering…');
+  await renderAllPages();
+  hideLoader();
+}
+
+// ── UI update ──────────────────────────────────────────────────────────────────
+function updateUI() {
+  const has = app.annotations.length > 0;
+  undoBtn.disabled  = !has;
+  clearBtn.disabled = !has;
+  saveBtn.disabled  = !app.pdfJsDoc;
+  const badge = $('anno-badge');
+  badge.style.display = has ? 'inline-flex' : 'none';
+  if (has) $('anno-count').textContent = app.annotations.length;
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function showLoader(msg) { loaderMsg.textContent = msg || 'Loading…'; $('loader').classList.add('show'); }
+function hideLoader()    { $('loader').classList.remove('show'); }
+
+let toastTimer;
+function toast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3000);
+}
+
+updateUI();
+</script>
+</body>
+</html>
