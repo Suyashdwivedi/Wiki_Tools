@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebM Forge — FFmpeg CRF Converter (Wikimedia Commons Ready)</title>
+<meta name="description" content="Convert video to WebM locally using FFmpeg WASM. True VP9 CRF quality mode, Opus audio, Wikimedia Commons compatible. No upload, no server.">
+<meta name="author" content="Suyash Dwivedi">
+<link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/webm-forge.html">
+<meta property="og:title" content="WebM Forge — FFmpeg CRF Converter">
+<meta property="og:description" content="True VP9 CRF encoding in your browser via FFmpeg WASM. No upload, no server.">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+<link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-GC8PGC89NB');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,500;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060810;--surface:#0c0f1a;--surface2:#111422;--surface3:#171b2e;
+  --border:#1a1f35;--border2:#232840;--border3:#2d3454;
+  --accent:#00e8a2;--accent2:#00b87c;--accent3:#007a52;
+  --accent-dim:rgba(0,232,162,.08);--accent-glow:rgba(0,232,162,.2);
+  --amber:#f5a623;--amber-dim:rgba(245,166,35,.1);--amber-border:rgba(245,166,35,.3);
+  --red:#ff4060;--red-dim:rgba(255,64,96,.08);
+  --wiki:#5588ee;--wiki-dim:rgba(85,136,238,.08);--wiki-light:#88aaff;
+  --text:#dde2f0;--text-dim:#7a85a8;--text-muted:#3a4060;
+  --mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;
+  --r:10px;--rs:6px;--tr:150ms cubic-bezier(.4,0,.2,1);
+  --crf-thumb:var(--accent);
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,232,162,.016) 1px,transparent 1px),linear-gradient(90deg,rgba(0,232,162,.016) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 20px 80px}
+
+/* ── Toasts ── */
+#toastRoot{position:fixed;top:18px;right:18px;z-index:10000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:9px;background:var(--surface3);border:1px solid var(--border3);border-radius:var(--r);padding:9px 14px;font-family:var(--mono);font-size:12px;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,.6);pointer-events:auto;max-width:320px;animation:toastIn .22s ease forwards}
+.toast.out{animation:toastOut .22s ease forwards}
+.ti{width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700}
+.toast.success .ti{background:var(--accent);color:#060810}
+.toast.error .ti{background:var(--red);color:#fff}
+.toast.info .ti{background:var(--wiki);color:#fff}
+.toast.warn .ti{background:var(--amber);color:#060810}
+@keyframes toastIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateX(16px)}}
+
+/* ── Brand & Header ── */
+.brand-bar{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);margin-bottom:26px;animation:fadeDown .35s ease}
+.brand-bar img{width:33px;height:33px;border-radius:7px;border:1px solid var(--border2)}
+.bb-title{font-weight:700;font-size:13px}.bb-sub{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:1.5px}
+.bb-spacer{flex:1}
+.bb-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;animation:fadeDown .35s .04s ease both}
+.logo-tag{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;opacity:.8}
+.logo h1{font-size:38px;font-weight:800;letter-spacing:-1.5px;line-height:1}
+.logo h1 span{color:var(--accent)}
+.hdr-badges{display:flex;flex-direction:column;align-items:flex-end;gap:5px;padding-top:4px}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:4px;padding:3px 10px;font-family:var(--mono);font-size:11px;letter-spacing:.5px;white-space:nowrap}
+.badge-green{background:var(--accent-dim);border:1px solid var(--accent3);color:var(--accent)}
+.badge-amber{background:var(--amber-dim);border:1px solid var(--amber-border);color:var(--amber)}
+.badge-wiki{background:var(--wiki-dim);border:1px solid rgba(85,136,238,.3);color:var(--wiki-light)}
+.badge-ffmpeg{background:rgba(255,100,0,.08);border:1px solid rgba(255,100,0,.3);color:#ff9040}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ── Notices ── */
+.notice{border-radius:var(--r);padding:12px 16px;margin-bottom:12px;font-size:13px;color:var(--text-dim);line-height:1.75;background:var(--surface);border:1px solid var(--border2)}
+.notice-green{border-left:3px solid var(--accent)}.notice-amber{border-left:3px solid var(--amber)}.notice-wiki{border-left:3px solid var(--wiki)}
+.notice strong{font-family:var(--mono);font-size:12px}
+.notice-green strong{color:var(--accent)}.notice-amber strong{color:var(--amber)}.notice-wiki strong{color:var(--wiki-light)}
+.notice a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent3)}.notice a:hover{color:var(--text)}
+code{font-family:var(--mono);font-size:11px;background:var(--surface2);padding:1px 5px;border-radius:3px;color:var(--accent2);border:1px solid var(--border2)}
+
+/* ── Engine status ── */
+.engine-status{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-bottom:14px;padding:9px 13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);transition:all var(--tr)}
+.engine-status.ready{border-color:var(--accent3);background:var(--accent-dim);color:var(--accent)}
+.engine-status.loading{border-color:var(--amber-border);background:var(--amber-dim);color:var(--amber)}
+.engine-status.err{border-color:rgba(255,64,96,.3);background:var(--red-dim);color:var(--red)}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.status-dot.checking,.status-dot.loading{background:var(--amber);animation:pulse 1.2s infinite}
+.status-dot.ready{background:var(--accent);box-shadow:0 0 6px var(--accent-glow)}
+.status-dot.err{background:var(--red)}
+.engine-load-bar{flex:1;height:3px;background:var(--border2);border-radius:99px;overflow:hidden;margin-left:6px;display:none}
+.engine-load-bar.visible{display:block}
+.engine-load-fill{height:100%;background:linear-gradient(90deg,var(--amber),#ffc966);border-radius:99px;width:0%;transition:width .3s}
+
+/* ── Audio toggle ── */
+.audio-toggle{display:flex;align-items:center;gap:10px;padding:9px 13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);font-family:var(--mono);font-size:11px;color:var(--text-dim);cursor:pointer;user-select:none;transition:all var(--tr);margin-bottom:16px}
+.audio-toggle:hover{border-color:var(--border3);color:var(--text)}
+.toggle-sw{width:34px;height:18px;background:var(--surface2);border:1px solid var(--border2);border-radius:99px;position:relative;transition:all .25s;flex-shrink:0}
+.toggle-sw::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--text-muted);transition:all .25s}
+.toggle-sw.on{background:var(--accent3);border-color:var(--accent)}.toggle-sw.on::after{left:18px;background:var(--accent)}
+
+/* ── Drop zone ── */
+.batch-drop{position:relative;border:2px dashed var(--border2);border-radius:14px;padding:42px 28px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);overflow:hidden}
+.batch-drop:hover,.batch-drop.dragover{border-color:var(--accent);background:var(--surface2);box-shadow:0 0 0 4px var(--accent-dim)}
+.batch-drop-icon{width:46px;height:46px;margin:0 auto 13px;color:var(--text-muted);transition:color .2s,transform .2s}
+.batch-drop:hover .batch-drop-icon,.batch-drop.dragover .batch-drop-icon{color:var(--accent);transform:translateY(-3px)}
+.batch-drop-title{font-size:17px;font-weight:700;margin-bottom:4px}
+.batch-drop-sub{font-family:var(--mono);font-size:11px;color:var(--text-muted)}
+.batch-drop-hint{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:9px;opacity:.55}
+.drop-counter{position:absolute;top:13px;right:13px;background:var(--accent);color:#060810;border-radius:99px;padding:2px 9px;font-family:var(--mono);font-size:11px;font-weight:700;opacity:0;transform:scale(.8);transition:all .2s}
+.batch-drop.dragover .drop-counter{opacity:1;transform:scale(1)}
+
+/* ── Queue ── */
+.queue-header{display:flex;align-items:center;justify-content:space-between;padding:11px 0 7px;gap:10px;flex-wrap:wrap}
+.queue-title{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)}
+.queue-count{font-family:var(--mono);font-size:11px;color:var(--text-dim)}
+.btn-clear-all{background:none;border:1px solid var(--border2);border-radius:var(--rs);padding:4px 10px;font-family:var(--mono);font-size:10px;color:var(--text-muted);cursor:pointer;transition:all var(--tr)}
+.btn-clear-all:hover{border-color:var(--red);color:var(--red);background:var(--red-dim)}
+.queue-list{display:flex;flex-direction:column;gap:8px}
+.queue-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;align-items:flex-start;gap:12px;transition:border-color .2s,background .2s;animation:itemIn .2s ease}
+@keyframes itemIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.queue-item:hover{border-color:var(--border2)}
+.queue-item.status-converting{border-color:var(--accent3);background:var(--accent-dim)}
+.queue-item.status-done{border-color:var(--accent3)}
+.queue-item.status-error{border-color:rgba(255,64,96,.3);background:var(--red-dim)}
+.qi-thumb{width:136px;height:88px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);flex-shrink:0;overflow:hidden;position:relative;cursor:pointer;transition:border-color .15s}
+.qi-thumb:hover{border-color:var(--accent3)}
+.qi-thumb img{position:absolute;width:100%;height:100%;object-fit:cover;border-radius:7px;transition:transform .3s}
+.qi-thumb-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.32);opacity:0;transition:opacity .15s;border-radius:7px}
+.qi-thumb:hover .qi-thumb-play{opacity:1}
+.qi-thumb-dur{position:absolute;bottom:4px;right:5px;background:rgba(0,0,0,.72);color:#fff;font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:3px}
+.qi-body{flex:1;min-width:0}
+.qi-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:2px}
+.qi-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.qi-ext{font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;background:var(--surface2);border:1px solid var(--border2);color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;flex-shrink:0}
+.qi-size{font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-bottom:7px}
+.qi-rot{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.qi-rot-label{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-right:2px}
+.qi-rot-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:3px 8px;font-family:var(--mono);font-size:10px;color:var(--text-muted);cursor:pointer;transition:all .12s;user-select:none}
+.qi-rot-btn:hover{border-color:var(--accent3);color:var(--text)}
+.qi-rot-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.qi-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.qi-status{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:3px;letter-spacing:.8px;text-transform:uppercase}
+.qi-status.s-queued{color:var(--text-muted);background:var(--surface2);border:1px solid var(--border2)}
+.qi-status.s-converting{color:var(--accent);background:var(--accent-dim);border:1px solid var(--accent3);animation:pulse 1.5s infinite}
+.qi-status.s-done{color:#060810;background:var(--accent)}
+.qi-status.s-error{color:var(--red);background:var(--red-dim);border:1px solid rgba(255,64,96,.3)}
+.qi-remove{background:none;border:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:pointer;font-size:13px;border-radius:4px;transition:all .12s}
+.qi-remove:hover{color:var(--red);background:var(--red-dim)}
+.qi-dl{background:var(--accent);color:#060810;border:none;border-radius:5px;padding:4px 11px;font-family:var(--mono);font-size:10px;cursor:pointer;font-weight:700}
+.qi-dl:hover{background:#00ffb0}
+.qi-bar-wrap{height:3px;background:var(--border2);border-radius:99px;overflow:hidden;margin-top:7px}
+.qi-bar{height:100%;background:linear-gradient(90deg,var(--accent3),var(--accent));border-radius:99px;width:0%;transition:width .4s ease}
+.qi-err{font-family:var(--mono);font-size:10px;color:var(--red);margin-top:4px;line-height:1.5}
+
+/* ── Preview ── */
+.preview-panel{display:none;background:var(--surface);border:1px solid var(--border2);border-radius:14px;margin-bottom:18px;overflow:hidden}
+.preview-panel.visible{display:block;animation:fadeIn .22s ease}
+.preview-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)}
+.preview-label{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)}
+.preview-info{font-family:var(--mono);font-size:11px;color:var(--accent);margin-left:8px}
+.preview-body{background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.preview-body video{max-width:100%;max-height:320px;width:100%;display:block;transition:transform .3s ease}
+.preview-controls{display:flex;align-items:center;gap:9px;padding:9px 13px;background:var(--surface2);border-top:1px solid var(--border)}
+.btn-play{background:var(--accent-dim);border:1px solid var(--accent3);border-radius:6px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--accent);transition:all var(--tr);flex-shrink:0}
+.btn-play:hover{background:var(--accent);color:#060810}
+.preview-seek{flex:1;height:4px;-webkit-appearance:none;appearance:none;background:var(--border2);border-radius:99px;outline:none;cursor:pointer}
+.preview-seek::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #060810}
+.preview-time{font-family:var(--mono);font-size:11px;color:var(--text-dim);white-space:nowrap;flex-shrink:0}
+.preview-vol{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.vol-icon{color:var(--text-muted);cursor:pointer;transition:color var(--tr)}.vol-icon:hover{color:var(--accent)}
+.preview-vol-range{width:54px;height:3px;-webkit-appearance:none;appearance:none;background:var(--border2);border-radius:99px;outline:none;cursor:pointer}
+.preview-vol-range::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--text-dim);cursor:pointer}
+.kb-hint{font-family:var(--mono);font-size:10px;color:var(--text-muted);padding:4px 13px;border-top:1px solid var(--border);background:var(--surface2)}
+.kbd{display:inline-block;background:var(--surface);border:1px solid var(--border2);border-radius:3px;padding:0 4px;font-size:10px;margin:0 1px}
+
+/* ── Rotation bar ── */
+.rotation-bar{display:none;align-items:center;gap:7px;padding:9px 13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:16px;flex-wrap:wrap}
+.rotation-bar.visible{display:flex;animation:fadeIn .18s ease}
+.rotation-label{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);flex-shrink:0}
+.rot-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:5px 11px;font-family:var(--mono);font-size:11px;color:var(--text-dim);cursor:pointer;transition:all var(--tr);display:flex;align-items:center;gap:5px;user-select:none}
+.rot-btn:hover{border-color:var(--accent3);color:var(--text)}
+.rot-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.rot-divider{width:1px;height:18px;background:var(--border2);margin:0 2px}
+.rot-badge{font-family:var(--mono);font-size:10px;color:var(--amber);background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:3px;padding:2px 8px;margin-left:auto}
+
+/* ── Settings grid ── */
+.settings{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+@media(max-width:620px){.settings{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;transition:border-color .2s}
+.card:hover{border-color:var(--border2)}
+.card-label{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+
+/* Pills */
+.pill-group{display:flex;flex-wrap:wrap;gap:6px}
+.pill{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:5px 11px;font-family:var(--mono);font-size:11px;color:var(--text-dim);cursor:pointer;transition:all var(--tr);user-select:none}
+.pill:hover{border-color:var(--accent3);color:var(--text);background:var(--surface3)}
+.pill.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+/* ── CRF Card ── */
+.crf-card{grid-column:1/-1;border-color:var(--accent3)!important}
+.crf-presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.crf-preset-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:5px 12px;font-family:var(--mono);font-size:11px;color:var(--text-dim);cursor:pointer;transition:all var(--tr);user-select:none;display:flex;align-items:center;gap:5px}
+.crf-preset-btn:hover{border-color:var(--accent3);color:var(--text);background:var(--surface3)}
+.crf-preset-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.crf-preset-btn .preset-recommended{font-size:10px;color:var(--accent);margin-left:2px}
+.crf-slider-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.crf-range-wrap{flex:1;position:relative;height:20px;display:flex;align-items:center}
+.crf-track-bg{position:absolute;left:0;right:0;height:6px;border-radius:99px;background:linear-gradient(90deg,var(--accent) 0%,var(--accent) 38%,var(--amber) 60%,var(--red) 100%);pointer-events:none}
+input[type=range]#crfSlider{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:transparent;position:relative;z-index:1;outline:none;cursor:pointer}
+input[type=range]#crfSlider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--crf-thumb);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5);transition:border-color .2s,transform .15s}
+input[type=range]#crfSlider:hover::-webkit-slider-thumb{transform:scale(1.1)}
+input[type=range]#crfSlider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--crf-thumb);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.crf-val-display{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);min-width:36px;text-align:right;flex-shrink:0}
+.crf-axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-bottom:10px;padding:0 2px}
+.crf-desc-box{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:10px 13px;display:flex;align-items:flex-start;gap:10px}
+.crf-tier-label{font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;white-space:nowrap}
+.crf-tier-label.excellent{color:var(--accent)}.crf-tier-label.good{color:var(--accent)}.crf-tier-label.medium{color:var(--amber)}.crf-tier-label.low{color:var(--red)}
+.crf-desc-text{font-family:var(--mono);font-size:11px;color:var(--text-dim);line-height:1.6}
+.crf-cmd-preview{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:9px;padding:7px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);overflow-x:auto;white-space:nowrap}
+.crf-cmd-preview span{color:var(--accent2)}
+
+/* Audio bitrate card */
+.audio-card .pill-group{gap:5px}
+
+/* Encode speed card */
+.speed-card .pill-group{gap:5px}
+
+/* Codec info */
+.codec-card{grid-column:1/-1}
+.codec-row{display:flex;gap:10px;flex-wrap:wrap}
+.codec-item{flex:1;min-width:120px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px}
+.codec-type{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px}
+.codec-name{font-size:14px;font-weight:700;color:var(--accent);font-family:var(--mono)}
+.codec-desc{font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.5}
+
+/* Commons metadata */
+.commons-card{grid-column:1/-1;border-color:rgba(85,136,238,.25)!important}
+.commons-card:hover{border-color:var(--wiki)!important}
+.commons-card .card-label{color:var(--wiki-light)}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:540px){.meta-grid{grid-template-columns:1fr}}
+.meta-field{display:flex;flex-direction:column;gap:4px}
+.meta-field label{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.opt-badge{font-family:var(--mono);font-size:9px;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border2);border-radius:3px;padding:0 5px}
+.meta-field input,.meta-field select{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:7px 10px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;transition:border-color var(--tr);width:100%}
+.meta-field input:focus,.meta-field select:focus{border-color:var(--wiki);box-shadow:0 0 0 2px var(--wiki-dim)}
+.meta-field input::placeholder{color:var(--text-muted)}
+.meta-field select option{background:var(--surface2)}
+.field-hint{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:2px}
+.field-hint a{color:var(--wiki-light);text-decoration:none}.field-hint a:hover{color:var(--text)}
+
+/* ── Actions ── */
+.actions{display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.btn-convert{flex:1;min-width:180px;background:var(--accent);color:#060810;border:none;border-radius:var(--r);padding:13px 26px;font-family:var(--sans);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden}
+.btn-convert::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,.14),transparent);transform:translateX(-100%);transition:transform .4s}
+.btn-convert:hover:not(:disabled)::after{transform:translateX(100%)}
+.btn-convert:hover:not(:disabled){background:#00ffb0;box-shadow:0 0 30px var(--accent-glow);transform:translateY(-1px)}
+.btn-convert:disabled{background:var(--surface2);color:var(--text-muted);cursor:not-allowed;transform:none;box-shadow:none}
+.btn-stop{background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:var(--r);padding:13px 15px;color:var(--amber);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all var(--tr);display:none;align-items:center;gap:6px}
+.btn-stop:hover{background:rgba(245,166,35,.18)}
+.btn-stop.visible{display:inline-flex}
+.btn-folder{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:13px 13px;color:var(--text-dim);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all var(--tr);white-space:nowrap;display:flex;align-items:center;gap:7px}
+.btn-folder:hover{border-color:var(--accent3);color:var(--text);background:var(--surface2)}
+.save-loc-display{font-family:var(--mono);font-size:11px;color:var(--text-muted);padding:3px 0 12px}
+.save-loc-display span{color:var(--accent)}
+.folder-reauth-bar{display:none;margin-top:6px;padding:9px 13px;background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:var(--rs);font-family:var(--mono);font-size:11px;color:var(--amber);align-items:center;gap:9px;flex-wrap:wrap}
+.folder-reauth-bar.visible{display:flex}
+.btn-regrant{background:var(--amber);color:#060810;border:none;border-radius:4px;padding:4px 11px;font-family:var(--mono);font-size:10px;font-weight:700;cursor:pointer}
+.btn-regrant:hover{background:#ffc454}
+.btn-clear-folder{background:none;border:1px solid var(--amber-border);border-radius:4px;padding:4px 9px;font-family:var(--mono);font-size:10px;color:var(--amber);cursor:pointer}
+
+/* Batch overall */
+.batch-overall{display:none;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:8px 13px;margin-bottom:10px;font-family:var(--mono);font-size:12px;color:var(--text-dim);align-items:center;gap:9px}
+.batch-overall.visible{display:flex}
+.batch-overall-count{color:var(--accent);font-weight:700}
+
+/* ── Progress ── */
+.progress-block{display:none;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:15px;margin-bottom:15px}
+.progress-block.visible{display:block;animation:fadeIn .22s ease}
+.progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;flex-wrap:wrap;gap:7px}
+.progress-label{font-family:var(--mono);font-size:12px;color:var(--accent)}
+.progress-right{display:flex;align-items:center;gap:11px}
+.progress-pct{font-family:var(--mono);font-size:16px;font-weight:700}
+.progress-eta{font-family:var(--mono);font-size:10px;color:var(--text-muted)}
+.progress-bar-bg{height:6px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-bottom:9px;position:relative}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent3),var(--accent),#00ffb0);border-radius:99px;transition:width .3s linear;width:0%}
+.progress-bar-fill.complete{background:var(--accent)}
+.progress-bar-fill::after{content:'';position:absolute;top:0;right:0;bottom:0;width:30px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3));animation:shimmer .9s linear infinite}
+@keyframes shimmer{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
+.progress-stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:5px}
+.pstat{font-family:var(--mono);font-size:11px;color:var(--text-muted)}.pstat strong{color:var(--text-dim)}
+.pstat.speed{color:var(--accent)}.pstat.speed strong{color:var(--accent);font-weight:700}
+.progress-log{font-family:var(--mono);font-size:10px;color:var(--text-muted);height:52px;overflow-y:auto;line-height:1.9;border-top:1px solid var(--border);padding-top:7px;margin-top:5px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.progress-log::-webkit-scrollbar{width:3px}.progress-log::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+.log-line{color:var(--text-dim)}.log-line.err{color:var(--red)}.log-line.ok{color:var(--accent)}.log-line.cmd{color:var(--wiki-light)}
+
+/* ── Output ── */
+.output-block{display:none;background:var(--surface);border:1px solid var(--accent3);border-radius:var(--r);padding:17px;margin-bottom:15px}
+.output-block.visible{display:block;animation:fadeIn .3s ease}
+.output-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.output-check{width:27px;height:27px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#060810;flex-shrink:0;box-shadow:0 0 10px var(--accent-glow)}
+.output-title{font-size:16px;font-weight:800;letter-spacing:-.3px}
+.output-meta{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.meta-item{font-family:var(--mono);font-size:12px;color:var(--text-dim)}.meta-item strong{color:var(--accent)}
+.output-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.btn-dl{background:var(--accent);color:#060810;border:none;border-radius:var(--rs);padding:9px 17px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-dl:hover{background:#00ffb0;box-shadow:0 0 18px var(--accent-glow)}
+.btn-save-fs{background:var(--surface2);border:1px solid var(--accent3);color:var(--accent);border-radius:var(--rs);padding:9px 17px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr);display:inline-flex;align-items:center;gap:6px}
+.btn-save-fs:hover{background:var(--accent-dim)}
+.btn-reconvert{background:var(--surface2);border:1px solid var(--border2);color:var(--text-dim);border-radius:var(--rs);padding:9px 17px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr);display:inline-flex;align-items:center;gap:6px}
+.btn-reconvert:hover{border-color:var(--accent3);color:var(--accent);background:var(--accent-dim)}
+.commons-check{background:var(--wiki-dim);border:1px solid rgba(85,136,238,.2);border-radius:8px;padding:12px 14px}
+.commons-check-title{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--wiki-light);margin-bottom:8px}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+@media(max-width:500px){.check-grid{grid-template-columns:1fr}}
+.check-item{display:flex;align-items:flex-start;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text-dim);line-height:1.5}
+.check-ok{color:var(--accent);flex-shrink:0}.check-warn{color:var(--amber);flex-shrink:0}
+
+/* ── Links & Footer ── */
+.links-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-top:15px}
+.links-title{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px}
+.link-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border)}
+.link-row:last-child{border-bottom:none;padding-bottom:0}
+.link-name{font-weight:700;font-size:13px}.link-desc{font-size:11px;color:var(--text-dim)}
+.link-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:5px 11px;color:var(--text-dim);font-family:var(--mono);font-size:11px;text-decoration:none;transition:all var(--tr);white-space:nowrap;flex-shrink:0}
+.link-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.footer{text-align:center;margin-top:42px;padding-top:22px;border-top:1px solid var(--border);color:var(--text-dim);font-size:13px;line-height:2}
+.footer a{color:var(--accent);text-decoration:none;font-weight:600}.footer a:hover{color:var(--text)}
+
+/* ── Scroll nav ── */
+.scroll-nav{position:fixed;right:16px;bottom:20px;display:flex;flex-direction:column;gap:7px;z-index:100}
+.scroll-btn{width:36px;height:36px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);color:var(--text-dim);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+.scroll-btn:hover{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+
+/* Spinner */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:15px;height:15px;border:2px solid rgba(0,0,0,.25);border-top-color:#060810;border-radius:50%;animation:spin .5s linear infinite;display:none}
+.btn-convert.loading .spinner{display:block}
+.btn-convert.loading .btn-text{opacity:.8}
+
+@media(max-width:600px){
+  .logo h1{font-size:28px}.batch-drop{padding:30px 18px}
+  .qi-thumb{width:100%;height:130px}.queue-item{flex-wrap:wrap}
+  .bb-badges,.hdr-badges{display:none}
+}
+svg{display:block}
+</style>
+</head>
+<body>
+<div id="toastRoot"></div>
+<video id="hiddenVideo" playsinline muted style="position:absolute;top:-9999px;left:-9999px;width:1px;height:1px"></video>
+
+<div class="wrap">
+
+<!-- Brand bar -->
+<div class="brand-bar">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Logo">
+  <div><div class="bb-title">Wiki's Lazy Coders</div><div class="bb-sub">TOOLS · SUYASH DWIVEDI</div></div>
+  <div class="bb-spacer"></div>
+  <div class="bb-badges">
+    <div class="badge badge-ffmpeg">⚡ FFmpeg WASM</div>
+    <div class="badge badge-wiki">🌐 Commons Ready</div>
+    <div class="badge badge-amber">100% Local · No Upload</div>
+  </div>
+</div>
+
+<!-- Header -->
+<header>
+  <div class="logo">
+    <div class="logo-tag">▶ Any format → WebM · FFmpeg CRF</div>
+    <h1>WebM <span>Forge</span></h1>
+  </div>
+  <div class="hdr-badges">
+    <div class="badge badge-green"><span class="dot"></span> VP9 CRF + Opus</div>
+    <div class="badge badge-wiki">Wikimedia Commons</div>
+  </div>
+</header>
+
+<!-- Notices -->
+<div class="notice notice-green">
+  <strong>// ENGINE</strong> — Now powered by <strong>FFmpeg WASM</strong> running entirely in your browser.
+  Uses true <strong>VP9 CRF quality mode</strong> (<code>-crf X -b:v 0</code>) — the same algorithm as desktop FFmpeg/HandBrake.
+  Encoding is <strong>faster than real-time</strong> (no playback lock). Supports <strong>MP4, MKV, MOV, AVI, WP4</strong> and virtually any format FFmpeg accepts.
+  <br><span style="color:var(--amber);font-size:12px">⚡ First load downloads the FFmpeg WASM engine (~28 MB). It is <strong>cached by your browser</strong> — subsequent loads are instant.</span>
+</div>
+<div class="notice notice-amber">
+  <strong>// CRF vs bitrate</strong> — CRF (Constant Rate Factor) controls <em>perceptual quality</em>, not file size directly.
+  Lower CRF = better quality = larger file. <strong>CRF 24–28 is the sweet spot</strong> for most content.
+  FFmpeg will automatically allocate more bits to complex scenes and fewer to simple ones — far more efficient than fixed bitrate.
+</div>
+<div class="notice notice-wiki">
+  <strong>// WIKIMEDIA COMMONS</strong> — Output is a <strong>.webm (VP9 + Opus)</strong> file — the preferred open format for Commons.
+  Metadata (title, creator, date, license) is embedded directly via <code>-metadata</code> tags.
+  Commons file size limit: <strong>4 GB</strong>. <a href="https://commons.wikimedia.org/wiki/Commons:Video" target="_blank">Commons video policy ↗</a>
+</div>
+
+<!-- Engine status -->
+<div class="engine-status loading" id="engineStatus">
+  <div class="status-dot loading" id="statusDot"></div>
+  <span id="statusText">Loading FFmpeg WASM engine…</span>
+  <div class="engine-load-bar visible" id="engineLoadBar"><div class="engine-load-fill" id="engineLoadFill"></div></div>
+</div>
+
+<!-- Audio toggle -->
+<div class="audio-toggle" onclick="toggleAudio()">
+  <div class="toggle-sw on" id="toggleSw"></div>
+  <span id="audioLabel">🔔 Audio notification on completion: ON</span>
+  <span style="margin-left:auto;font-size:10px;opacity:.45">click to toggle</span>
+</div>
+
+<!-- Drop zone -->
+<div style="margin-bottom:18px">
+  <div class="batch-drop" id="dropZone" onclick="document.getElementById('fileInput').click()" role="button" tabindex="0" aria-label="Drop video files or click to browse">
+    <div class="drop-counter" id="dropCounter">+ files</div>
+    <svg class="batch-drop-icon" viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.4">
+      <rect x="4" y="4" width="48" height="48" rx="6" stroke-dasharray="4 3"/>
+      <polyline points="20 28 28 20 36 28"/><line x1="28" y1="20" x2="28" y2="40"/>
+    </svg>
+    <div class="batch-drop-title">Drop videos here</div>
+    <div class="batch-drop-sub">MP4 · MKV · MOV · AVI · WP4 · WebM · or click to browse</div>
+    <div class="batch-drop-hint">Multiple files supported · FFmpeg handles virtually any format</div>
+  </div>
+  <input type="file" id="fileInput" accept="video/*,.mp4,.mov,.mkv,.avi,.webm,.ogv,.wp4,.mts,.m2ts,.flv,.wmv" multiple>
+
+  <div id="queueSection" style="display:none;margin-top:13px">
+    <div class="queue-header">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="queue-title">// Batch Queue</div>
+        <div class="queue-count" id="queueCount"></div>
+      </div>
+      <button class="btn-clear-all" onclick="clearAllQueue()">Clear All</button>
+    </div>
+    <div class="queue-list" id="queueList"></div>
+  </div>
+</div>
+
+<!-- Preview panel -->
+<div class="preview-panel" id="previewPanel">
+  <div class="preview-header">
+    <div style="display:flex;align-items:center">
+      <div class="preview-label">// Preview</div>
+      <div class="preview-info" id="previewInfo"></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted)">source · not output</div>
+  </div>
+  <div class="preview-body"><video id="previewVideo" playsinline preload="metadata"></video></div>
+  <div class="preview-controls">
+    <div class="btn-play" id="playBtn" onclick="togglePlay()" title="Play/Pause">
+      <svg id="playIcon" width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><polygon points="2,1 11,6 2,11"/></svg>
+    </div>
+    <input class="preview-seek" id="seekBar" type="range" min="0" max="100" step="0.1" value="0">
+    <div class="preview-time" id="previewTime">0:00 / 0:00</div>
+    <div class="preview-vol">
+      <svg class="vol-icon" id="volIcon" onclick="toggleMute()" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <path id="volWave" d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      </svg>
+      <input class="preview-vol-range" id="volRange" type="range" min="0" max="1" step="0.05" value="1" oninput="setVolume(this.value)">
+    </div>
+  </div>
+  <div class="kb-hint"><span class="kbd">Space</span> play/pause &nbsp;·&nbsp; <span class="kbd">←</span><span class="kbd">→</span> seek 5s &nbsp;·&nbsp; <span class="kbd">M</span> mute</div>
+</div>
+
+<!-- Rotation bar -->
+<div class="rotation-bar" id="rotationBar">
+  <div class="rotation-label">// Rotation</div>
+  <div class="rot-btn active" data-rot="0" onclick="setRotation(0)">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>0°
+  </div>
+  <div class="rot-btn" data-rot="90" onclick="setRotation(90)">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8"/></svg>90° CW
+  </div>
+  <div class="rot-btn" data-rot="180" onclick="setRotation(180)">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 8v4l3 3"/></svg>180°
+  </div>
+  <div class="rot-btn" data-rot="270" onclick="setRotation(270)">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 2v6h6M21 12a9 9 0 0 1-15 6.7L3 8"/></svg>90° CCW
+  </div>
+  <div class="rot-divider"></div>
+  <div class="rot-badge" id="rotBadge">0°</div>
+</div>
+
+<!-- Settings -->
+<div class="settings">
+
+  <!-- CRF Quality -->
+  <div class="card crf-card">
+    <div class="card-label">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      VP9 CRF Quality — <span style="color:var(--accent)">lower = better</span>
+    </div>
+    <div class="crf-presets">
+      <button class="crf-preset-btn" data-crf="0">Lossless <span style="font-family:var(--mono);font-size:9px;opacity:.6">CRF 0</span></button>
+      <button class="crf-preset-btn" data-crf="15">Archive <span style="font-family:var(--mono);font-size:9px;opacity:.6">15</span></button>
+      <button class="crf-preset-btn active" data-crf="24">High ★ <span style="font-family:var(--mono);font-size:9px;opacity:.6">24</span></button>
+      <button class="crf-preset-btn" data-crf="30">Balanced <span style="font-family:var(--mono);font-size:9px;opacity:.6">30</span></button>
+      <button class="crf-preset-btn" data-crf="36">Web <span style="font-family:var(--mono);font-size:9px;opacity:.6">36</span></button>
+      <button class="crf-preset-btn" data-crf="45">Small <span style="font-family:var(--mono);font-size:9px;opacity:.6">45</span></button>
+    </div>
+    <div class="crf-slider-row">
+      <span style="font-family:var(--mono);font-size:10px;color:var(--accent)">0</span>
+      <div class="crf-range-wrap">
+        <div class="crf-track-bg"></div>
+        <input type="range" id="crfSlider" min="0" max="63" value="24" oninput="updateCRF(parseInt(this.value))">
+      </div>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--red)">63</span>
+      <div class="crf-val-display" id="crfVal">24</div>
+    </div>
+    <div class="crf-axis">
+      <span>◄ Better quality</span>
+      <span style="opacity:.4">────────────────────────────────────</span>
+      <span>Smaller file ►</span>
+    </div>
+    <div class="crf-desc-box" id="crfDescBox">
+      <div class="crf-tier-label good" id="crfTierLabel">High quality ★</div>
+      <div class="crf-desc-text" id="crfDescText">Recommended for most content. Visually excellent, efficient file sizes. The sweet spot for VP9.</div>
+    </div>
+    <div class="crf-cmd-preview" id="crfCmdPreview">
+      <span>-c:v libvpx-vp9 -crf</span> 24 <span>-b:v 0 -c:a libopus</span>
+    </div>
+  </div>
+
+  <!-- Resolution -->
+  <div class="card">
+    <div class="card-label">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Output Resolution
+    </div>
+    <div class="pill-group" id="resPills">
+      <div class="pill active" data-res="original">Original</div>
+      <div class="pill" data-res="480">480p</div>
+      <div class="pill" data-res="720">720p HD</div>
+      <div class="pill" data-res="1080">1080p FHD</div>
+      <div class="pill" data-res="1440">1440p QHD</div>
+      <div class="pill" data-res="2160">4K UHD</div>
+    </div>
+  </div>
+
+  <!-- Audio bitrate -->
+  <div class="card audio-card">
+    <div class="card-label">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+      Audio Bitrate (Opus)
+    </div>
+    <div class="pill-group" id="audioPills">
+      <div class="pill" data-abr="64">64k</div>
+      <div class="pill" data-abr="96">96k</div>
+      <div class="pill active" data-abr="128">128k ★</div>
+      <div class="pill" data-abr="192">192k</div>
+      <div class="pill" data-abr="320">320k</div>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px">Opus 128k ≈ MP3 320k quality · 64k is transparent for voice</div>
+  </div>
+
+  <!-- Encoding speed -->
+  <div class="card speed-card">
+    <div class="card-label">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Encoding Speed (cpu-used)
+    </div>
+    <div class="pill-group" id="speedPills">
+      <div class="pill" data-cpu="0">Thorough <span style="font-family:var(--mono);font-size:9px;opacity:.6">0</span></div>
+      <div class="pill active" data-cpu="2">Balanced <span style="font-family:var(--mono);font-size:9px;opacity:.6">2 ★</span></div>
+      <div class="pill" data-cpu="4">Fast <span style="font-family:var(--mono);font-size:9px;opacity:.6">4</span></div>
+      <div class="pill" data-cpu="6">Faster <span style="font-family:var(--mono);font-size:9px;opacity:.6">6</span></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:8px">Higher = faster encode, marginally lower quality at same CRF</div>
+  </div>
+
+  <!-- Codec info -->
+  <div class="card codec-card">
+    <div class="card-label">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      Codecs · Open · Commons Approved
+    </div>
+    <div class="codec-row">
+      <div class="codec-item">
+        <div class="codec-type">Video Codec</div>
+        <div class="codec-name">libvpx-vp9</div>
+        <div class="codec-desc">True CRF quality mode via <code>-crf</code> + <code>-b:v 0</code>. Royalty-free. Commons-native.</div>
+      </div>
+      <div class="codec-item">
+        <div class="codec-type">Audio Codec</div>
+        <div class="codec-name">libopus</div>
+        <div class="codec-desc">Xiph Opus — best open-source audio codec. Superior to AAC and MP3 at every bitrate.</div>
+      </div>
+      <div class="codec-item">
+        <div class="codec-type">Container</div>
+        <div class="codec-name">.webm</div>
+        <div class="codec-desc">Open W3C standard. Commons native video format since 2010. Up to 4 GB.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Commons metadata -->
+  <div class="card commons-card">
+    <div class="card-label">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Wikimedia Commons Metadata — embedded via <code>-metadata</code>
+    </div>
+    <div class="meta-grid">
+      <div class="meta-field"><label>Title</label><input type="text" id="metaTitle" placeholder="e.g. Sunset over Bhopal Lake"></div>
+      <div class="meta-field"><label>Creator / Real Name</label><input type="text" id="metaCreator" placeholder="e.g. Suyash Dwivedi" value="Suyash Dwivedi"></div>
+      <div class="meta-field" style="grid-column:1/-1">
+        <label>Wikimedia Username <span class="opt-badge">optional</span></label>
+        <input type="text" id="metaWikiUser" placeholder="e.g. Suyash.dwivedi" value="Suyash.dwivedi">
+        <div class="field-hint">Embedded as encoder tag. <a href="https://commons.wikimedia.org/wiki/Special:MyPage" target="_blank">Check your username ↗</a></div>
+      </div>
+      <div class="meta-field"><label>Date (YYYY-MM-DD)</label><input type="text" id="metaDate" placeholder="e.g. 2026-03-22"></div>
+      <div class="meta-field">
+        <label>License</label>
+        <select id="metaLicense">
+          <option value="CC BY-SA 4.0">CC BY-SA 4.0 (Commons default)</option>
+          <option value="CC BY 4.0">CC BY 4.0</option>
+          <option value="CC0 1.0">CC0 1.0 (Public Domain)</option>
+          <option value="CC BY-SA 3.0">CC BY-SA 3.0</option>
+          <option value="GFDL">GFDL</option>
+        </select>
+      </div>
+      <div class="meta-field" style="grid-column:1/-1">
+        <label>Description <span class="opt-badge">optional</span></label>
+        <input type="text" id="metaDesc" placeholder="Brief description for Commons upload page">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Actions -->
+<div class="actions">
+  <button class="btn-convert" id="convertBtn" disabled onclick="startBatch()">
+    <div class="spinner"></div>
+    <span class="btn-text">Convert All</span>
+  </button>
+  <button class="btn-stop" id="stopBtn" onclick="stopConvert()">
+    <svg width="9" height="9" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" rx="1" fill="currentColor"/></svg>Stop
+  </button>
+  <button class="btn-folder" onclick="chooseOutputFolder()" title="Auto-save converted files to a folder">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Output Folder
+  </button>
+</div>
+<div class="save-loc-display" id="saveLocDisplay">Output folder: <span>Browser default downloads</span></div>
+<div class="folder-reauth-bar" id="folderReauthBar">
+  <span>⚠ Folder access needs re-authorisation</span>
+  <button class="btn-regrant" onclick="regrantFolderAccess()">Re-grant ↗</button>
+  <button class="btn-clear-folder" onclick="clearFolderChoice()">Clear</button>
+</div>
+<div class="batch-overall" id="batchOverall">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+  <span>Batch: </span>
+  <span class="batch-overall-count" id="batchOverallCount">0 / 0</span>
+  <span id="batchOverallLabel">encoding…</span>
+</div>
+
+<!-- Progress -->
+<div class="progress-block" id="progressBlock">
+  <div class="progress-header">
+    <div class="progress-label" id="progressLabel">▶ Converting…</div>
+    <div class="progress-right">
+      <div class="progress-eta" id="progressETA">Estimating…</div>
+      <div class="progress-pct" id="progressPct">0%</div>
+    </div>
+  </div>
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+  <div class="progress-stats" id="progressStats"></div>
+  <div class="progress-log" id="progressLog"></div>
+</div>
+
+<!-- Output -->
+<div class="output-block" id="outputBlock">
+  <div class="output-header">
+    <div class="output-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div class="output-title">Conversion Complete</div>
+  </div>
+  <div class="output-meta" id="outputMeta"></div>
+  <div class="output-actions" id="outputActions"></div>
+  <div class="commons-check">
+    <div class="commons-check-title">// Wikimedia Commons Upload Checklist</div>
+    <div class="check-grid" id="checkGrid"></div>
+  </div>
+</div>
+
+<!-- Links -->
+<div class="links-section">
+  <div class="links-title">// Related Tools & Resources</div>
+  <div class="link-row"><div><div class="link-name">Wikimedia Commons: Video</div><div class="link-desc">Official Commons video policy, formats & upload guide</div></div><a class="link-btn" href="https://commons.wikimedia.org/wiki/Commons:Video" target="_blank">Read ↗</a></div>
+  <div class="link-row"><div><div class="link-name">FFmpeg Documentation</div><div class="link-desc">Official FFmpeg docs — VP9 encoding guide and all options</div></div><a class="link-btn" href="https://trac.ffmpeg.org/wiki/Encode/VP9" target="_blank">Read ↗</a></div>
+  <div class="link-row"><div><div class="link-name">HandBrake</div><div class="link-desc">GUI transcoder — VP9/WebM output, great for large files</div></div><a class="link-btn" href="https://handbrake.fr/downloads.php" target="_blank">Download ↗</a></div>
+  <div class="link-row"><div><div class="link-name">VP9 Encoding Guide</div><div class="link-desc">Google's WebM Project — VP9 bitstream spec & best practices</div></div><a class="link-btn" href="https://www.webmproject.org/vp9/" target="_blank">Read ↗</a></div>
+  <div class="link-row"><div><div class="link-name">VLC Media Player</div><div class="link-desc">Open-source player & converter with full WebM/VP9 support</div></div><a class="link-btn" href="https://www.videolan.org/vlc/" target="_blank">Download ↗</a></div>
+</div>
+
+<div class="footer">
+  Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> ·
+  <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank">Wiki's Lazy Coders</a> ·
+  6 March 2026 · FFmpeg WASM edition
+</div>
+</div>
+
+<div class="scroll-nav">
+  <button class="scroll-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Top">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+  <button class="scroll-btn" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})" title="Bottom">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+</div>
+
+<script>
+'use strict';
+// ── State ──────────────────────────────────────────────────
+let batchQueue    = [];
+let queueIdSeq    = 0;
+let isConverting  = false;
+let stopRequested = false;
+let outputDirHandle = null;
+let convStartTime = 0;
+let currentItem   = null;
+let currentItemDuration = 0;
+let _renderPending = false;
+let _savePrefTimer = null;
+let previewURL    = null;
+let isMuted       = false;
+
+// FFmpeg state
+let ffmpegInst    = null;
+let fetchFileFn   = null;
+let toBlobURLFn   = null;
+let ffmpegReady   = false;
+
+// Settings
+let crfValue      = 24;
+let audioBitrate  = 128;
+let cpuUsed       = 2;
+let selectedRes   = 'original';
+let audioEnabled  = true;
+
+// ── CRF descriptions ─────────────────────────────────────
+const CRF_INFO = [
+  { max:0,  tier:'excellent', label:'Lossless',       desc:'Mathematically identical to source. Very large files. Use for masters only.' },
+  { max:15, tier:'excellent', label:'Near-lossless',  desc:'Indistinguishable from source at normal viewing. Professional archival grade.' },
+  { max:23, tier:'good',      label:'High fidelity',  desc:'Excellent visual quality. Ideal for professional video and archival storage.' },
+  { max:28, tier:'good',      label:'High quality ★', desc:'Recommended for most content. Visually excellent with efficient file sizes. Sweet spot.' },
+  { max:35, tier:'medium',    label:'Good quality',   desc:'Solid quality for web sharing. Minor artifacts only in very fast motion scenes.' },
+  { max:42, tier:'medium',    label:'Balanced',       desc:'Noticeable quality trade-off. Good for high-volume streaming or social uploads.' },
+  { max:52, tier:'low',       label:'Low quality',    desc:'Visible compression artifacts. Use only when file size is the primary constraint.' },
+  { max:63, tier:'low',       label:'Poor quality',   desc:'Heavy compression with significant visual degradation. Not recommended.' },
+];
+function getCRFInfo(v) {
+  return CRF_INFO.find(i => v <= i.max) || CRF_INFO[CRF_INFO.length-1];
+}
+
+// ── Toast ─────────────────────────────────────────────────
+function toast(msg, type='info', dur=3500) {
+  const root = document.getElementById('toastRoot');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icons = {success:'✓', error:'✕', info:'i', warn:'!'};
+  el.innerHTML = `<div class="ti">${icons[type]||'i'}</div><span>${msg}</span>`;
+  root.appendChild(el);
+  const dismiss = () => { el.classList.add('out'); setTimeout(()=>el.remove(), 230); };
+  const t = setTimeout(dismiss, dur);
+  el.onclick = () => { clearTimeout(t); dismiss(); };
+}
+
+// ── FFmpeg WASM ───────────────────────────────────────────
+async function initFFmpeg() {
+  setEngineStatus('loading', 'Loading FFmpeg WASM (~28 MB, cached after first use)…');
+  animateLoadBar();
+  try {
+    const [ffmpegMod, utilMod] = await Promise.all([
+      import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/esm/index.js'),
+      import('https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js'),
+    ]);
+    fetchFileFn  = utilMod.fetchFile;
+    toBlobURLFn  = utilMod.toBlobURL;
+
+    ffmpegInst = new ffmpegMod.FFmpeg();
+    ffmpegInst.on('log',      ({ message }) => handleFFmpegLog(message));
+    ffmpegInst.on('progress', ({ progress }) => {
+      if (progress >= 0 && progress <= 1) setProgress(progress);
+    });
+
+    const base = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
+    await ffmpegInst.load({
+      coreURL: await toBlobURLFn(`${base}/ffmpeg-core.js`,   'text/javascript'),
+      wasmURL: await toBlobURLFn(`${base}/ffmpeg-core.wasm`, 'application/wasm'),
+    });
+
+    ffmpegReady = true;
+    stopLoadBar();
+    setEngineStatus('ready', 'FFmpeg WASM ready — VP9 CRF · Opus · Batch · Faster than real-time');
+    updateConvertBtn();
+    toast('FFmpeg engine loaded and ready', 'success', 3000);
+  } catch(e) {
+    stopLoadBar();
+    setEngineStatus('err', 'Failed to load FFmpeg: ' + e.message + ' — check connection and reload');
+    toast('FFmpeg load failed. Check your internet connection.', 'error', 6000);
+    console.error(e);
+  }
+}
+
+let _loadBarTimer = null;
+let _loadBarVal = 0;
+function animateLoadBar() {
+  _loadBarVal = 0;
+  const fill = document.getElementById('engineLoadFill');
+  if (!fill) return;
+  // Simulate progress up to 90% — snaps to 100% on success
+  _loadBarTimer = setInterval(() => {
+    _loadBarVal = Math.min(90, _loadBarVal + Math.random() * 3);
+    fill.style.width = _loadBarVal + '%';
+  }, 250);
+}
+function stopLoadBar() {
+  clearInterval(_loadBarTimer);
+  const fill = document.getElementById('engineLoadFill');
+  if (fill) { fill.style.width='100%'; setTimeout(()=>document.getElementById('engineLoadBar').classList.remove('visible'), 400); }
+}
+function setEngineStatus(state, msg) {
+  const es = document.getElementById('engineStatus');
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  es.className = 'engine-status ' + state;
+  dot.className = 'status-dot ' + state;
+  txt.textContent = msg;
+}
+
+// ── CRF UI ────────────────────────────────────────────────
+function updateCRF(val, skipSlider=false) {
+  crfValue = val;
+  if (!skipSlider) document.getElementById('crfSlider').value = val;
+  document.getElementById('crfVal').textContent = val;
+
+  const info = getCRFInfo(val);
+  document.getElementById('crfTierLabel').textContent = info.label;
+  document.getElementById('crfTierLabel').className = 'crf-tier-label ' + info.tier;
+  document.getElementById('crfDescText').textContent = info.desc;
+
+  // Update thumb color
+  const thumbColor = (info.tier==='excellent'||info.tier==='good') ? 'var(--accent)' : info.tier==='medium' ? 'var(--amber)' : 'var(--red)';
+  document.documentElement.style.setProperty('--crf-thumb', thumbColor);
+
+  // Update command preview
+  document.getElementById('crfCmdPreview').innerHTML =
+    `<span>-c:v libvpx-vp9 -crf</span> ${val} <span>-b:v 0 -cpu-used</span> ${cpuUsed} <span>-c:a libopus -b:a</span> ${audioBitrate}k`;
+
+  // Update preset button active state
+  document.querySelectorAll('.crf-preset-btn').forEach(b =>
+    b.classList.toggle('active', parseInt(b.dataset.crf) === val)
+  );
+  savePrefs();
+}
+
+// ── File handling ─────────────────────────────────────────
+const dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover', e => {
+  e.preventDefault(); dropZone.classList.add('dragover');
+  const n = e.dataTransfer.items?.length || 0;
+  document.getElementById('dropCounter').textContent = n ? `+${n} file${n>1?'s':''}` : 'Drop!';
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  addFiles(e.dataTransfer.files);
+});
+document.getElementById('fileInput').addEventListener('change', e => {
+  addFiles(e.target.files); e.target.value = '';
+});
+dropZone.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') document.getElementById('fileInput').click(); });
+
+function addFiles(fileList) {
+  let added = 0;
+  Array.from(fileList).forEach(f => {
+    if (!f.type.startsWith('video/') && !/\.(mp4|mov|mkv|avi|webm|ogv|wp4|mts|m2ts|flv|wmv|3gp|ts)$/i.test(f.name)) return;
+    const item = { id:++queueIdSeq, file:f, rotation:0, status:'queued', blob:null,
+      filename: f.name.replace(/\.[^.]+$/, '') + '.webm', errorMsg:'', thumb:null, duration:null };
+    batchQueue.push(item);
+    extractThumb(item);
+    added++;
+  });
+  if (added > 0) toast(`${added} file${added>1?'s':''} added`, 'success', 2000);
+  scheduleRender(); updateConvertBtn();
+}
+
+function extractThumb(item) {
+  const v = document.createElement('video');
+  v.muted = true; v.preload = 'metadata';
+  const url = URL.createObjectURL(item.file);
+  v.src = url;
+  v.onloadedmetadata = () => { item.duration = v.duration; v.currentTime = Math.min(2, (v.duration||0)*0.1); scheduleRender(); };
+  v.onseeked = () => {
+    try {
+      const c = document.createElement('canvas'); c.width=280; c.height=158;
+      c.getContext('2d').drawImage(v, 0, 0, 280, 158);
+      item.thumb = c.toDataURL('image/jpeg', .7);
+    } catch(e) {}
+    URL.revokeObjectURL(url); v.src = ''; scheduleRender();
+  };
+  v.onerror = () => URL.revokeObjectURL(url);
+}
+
+function scheduleRender() {
+  if (_renderPending) return;
+  _renderPending = true;
+  requestAnimationFrame(() => { _renderPending = false; renderQueue(); });
+}
+
+function clearAllQueue() {
+  if (isConverting) return;
+  batchQueue.forEach(i => { i.blob = null; });
+  batchQueue = [];
+  renderQueue(); updateConvertBtn();
+  document.getElementById('previewVideo').pause();
+  document.getElementById('previewVideo').src = '';
+  document.getElementById('previewPanel').classList.remove('visible');
+  document.getElementById('rotationBar').classList.remove('visible');
+  document.getElementById('outputBlock').classList.remove('visible');
+  document.getElementById('batchOverall').classList.remove('visible');
+  toast('Queue cleared', 'info', 2000);
+}
+
+function removeQueueItem(id) {
+  const item = batchQueue.find(i => i.id===id);
+  if (item) item.blob = null;
+  batchQueue = batchQueue.filter(i => i.id!==id);
+  scheduleRender(); updateConvertBtn();
+}
+
+function setItemRotation(id, deg) {
+  const item = batchQueue.find(i => i.id===id);
+  if (!item) return;
+  item.rotation = deg;
+  document.querySelectorAll(`.qi-rot-btn[data-id="${id}"]`).forEach(b =>
+    b.classList.toggle('active', parseInt(b.dataset.deg)===deg)
+  );
+  const badge = document.getElementById(`rot-badge-${id}`);
+  if (badge) badge.textContent = deg ? deg+'°' : '';
+  const img = document.getElementById(`qi-img-${id}`);
+  if (img) { const s=deg===90||deg===270; img.style.transform=`rotate(${deg}deg) ${s?'scale(.65)':'scale(1)'}`; }
+  if (window._previewingId === id) applyPreviewRotationDeg(deg);
+}
+
+// ── Queue render ──────────────────────────────────────────
+function renderQueue() {
+  const section = document.getElementById('queueSection');
+  const list    = document.getElementById('queueList');
+  const count   = document.getElementById('queueCount');
+  if (batchQueue.length === 0) { section.style.display='none'; return; }
+  section.style.display = 'block';
+  const done  = batchQueue.filter(i=>i.status==='done').length;
+  const errs  = batchQueue.filter(i=>i.status==='error').length;
+  const q     = batchQueue.filter(i=>i.status==='queued').length;
+  count.textContent = `${batchQueue.length} file${batchQueue.length>1?'s':''}${q?' · '+q+' queued':''}${done?' · '+done+' done':''}${errs?' · '+errs+' error':''}`;
+
+  list.innerHTML = batchQueue.map(item => {
+    const sc = {queued:'s-queued',converting:'s-converting',done:'s-done',error:'s-error'}[item.status]||'s-queued';
+    const sl = {queued:'QUEUED',converting:'ENCODING…',done:'DONE',error:'ERROR'}[item.status]||'QUEUED';
+    const rots = [{d:0,l:'0°'},{d:90,l:'90°↻'},{d:180,l:'180°'},{d:270,l:'↺90°'}];
+    const rotBtns = rots.map(r=>`<button class="qi-rot-btn${item.rotation===r.d?' active':''}" data-id="${item.id}" data-deg="${r.d}" onclick="setItemRotation(${item.id},${r.d})">${r.l}</button>`).join('');
+
+    let dlBtn = '';
+    if (item.status==='done') {
+      if (item.savedToFolder && !item.blob) dlBtn=`<span style="font-family:var(--mono);font-size:10px;color:var(--accent)">📁 Saved</span>`;
+      else if (item.blob)                   dlBtn=`<button class="qi-dl" onclick="downloadItem(${item.id})">↓ DL</button>`;
+      else                                  dlBtn=`<span style="font-family:var(--mono);font-size:10px;color:var(--text-muted)">freed</span>`;
+    }
+
+    const ext = item.file.name.split('.').pop().toUpperCase();
+    const rot = item.rotation||0; const isR=rot===90||rot===270;
+    const thumbStyle = `transform:rotate(${rot}deg) ${isR?'scale(.65)':'scale(1)'}`;
+    const durStr = item.duration ? fmtTime(item.duration) : '';
+    const thumbContent = item.thumb
+      ? `<img src="${item.thumb}" id="qi-img-${item.id}" style="${thumbStyle}" alt="">
+         <div class="qi-thumb-play"><svg width="15" height="15" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div>
+         ${durStr?`<div class="qi-thumb-dur">${durStr}</div>`:''}`
+      : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.4"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>`;
+
+    const errHtml = item.status==='error' ? `<div class="qi-err">⚠ ${escHtml(item.errorMsg||'Unknown error')}</div>` : '';
+    const barHtml = item.status==='converting' ? `<div class="qi-bar-wrap"><div class="qi-bar" id="qi-bar-${item.id}"></div></div>` : '';
+
+    return `<div class="queue-item status-${item.status}" id="qi-${item.id}">
+      <div class="qi-thumb" onclick="previewItem(${item.id})" title="Click to preview">${thumbContent}</div>
+      <div class="qi-body">
+        <div class="qi-top">
+          <div class="qi-name" title="${escHtml(item.file.name)}">${escHtml(item.file.name)}</div>
+          <span class="qi-ext">${ext}</span>
+        </div>
+        <div class="qi-size">${formatBytes(item.file.size)}${item.duration?' · '+fmtTime(item.duration):''}</div>
+        <div class="qi-rot"><span class="qi-rot-label">Rotate:</span>${rotBtns}<span id="rot-badge-${item.id}" style="font-family:var(--mono);font-size:10px;color:var(--amber);margin-left:4px">${rot?rot+'°':''}</span></div>
+        ${barHtml}${errHtml}
+      </div>
+      <div class="qi-right">
+        <span class="qi-status ${sc}">${sl}</span>
+        ${dlBtn}
+        ${item.status==='queued'?`<button class="qi-remove" onclick="removeQueueItem(${item.id})" title="Remove">✕</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function downloadItem(id) {
+  const item = batchQueue.find(i=>i.id===id);
+  if (!item||!item.blob) return;
+  const url=URL.createObjectURL(item.blob), a=document.createElement('a');
+  a.href=url; a.download=item.filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => { URL.revokeObjectURL(url); item.blob=null; scheduleRender(); }, 3500);
+}
+
+function previewItem(id) {
+  const item = batchQueue.find(i=>i.id===id);
+  if (!item) return;
+  loadPreview(item.file, item.rotation);
+  window._previewingId = id;
+}
+
+// ── Batch conversion ──────────────────────────────────────
+async function startBatch() {
+  if (isConverting || batchQueue.length===0 || !ffmpegReady) return;
+  isConverting = true; stopRequested = false;
+  const btn = document.getElementById('convertBtn');
+  btn.disabled=true; btn.classList.add('loading'); btn.querySelector('.btn-text').textContent='Converting…';
+  const stopBtn = document.getElementById('stopBtn');
+  stopBtn.classList.add('visible'); stopBtn.style.display='inline-flex';
+
+  document.getElementById('progressBlock').classList.add('visible');
+  document.getElementById('outputBlock').classList.remove('visible');
+  const bo = document.getElementById('batchOverall'); bo.classList.add('visible'); bo.style.display='flex';
+
+  const items = batchQueue.filter(i=>i.status==='queued');
+  const total = items.length; let doneCount = 0;
+
+  for (const item of items) {
+    if (stopRequested) break;
+    updateBatchOverall(doneCount, total, 'converting');
+    scheduleRender();
+    try {
+      await convertOne(item);
+      doneCount++;
+    } catch(e) {
+      item.status='error'; item.errorMsg=e.message;
+      toast(`Error: ${item.file.name.slice(0,30)} — ${e.message}`, 'error', 5000);
+      scheduleRender();
+    }
+    updateBatchOverall(doneCount, total, stopRequested?'stopped':'converting');
+  }
+
+  isConverting = false;
+  btn.disabled=false; btn.classList.remove('loading'); btn.querySelector('.btn-text').textContent='Convert All';
+  stopBtn.style.display='none'; stopBtn.classList.remove('visible');
+  updateConvertBtn();
+  updateBatchOverall(doneCount, total, 'done');
+  scheduleRender();
+
+  if (!stopRequested) {
+    playChime(); toast(`✓ ${doneCount} file${doneCount>1?'s':''} converted`, 'success', 4000);
+  } else {
+    toast(`Stopped after ${doneCount}/${total}`, 'warn', 3000);
+  }
+
+  const doneItems = batchQueue.filter(i=>i.status==='done');
+  if (doneItems.length > 0) showBatchResults(doneItems);
+}
+
+function updateBatchOverall(done, total, state) {
+  document.getElementById('batchOverallCount').textContent = done+' / '+total;
+  document.getElementById('batchOverallLabel').textContent = state==='done'?'— all done ✓':state==='stopped'?'— stopped':' encoding…';
+}
+
+function stopConvert() {
+  stopRequested = true;
+  if (ffmpegInst) ffmpegInst.terminate();
+  toast('Stopping after current file…', 'warn', 2500);
+  // Re-init FFmpeg for next use since we terminated it
+  ffmpegReady = false; ffmpegInst = null;
+  setTimeout(() => initFFmpeg(), 500);
+}
+
+// ── Convert single item (FFmpeg WASM) ─────────────────────
+async function convertOne(item) {
+  item.status = 'converting';
+  currentItem = item;
+  currentItemDuration = item.duration || 0;
+  scheduleRender();
+
+  // Reset progress UI
+  document.getElementById('progressLog').innerHTML = '';
+  document.getElementById('progressStats').innerHTML = '';
+  document.getElementById('progressFill').classList.remove('complete');
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('progressPct').textContent = '0%';
+  document.getElementById('progressETA').textContent = 'Estimating…';
+  document.getElementById('progressLabel').textContent = `▶ ${item.file.name}`;
+  convStartTime = Date.now();
+
+  const ext = (item.file.name.split('.').pop() || 'mp4').toLowerCase();
+  const inputName  = `in_${item.id}.${ext}`;
+  const outputName = `out_${item.id}.webm`;
+
+  try {
+    log(`Writing to virtual FS: ${item.file.name} (${formatBytes(item.file.size)})…`);
+    await ffmpegInst.writeFile(inputName, await fetchFileFn(item.file));
+    log(`✓ File loaded — starting FFmpeg…`, 'ok');
+
+    // Build -vf filter chain
+    const vf = buildVF(item.rotation, selectedRes);
+
+    // Build -metadata args
+    const metaArgs = buildMeta();
+
+    // Final FFmpeg command
+    const args = [
+      '-i', inputName,
+      '-c:v', 'libvpx-vp9',
+      '-crf', String(crfValue),
+      '-b:v', '0',            // Required for CRF mode in VP9
+      '-cpu-used', String(cpuUsed),
+      '-row-mt', '1',         // Row multi-threading
+      '-c:a', 'libopus',
+      '-b:a', `${audioBitrate}k`,
+      ...metaArgs,
+      ...(vf ? ['-vf', vf] : []),
+      outputName,
+    ];
+
+    log(`CMD: ffmpeg ${args.join(' ')}`, 'cmd');
+
+    const ret = await ffmpegInst.exec(args);
+    if (ret !== 0) throw new Error(`FFmpeg exited with code ${ret} — unsupported format or conversion error`);
+
+    log(`Reading output…`);
+    const data = await ffmpegInst.readFile(outputName);
+    item.blob     = new Blob([data.buffer], { type: 'video/webm' });
+    item.blobSize = item.blob.size;
+    item.status   = 'done';
+
+    setProgress(1);
+    document.getElementById('progressFill').classList.add('complete');
+    document.getElementById('progressLabel').textContent = `✓ ${item.file.name}`;
+    document.getElementById('progressETA').textContent = 'Done in ' + formatTime((Date.now()-convStartTime)/1000);
+    log(`✓ Complete: ${formatBytes(item.blobSize)} · CRF ${crfValue}`, 'ok');
+
+    if (outputDirHandle) {
+      const saved = await saveToOutputFolder(item.blob, item.filename);
+      if (saved) { item.blob=null; item.savedToFolder=true; }
+    }
+
+  } finally {
+    try { await ffmpegInst.deleteFile(inputName); }  catch(e) {}
+    try { await ffmpegInst.deleteFile(outputName); } catch(e) {}
+    scheduleRender();
+  }
+}
+
+function buildVF(rotation, res) {
+  const parts = [];
+  if (res !== 'original') parts.push(`scale=-2:${res}`);
+  if (rotation === 90)  parts.push('transpose=1');
+  if (rotation === 180) parts.push('hflip,vflip');
+  if (rotation === 270) parts.push('transpose=2');
+  return parts.length ? parts.join(',') : null;
+}
+
+function buildMeta() {
+  const args = [];
+  const get = id => document.getElementById(id)?.value?.trim() || '';
+  const title   = get('metaTitle');
+  const creator = get('metaCreator');
+  const wikiUser= get('metaWikiUser');
+  const date    = get('metaDate');
+  const license = get('metaLicense');
+  const desc    = get('metaDesc');
+  if (title)    { args.push('-metadata', `title=${title}`); }
+  if (creator)  { args.push('-metadata', `artist=${creator}`); }
+  if (date)     { args.push('-metadata', `date=${date}`); }
+  if (license)  { args.push('-metadata', `copyright=${license}`); }
+  if (desc)     { args.push('-metadata', `comment=${desc}`); }
+  if (wikiUser) { args.push('-metadata', `encoder=WebM Forge · Wikimedia User: ${wikiUser}`); }
+  return args;
+}
+
+// ── FFmpeg log parsing ────────────────────────────────────
+function handleFFmpegLog(msg) {
+  if (!msg || msg.trim().length < 3) return;
+
+  // Show in log pane (filter very noisy lines)
+  const isError = /error|invalid|failed/i.test(msg);
+  if (isError) log(msg, 'err');
+  else if (!/^\s*$/.test(msg)) log(msg);
+
+  // Parse progress from time=HH:MM:SS.ss
+  const timeMatch = msg.match(/time=(-?)(\d+):(\d+):(\d+\.\d+)/);
+  if (timeMatch && currentItemDuration > 0) {
+    const sign = timeMatch[1]==='-' ? -1 : 1;
+    const t = sign * (parseInt(timeMatch[2])*3600 + parseInt(timeMatch[3])*60 + parseFloat(timeMatch[4]));
+    if (t >= 0) {
+      const pct = Math.min(1, t / currentItemDuration);
+      setProgress(pct);
+      const bar = document.getElementById(`qi-bar-${currentItem?.id}`);
+      if (bar) bar.style.width = (pct*100).toFixed(1)+'%';
+
+      // ETA
+      const elapsed = (Date.now()-convStartTime)/1000;
+      const rem = pct > 0.02 ? Math.max(0, (elapsed/pct)-elapsed) : null;
+
+      // Speed
+      const speedM = msg.match(/speed=\s*([\d.]+)x/);
+      const speedStr = speedM ? speedM[1]+'×' : null;
+
+      document.getElementById('progressETA').textContent =
+        (rem!==null ? '~'+formatTime(rem)+' left' : 'Estimating…') +
+        (speedStr ? ' · '+speedStr+' speed' : '');
+    }
+  }
+
+  // Parse frame stats
+  const statsM = msg.match(/frame=\s*(\d+)\s+fps=\s*([\d.]+).*size=\s*(\d+)kB.*bitrate=\s*([\d.]+)kbits.*speed=\s*([\d.]+)x/);
+  if (statsM) {
+    const speed = parseFloat(statsM[5]);
+    document.getElementById('progressStats').innerHTML =
+      `<div class="pstat">Frame: <strong>${statsM[1]}</strong></div>` +
+      `<div class="pstat">FPS: <strong>${statsM[2]}</strong></div>` +
+      `<div class="pstat">Size so far: <strong>${(parseInt(statsM[3])/1024).toFixed(1)} MB</strong></div>` +
+      `<div class="pstat">Bitrate: <strong>${statsM[4]} kbps</strong></div>` +
+      `<div class="pstat speed">⚡ Speed: <strong>${statsM[5]}× real-time</strong></div>`;
+  }
+}
+
+function requeueForReconvert() {
+  batchQueue.forEach(item => {
+    if (item.status==='done' || item.status==='error') {
+      item.status='queued'; item.blob=null; item.blobSize=null; item.savedToFolder=false; item.errorMsg='';
+    }
+  });
+  document.getElementById('outputBlock').classList.remove('visible');
+  document.getElementById('batchOverall').classList.remove('visible');
+  document.getElementById('batchOverall').style.display = 'none';
+  scheduleRender(); updateConvertBtn();
+  document.querySelector('.settings')?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function showBatchResults(doneItems) {
+  const totalIn  = doneItems.reduce((a,i)=>a+i.file.size, 0);
+  const totalOut = doneItems.reduce((a,i)=>a+(i.blobSize||0), 0);
+  const red = totalIn>0 ? Math.round((1-totalOut/totalIn)*100) : 0;
+  document.getElementById('outputMeta').innerHTML =
+    `<div class="meta-item">Files: <strong>${doneItems.length}</strong></div>` +
+    `<div class="meta-item">In: <strong>${formatBytes(totalIn)}</strong></div>` +
+    `<div class="meta-item">Out: <strong>${formatBytes(totalOut)}</strong></div>` +
+    (red!==0 ? `<div class="meta-item">${red>0?'Reduction':'Increase'}: <strong>${Math.abs(red)}%</strong></div>` : '') +
+    `<div class="meta-item">CRF: <strong>${crfValue}</strong></div>` +
+    `<div class="meta-item">Codec: <strong>VP9 + Opus</strong></div>`;
+
+  let btns = '';
+  if (doneItems.length > 1)
+    btns += `<button class="btn-dl" onclick="downloadAllZip()">↓ Download All (${doneItems.length})</button>`;
+  doneItems.forEach(i => {
+    btns += i.blob
+      ? `<button class="btn-dl" onclick="downloadItem(${i.id})">↓ ${escHtml(i.file.name.replace(/\.[^.]+$/,''))}.webm</button>`
+      : `<span class="btn-dl" style="opacity:.4;cursor:default">📁 ${escHtml(i.file.name.replace(/\.[^.]+$/,''))}.webm</span>`;
+  });
+  if ('showSaveFilePicker' in window)
+    btns += `<button class="btn-save-fs" onclick="saveWithPicker()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save to Folder…</button>`;
+  if (batchQueue.length > 0)
+    btns += `<button class="btn-reconvert" onclick="requeueForReconvert()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.96"/></svg>Re-convert</button>`;
+  document.getElementById('outputActions').innerHTML = btns;
+
+  const get = id => document.getElementById(id)?.value?.trim()||'';
+  buildCommonsChecklist(get('metaTitle'),get('metaCreator'),get('metaWikiUser'),get('metaDate'),get('metaLicense'),get('metaDesc'));
+  document.getElementById('outputBlock').classList.add('visible');
+  setTimeout(() => document.getElementById('outputBlock').scrollIntoView({behavior:'smooth',block:'nearest'}), 120);
+}
+
+function buildCommonsChecklist(title,creator,wiki,date,license,desc) {
+  const items = [
+    {ok:true, label:'Container: .webm (open format)'},
+    {ok:true, label:'Codec: VP9 (libvpx-vp9) + Opus'},
+    {ok:true, label:`CRF ${crfValue} — ${getCRFInfo(crfValue).label}`},
+    {ok:!!title,   label:title?`Title: "${title.slice(0,24)}${title.length>24?'…':''}"`:'⚠ Title missing'},
+    {ok:!!creator, label:creator?`Creator: ${creator}`:'⚠ Creator missing'},
+    {ok:!!license, label:license?`License: ${license}`:'⚠ License missing'},
+    {ok:!!date,    label:date?`Date: ${date}`:'⚠ Date missing'},
+    {ok:!!wiki,    label:wiki?`Wiki user: ${wiki}`:'Wiki user: (not set)'},
+  ];
+  document.getElementById('checkGrid').innerHTML = items.map(it=>
+    `<div class="check-item"><span class="${it.ok?'check-ok':'check-warn'}">${it.ok?'✓':'⚠'}</span>${it.label}</div>`
+  ).join('');
+}
+
+// ── Preview ───────────────────────────────────────────────
+function loadPreview(file, rotation=0) {
+  const pv = document.getElementById('previewVideo');
+  if (previewURL) URL.revokeObjectURL(previewURL);
+  previewURL = URL.createObjectURL(file);
+  pv.src = previewURL; pv.load();
+  pv.onloadedmetadata = () => {
+    document.getElementById('previewPanel').classList.add('visible');
+    document.getElementById('rotationBar').classList.add('visible');
+    document.getElementById('previewInfo').textContent = ` · ${pv.videoWidth}×${pv.videoHeight} · ${fmtTime(pv.duration)}`;
+    updateSeekUI(); applyPreviewRotationDeg(rotation);
+    document.querySelectorAll('.rot-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.rot)===rotation));
+    document.getElementById('rotBadge').textContent = rotation+'°';
+    document.getElementById('previewPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+  };
+  pv.ontimeupdate = updateSeekUI;
+  pv.onended  = () => { document.getElementById('playIcon').innerHTML='<polygon points="2,1 11,6 2,11"/>'; };
+  pv.onplay   = () => { document.getElementById('playIcon').innerHTML='<rect x="2" y="1" width="3.5" height="10" rx="1"/><rect x="6.5" y="1" width="3.5" height="10" rx="1"/>'; };
+  pv.onpause  = () => { document.getElementById('playIcon').innerHTML='<polygon points="2,1 11,6 2,11"/>'; };
+}
+
+function updateSeekUI() {
+  const pv = document.getElementById('previewVideo');
+  const dur = pv.duration||0;
+  if (dur > 0) document.getElementById('seekBar').value = (pv.currentTime/dur)*100;
+  document.getElementById('previewTime').textContent = fmtTime(pv.currentTime)+' / '+fmtTime(dur);
+}
+
+document.getElementById('seekBar').addEventListener('input', function() {
+  const pv = document.getElementById('previewVideo');
+  if (pv.duration) pv.currentTime = (this.value/100)*pv.duration;
+});
+
+function fmtTime(s) {
+  if (!s||isNaN(s)) return '0:00';
+  const m=Math.floor(s/60), sec=Math.floor(s%60);
+  return m+':'+String(sec).padStart(2,'0');
+}
+function togglePlay() { const pv=document.getElementById('previewVideo'); pv.paused?pv.play():pv.pause(); }
+function toggleMute() {
+  const pv=document.getElementById('previewVideo'); isMuted=!isMuted; pv.muted=isMuted;
+  document.getElementById('volWave').setAttribute('d', isMuted?'M23 9l-6 6M17 9l6 6':'M15.54 8.46a5 5 0 0 1 0 7.07');
+}
+function setVolume(v) {
+  const pv=document.getElementById('previewVideo'); pv.volume=parseFloat(v);
+  isMuted = parseFloat(v)===0; pv.muted=isMuted;
+}
+function setRotation(deg) {
+  const id = window._previewingId;
+  if (id != null) setItemRotation(id, deg);
+  else if (batchQueue.length===1) setItemRotation(batchQueue[0].id, deg);
+  document.querySelectorAll('.rot-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.rot)===deg));
+  document.getElementById('rotBadge').textContent = deg+'°';
+  applyPreviewRotationDeg(deg);
+}
+function applyPreviewRotationDeg(deg) {
+  const pv=document.getElementById('previewVideo');
+  pv.style.transform = `rotate(${deg}deg)`;
+  if (deg===90||deg===270) {
+    const r=Math.min(1,(pv.videoHeight||1)/(pv.videoWidth||1));
+    pv.style.width=(r*100).toFixed(1)+'%'; pv.style.maxHeight='320px';
+  } else { pv.style.width='100%'; pv.style.maxHeight='320px'; }
+}
+
+// ── Keyboard shortcuts ────────────────────────────────────
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement.tagName;
+  if (tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA') return;
+  const pv = document.getElementById('previewVideo');
+  const vis = document.getElementById('previewPanel').classList.contains('visible');
+  if (vis) {
+    if (e.code==='Space')       { e.preventDefault(); togglePlay(); }
+    if (e.code==='ArrowLeft')   { e.preventDefault(); pv.currentTime=Math.max(0,pv.currentTime-5); }
+    if (e.code==='ArrowRight')  { e.preventDefault(); pv.currentTime=Math.min(pv.duration||0,pv.currentTime+5); }
+    if (e.code==='KeyM')        { e.preventDefault(); toggleMute(); }
+  }
+  if (e.ctrlKey && e.code==='Enter') { e.preventDefault(); startBatch(); }
+});
+
+// ── Helpers ───────────────────────────────────────────────
+function setProgress(ratio) {
+  const pct = Math.min(100, Math.round(ratio*100));
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressPct').textContent  = pct+'%';
+}
+function updateConvertBtn() {
+  const hasQueued = batchQueue.some(i=>i.status==='queued');
+  const btn = document.getElementById('convertBtn');
+  btn.disabled = !hasQueued || !ffmpegReady || isConverting;
+  if (!isConverting) {
+    const n = batchQueue.filter(i=>i.status==='queued').length;
+    btn.querySelector('.btn-text').textContent = n>0 ? `Convert All (${n} file${n>1?'s':''})` : 'Convert All';
+    btn.title = 'Ctrl+Enter';
+  }
+}
+function log(msg, cls='') {
+  const el = document.getElementById('progressLog');
+  const d = document.createElement('div');
+  d.className = 'log-line'+(cls?' '+cls:'');
+  d.textContent = msg;
+  el.appendChild(d);
+  if (el.scrollHeight-el.scrollTop-el.clientHeight < 60) el.scrollTop=el.scrollHeight;
+}
+function formatBytes(b) {
+  if (b<1024) return b+' B';
+  if (b<1048576) return (b/1024).toFixed(1)+' KB';
+  if (b<1073741824) return (b/1048576).toFixed(2)+' MB';
+  return (b/1073741824).toFixed(2)+' GB';
+}
+function formatTime(s) {
+  s=Math.round(s); if(s<60) return s+'s';
+  return Math.floor(s/60)+'m'+(s%60>0?' '+s%60+'s':'');
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Audio chime ───────────────────────────────────────────
+function playChime() {
+  if (!audioEnabled) return;
+  try {
+    const ctx = new(window.AudioContext||window.webkitAudioContext)();
+    [523.25,659.25,783.99,1046.5].forEach((freq,i)=>{
+      const t=ctx.currentTime+i*.14, osc=ctx.createOscillator(), g=ctx.createGain();
+      osc.connect(g); g.connect(ctx.destination);
+      osc.type='sine'; osc.frequency.setValueAtTime(freq,t);
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.18,t+.03); g.gain.exponentialRampToValueAtTime(.001,t+.5);
+      osc.start(t); osc.stop(t+.55);
+    });
+  } catch(e) {}
+}
+function toggleAudio() {
+  audioEnabled = !audioEnabled;
+  document.getElementById('toggleSw').className = 'toggle-sw'+(audioEnabled?' on':'');
+  document.getElementById('audioLabel').textContent = '🔔 Audio notification on completion: '+(audioEnabled?'ON':'OFF');
+  if (audioEnabled) playChime();
+  savePrefs();
+}
+
+// ── Output folder ─────────────────────────────────────────
+async function chooseOutputFolder() {
+  if (!('showDirectoryPicker' in window)) { toast('Directory picker not supported in this browser','warn'); return; }
+  try {
+    outputDirHandle = await window.showDirectoryPicker({mode:'readwrite'});
+    await dbSet('outputDirHandle', outputDirHandle);
+    document.getElementById('folderReauthBar').classList.remove('visible');
+    updateFolderDisplay();
+    toast(`Output folder: ${outputDirHandle.name}`, 'success');
+  } catch(e) { if (e.name!=='AbortError') toast('Could not set folder: '+e.message, 'error'); }
+}
+async function regrantFolderAccess() {
+  if (!outputDirHandle) return;
+  try {
+    const perm = await outputDirHandle.requestPermission({mode:'readwrite'});
+    if (perm==='granted') { document.getElementById('folderReauthBar').classList.remove('visible'); updateFolderDisplay(); toast('Folder access restored','success'); }
+    else toast('Folder access denied','error');
+  } catch(e) { toast('Re-grant failed: '+e.message,'error'); }
+}
+async function clearFolderChoice() {
+  outputDirHandle = null; await dbSet('outputDirHandle', null);
+  document.getElementById('folderReauthBar').classList.remove('visible');
+  updateFolderDisplay(); toast('Output folder cleared','info',2000);
+}
+async function saveToOutputFolder(blob, filename) {
+  if (!outputDirHandle) return false;
+  try {
+    const perm = await outputDirHandle.queryPermission({mode:'readwrite'});
+    if (perm !== 'granted') { document.getElementById('folderReauthBar').classList.add('visible'); return false; }
+    const fh=await outputDirHandle.getFileHandle(filename,{create:true});
+    const w=await fh.createWritable(); await w.write(blob); await w.close();
+    return true;
+  } catch(e) { log('Folder save failed: '+e.message,'err'); return false; }
+}
+function updateFolderDisplay() {
+  const el = document.getElementById('saveLocDisplay');
+  el.innerHTML = outputDirHandle
+    ? `Output folder: <span>📁 ${escHtml(outputDirHandle.name)}</span> <span style="color:var(--accent);font-size:10px">✓</span>`
+    : `Output folder: <span>Browser default downloads</span>`;
+}
+async function downloadAllZip() {
+  const done = batchQueue.filter(i=>i.status==='done'&&i.blob);
+  for (let i=0; i<done.length; i++) { await new Promise(r=>setTimeout(r,320*i)); downloadItem(done[i].id); }
+}
+async function saveWithPicker() {
+  const done = batchQueue.filter(i=>i.status==='done');
+  if (!done.length) return;
+  if (done.length===1 && done[0].blob) {
+    try {
+      const h=await window.showSaveFilePicker({suggestedName:done[0].filename,types:[{description:'WebM Video',accept:{'video/webm':['.webm']}}]});
+      const w=await h.createWritable(); await w.write(done[0].blob); await w.close();
+      toast('Saved: '+done[0].filename,'success');
+    } catch(err) { if (err.name!=='AbortError') downloadItem(done[0].id); }
+  } else downloadAllZip();
+}
+
+// ── IndexedDB persistence ─────────────────────────────────
+const DB_NAME='webmforge2',DB_VER=1,DB_STORE='settings';
+let _db=null;
+function openDB() {
+  return new Promise((res,rej)=>{
+    if(_db){res(_db);return;}
+    const req=indexedDB.open(DB_NAME,DB_VER);
+    req.onupgradeneeded=e=>e.target.result.createObjectStore(DB_STORE);
+    req.onsuccess=e=>{_db=e.target.result;res(_db);};
+    req.onerror=e=>rej(e.target.error);
+  });
+}
+async function dbSet(k,v){try{const db=await openDB();db.transaction(DB_STORE,'readwrite').objectStore(DB_STORE).put(v,k);}catch(e){}}
+async function dbGet(k){try{const db=await openDB();return new Promise((r,j)=>{const req=db.transaction(DB_STORE,'readonly').objectStore(DB_STORE).get(k);req.onsuccess=e=>r(e.target.result);req.onerror=e=>j(e.target.error);});}catch(e){return undefined;}}
+
+function savePrefs() {
+  clearTimeout(_savePrefTimer);
+  _savePrefTimer = setTimeout(async()=>{
+    await dbSet('crfValue',   crfValue);
+    await dbSet('audioBitrate',audioBitrate);
+    await dbSet('cpuUsed',    cpuUsed);
+    await dbSet('selectedRes',selectedRes);
+    await dbSet('audioEnabled',audioEnabled);
+    const v=id=>document.getElementById(id)?.value;
+    await dbSet('metaCreator', v('metaCreator'));
+    await dbSet('metaWikiUser',v('metaWikiUser'));
+    await dbSet('metaLicense', v('metaLicense'));
+  }, 400);
+}
+
+async function loadPrefs() {
+  const crf   = await dbGet('crfValue')    ?? 24;
+  const abr   = await dbGet('audioBitrate')?? 128;
+  const cpu   = await dbGet('cpuUsed')     ?? 2;
+  const res   = await dbGet('selectedRes') ?? 'original';
+  const audio = await dbGet('audioEnabled')?? true;
+  const creator = await dbGet('metaCreator');
+  const wiki    = await dbGet('metaWikiUser');
+  const lic     = await dbGet('metaLicense');
+
+  updateCRF(crf, true);
+  document.getElementById('crfSlider').value = crf;
+
+  audioBitrate = abr;
+  document.querySelectorAll('.pill[data-abr]').forEach(p=>p.classList.toggle('active',parseInt(p.dataset.abr)===abr));
+
+  cpuUsed = cpu;
+  document.querySelectorAll('.pill[data-cpu]').forEach(p=>p.classList.toggle('active',parseInt(p.dataset.cpu)===cpu));
+
+  selectedRes = res;
+  document.querySelectorAll('.pill[data-res]').forEach(p=>p.classList.toggle('active',p.dataset.res===res));
+
+  audioEnabled = audio;
+  document.getElementById('toggleSw').className='toggle-sw'+(audio?' on':'');
+  document.getElementById('audioLabel').textContent='🔔 Audio notification on completion: '+(audio?'ON':'OFF');
+
+  if (creator!==undefined && document.getElementById('metaCreator'))  document.getElementById('metaCreator').value=creator;
+  if (wiki!==undefined    && document.getElementById('metaWikiUser')) document.getElementById('metaWikiUser').value=wiki;
+  if (lic!==undefined     && document.getElementById('metaLicense'))  document.getElementById('metaLicense').value=lic;
+
+  // Restore folder handle
+  const stored = await dbGet('outputDirHandle');
+  if (stored) {
+    try {
+      const perm = await stored.queryPermission({mode:'readwrite'});
+      outputDirHandle = stored; updateFolderDisplay();
+      if (perm !== 'granted') document.getElementById('folderReauthBar').classList.add('visible');
+    } catch(e) { outputDirHandle=null; await dbSet('outputDirHandle',null); }
+  }
+}
+
+// ── Event listeners ───────────────────────────────────────
+document.getElementById('resPills').addEventListener('click', e => {
+  const p=e.target.closest('.pill[data-res]'); if(!p)return;
+  document.querySelectorAll('.pill[data-res]').forEach(x=>x.classList.remove('active'));
+  p.classList.add('active'); selectedRes=p.dataset.res; savePrefs();
+});
+document.getElementById('audioPills').addEventListener('click', e => {
+  const p=e.target.closest('.pill[data-abr]'); if(!p)return;
+  document.querySelectorAll('.pill[data-abr]').forEach(x=>x.classList.remove('active'));
+  p.classList.add('active'); audioBitrate=parseInt(p.dataset.abr);
+  updateCRF(crfValue, true); savePrefs();
+});
+document.getElementById('speedPills').addEventListener('click', e => {
+  const p=e.target.closest('.pill[data-cpu]'); if(!p)return;
+  document.querySelectorAll('.pill[data-cpu]').forEach(x=>x.classList.remove('active'));
+  p.classList.add('active'); cpuUsed=parseInt(p.dataset.cpu);
+  updateCRF(crfValue, true); savePrefs();
+});
+document.querySelectorAll('.crf-preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => updateCRF(parseInt(btn.dataset.crf)));
+});
+['metaCreator','metaWikiUser','metaLicense'].forEach(id=>{
+  const el=document.getElementById(id); if(el) el.addEventListener('change',savePrefs);
+});
+
+// ── Init ──────────────────────────────────────────────────
+document.getElementById('metaDate').value = new Date().toISOString().slice(0,10);
+loadPrefs();
+initFFmpeg(); // start loading WASM in background immediately
+</script>
+</body>
+</html>
