@@ -753,7 +753,15 @@ async function conv1(item){
   const inp=`in_${item.id}.${ext}`,outp=`out_${item.id}.webm`;
   try{
     log(`Loading ${item.file.name} (${fb(item.file.size)})…`);
-    ff.FS('writeFile',inp,await window._FF(item.file));
+    // Use FileReader instead of fetchFile — fetchFile silently fails on
+    // local File objects in some browsers with FFmpeg WASM v0.11
+    const fileData = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = e => resolve(new Uint8Array(e.target.result));
+      reader.onerror = () => reject(new Error('FileReader failed: ' + reader.error));
+      reader.readAsArrayBuffer(item.file);
+    });
+    ff.FS('writeFile', inp, fileData);
     log('✓ File loaded','ok');
     const vf=bVF(item.rot,resV);
     const ma=bMeta();
