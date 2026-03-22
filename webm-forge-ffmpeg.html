@@ -16,8 +16,7 @@
   The page reloads once automatically on first visit to activate the worker — this is normal.
 -->
 <script src="./coi-serviceworker.min.js"></script>
-<!-- FFmpeg WASM v0.11 — loads after coi-serviceworker makes SharedArrayBuffer available -->
-<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.0/dist/ffmpeg.min.js"></script>
+<!-- FFmpeg loaded dynamically inside initFF() after SW is active -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:opsz,wght@9..40,500;9..40,700;9..40,800&display=swap" rel="stylesheet">
 <style>
@@ -277,7 +276,7 @@ svg{display:block}
   <div><div class="bb-t">Wiki's Lazy Coders</div><div class="bb-s">TOOLS · SUYASH DWIVEDI</div></div>
   <div class="bb-sp"></div>
   <div class="bb-badges">
-    <div class="badge bf">⚡ FFmpeg WASM v0.11</div>
+    <div class="badge bf">⚡ FFmpeg WASM v0.11.6</div>
     <div class="badge bw">🌐 Commons Ready</div>
     <div class="badge ba">100% Local · No Upload</div>
   </div>
@@ -295,7 +294,7 @@ svg{display:block}
 </header>
 
 <div class="notice ng">
-  <strong>// ENGINE</strong> — Powered by <strong>FFmpeg WASM v0.11</strong> + <strong>coi-serviceworker</strong>.
+  <strong>// ENGINE</strong> — Powered by <strong>FFmpeg WASM v0.11.6</strong> + <strong>coi-serviceworker</strong>.
   The service worker silently injects <code>COOP</code>/<code>COEP</code> headers so <code>SharedArrayBuffer</code> works on
   <strong>GitHub Pages, Netlify, and any static host</strong> — no server config needed.
   <em>The page reloads once automatically on first visit</em> to register the worker — this is normal.
@@ -317,7 +316,7 @@ svg{display:block}
 
 <div class="es loading" id="ES">
   <div class="sd loading" id="SD"></div>
-  <span id="ST">Loading FFmpeg WASM v0.11…</span>
+  <span id="ST">Loading FFmpeg WASM v0.11.6…</span>
   <div class="elb" id="ELB"><div class="elf" id="ELF"></div></div>
 </div>
 
@@ -519,7 +518,7 @@ svg{display:block}
   <div class="lr"><div><div class="ln">VLC Media Player</div><div class="ld">Open-source player and converter with full VP9 support</div></div><a class="lb" href="https://www.videolan.org/vlc/" target="_blank">Download ↗</a></div>
 </div>
 
-<footer>Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> · <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank">Wiki's Lazy Coders</a> · FFmpeg WASM v0.11 edition</footer>
+<footer>Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> · <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank">Wiki's Lazy Coders</a> · FFmpeg WASM v0.11.6 edition</footer>
 </div>
 
 <div class="snav">
@@ -559,11 +558,27 @@ function toast(msg,type='info',dur=3500){
 }
 
 // ── FFmpeg init
+async function loadScript(src){
+  return new Promise((resolve,reject)=>{
+    if(document.querySelector(`script[src="${src}"]`)){resolve();return;}
+    const s=document.createElement('script');
+    s.src=src; s.crossOrigin='anonymous';
+    s.onload=resolve;
+    s.onerror=()=>reject(new Error('Failed to fetch: '+src));
+    document.head.appendChild(s);
+  });
+}
+
 async function initFF(){
-  setES('loading','Loading FFmpeg WASM v0.11 core (~20 MB, cached after first visit)…');
+  setES('loading','Loading FFmpeg WASM v0.11.6 (~20 MB, cached after first visit)…');
   animLB();
   try{
-    if(typeof window.FFmpeg==='undefined') throw new Error('FFmpeg script not loaded — check network connection');
+    // Load FFmpeg script dynamically — after coi-serviceworker SW is active,
+    // so COEP/CORP headers are properly applied to this cross-origin fetch
+    if(typeof window.FFmpeg==='undefined'){
+      await loadScript('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js');
+    }
+    if(typeof window.FFmpeg==='undefined') throw new Error('FFmpeg script loaded but window.FFmpeg not defined — try reloading');
     const {createFFmpeg,fetchFile}=window.FFmpeg;
     window._FF=fetchFile;
     ff=createFFmpeg({
