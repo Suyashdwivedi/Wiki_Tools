@@ -533,7 +533,7 @@
 <footer>
     <p>
         ✨ <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Created by Suyash Dwivedi</a> | 
-        🚀 Updated on: December 27, 2025
+        🚀 Updated on: 04/04/2026
     </p>
     <p style="margin-top: 10px; opacity: 0.7;">
         Powered by Wikimedia Commons API | Made with ❤️
@@ -600,24 +600,26 @@
             const allFiles = [];
             const processedTitles = new Set();
 
-            // Fetch all files in parallel with larger batches
-            const batchSize = 25;
+            // Fetch files in small batches to avoid rate limiting
+            const batchSize = 5;
             for (let i = 0; i < allCategories.length; i += batchSize) {
                 const batch = allCategories.slice(i, i + batchSize);
-                const filesPromises = batch.map(cat => fetchCategoryFiles(cat));
-                const filesResults = await Promise.all(filesPromises);
+                const filesResults = await Promise.allSettled(batch.map(cat => fetchCategoryFiles(cat)));
                 
-                filesResults.forEach(files => {
-                    for (const file of files) {
-                        if (!processedTitles.has(file.title)) {
-                            processedTitles.add(file.title);
-                            allFiles.push(file);
+                filesResults.forEach(result => {
+                    if (result.status === 'fulfilled') {
+                        for (const file of result.value) {
+                            if (!processedTitles.has(file.title)) {
+                                processedTitles.add(file.title);
+                                allFiles.push(file);
+                            }
                         }
                     }
                 });
                 
                 // Update progress during file fetching
                 statusDiv.innerHTML = `<span class="loading-spinner"></span> Fetching files from categories... (${Math.min(i + batchSize, allCategories.length)}/${allCategories.length} categories processed)`;
+                if (i + batchSize < allCategories.length) await new Promise(r => setTimeout(r, 150));
             }
 
             totalFiles = allFiles.length;
@@ -629,18 +631,20 @@
 
             statusDiv.innerHTML = `<span class="loading-spinner"></span> Found ${totalFiles} files. Checking assessments... (0/${totalFiles})`;
 
-            // Process files in parallel batches
-            const checkBatchSize = 25;
+            // Process files in small batches to avoid rate limiting
+            const checkBatchSize = 8;
             for (let i = 0; i < allFiles.length; i += checkBatchSize) {
                 const batch = allFiles.slice(i, i + checkBatchSize);
-                const assessmentPromises = batch.map(async file => {
-                    const assessment = await checkImageAssessment(file.title);
-                    return { file, assessment };
-                });
+                const results = await Promise.allSettled(
+                    batch.map(async file => {
+                        const assessment = await checkImageAssessment(file.title);
+                        return { file, assessment };
+                    })
+                );
                 
-                const results = await Promise.all(assessmentPromises);
-                
-                for (const { file, assessment } of results) {
+                for (const result of results) {
+                    if (result.status !== 'fulfilled') continue;
+                    const { file, assessment } = result.value;
                     processedFiles++;
                     
                     if (assessment.isRecognized) {
@@ -650,6 +654,7 @@
                 }
 
                 statusDiv.innerHTML = `<span class="loading-spinner"></span> Checking assessments... (${processedFiles}/${totalFiles}) - Found ${foundCount} assessed image${foundCount !== 1 ? 's' : ''}`;
+                if (i + checkBatchSize < allFiles.length) await new Promise(r => setTimeout(r, 100));
             }
 
             if (foundCount === 0) {
@@ -693,59 +698,105 @@
 
         const url = `https://commons.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtitle=${encodeURIComponent(category)}&cmtype=subcat&cmlimit=500&format=json&origin=*`;
         
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            const subcategories = data.query.categorymembers || [];
+        const data = await apiFetch(url);
+        const subcategories = (data && data.query && data.query.categorymembers) || [];
 
-            // Process subcategories in parallel batches
-            const batchSize = 25;
-            for (let i = 0; i < subcategories.length; i += batchSize) {
-                const batch = subcategories.slice(i, i + batchSize);
-                const promises = batch.map(subcat => 
-                    fetchCategoriesRecursive(subcat.title, maxDepth, currentDepth + 1)
-                );
-                const results = await Promise.all(promises);
-                results.forEach(subCats => categories.push(...subCats));
+        // Process subcategories sequentially in small batches to avoid rate limiting
+        const batchSize = 5;
+        for (let i = 0; i < subcategories.length; i += batchSize) {
+            const batch = subcategories.slice(i, i + batchSize);
+            const results = await Promise.allSettled(
+                batch.map(subcat => fetchCategoriesRecursive(subcat.title, maxDepth, currentDepth + 1))
+            );
+            results.forEach(result => {
+                if (result.status === 'fulfilled') {
+                    categories.push(...result.value);
+                } else {
+                    console.warn(`Skipping subcategory due to error:`, result.reason);
+                }
+            });
+            // Small delay between batches to respect API rate limits
+            if (i + batchSize < subcategories.length) {
+                await new Promise(r => setTimeout(r, 200));
             }
-        } catch (error) {
-            console.error(`Error fetching subcategories for ${category}:`, error);
         }
 
         return categories;
     }
 
+    async function apiFetch(url, retries = 4) {
+        for (let attempt = 0; attempt < retries; attempt++) {
+            try {
+                if (attempt > 0) await new Promise(r => setTimeout(r, 700 * attempt));
+                const resp = await fetch(url, { credentials: 'omit' });
+                const text = await resp.text();
+                let data;
+                try { data = JSON.parse(text); } catch (e) {
+                    console.warn(`Non-JSON response (attempt ${attempt + 1}):`, text.slice(0, 200));
+                    continue;
+                }
+                if (data && data.error) {
+                    console.warn(`API error (attempt ${attempt + 1}):`, data.error);
+                    continue;
+                }
+                if (data && data.query) return data;
+                console.warn(`Missing query field (attempt ${attempt + 1}):`, data);
+            } catch (e) {
+                console.error(`Fetch failed (attempt ${attempt + 1}):`, e);
+            }
+        }
+        return null;
+    }
+
     async function fetchCategoryFiles(category) {
-        const url = `https://commons.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtitle=${encodeURIComponent(category)}&cmtype=file&cmlimit=500&format=json&origin=*`;
-        const response = await fetch(url);
-        const data = await response.json();
-        return data.query.categorymembers || [];
+        const allFiles = [];
+        let continueToken = null;
+        let hasMorePages = true;
+
+        while (hasMorePages) {
+            let url = `https://commons.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtitle=${encodeURIComponent(category)}&cmtype=file&cmlimit=500&format=json&origin=*`;
+            if (continueToken) {
+                url += `&cmcontinue=${continueToken}`;
+            }
+
+            const data = await apiFetch(url);
+            if (!data) break; // all retries exhausted
+
+            const members = data.query.categorymembers || [];
+            allFiles.push(...members);
+
+            if (data.continue && data.continue.cmcontinue) {
+                continueToken = data.continue.cmcontinue;
+            } else {
+                hasMorePages = false;
+            }
+        }
+
+        return allFiles;
     }
 
     async function checkImageAssessment(fileTitle) {
-        const url = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(fileTitle)}&prop=categories&format=json&origin=*`;
-        const response = await fetch(url);
-        const data = await response.json();
+        const url = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(fileTitle)}&prop=categories&cllimit=500&format=json&origin=*`;
+        const data = await apiFetch(url);
+        if (!data || !data.query || !data.query.pages) return { isRecognized: false, types: [] };
         const pages = data.query.pages;
         const pageId = Object.keys(pages)[0];
-        const categories = pages[pageId].categories || [];
-        
-        const assessments = { isRecognized: false, types: [] };
+        const categories = (pages[pageId] && pages[pageId].categories) || [];
 
+        const assessments = { isRecognized: false, types: [] };
         categories.forEach(cat => {
             if (cat.title.includes('Quality images')) assessments.types.push('QI');
             if (cat.title.includes('Featured pictures on Wikimedia Commons')) assessments.types.push('FP');
             if (cat.title.includes('Commons:Valued images')) assessments.types.push('VI');
         });
-
         if (assessments.types.length > 0) assessments.isRecognized = true;
         return assessments;
     }
 
     async function displayImage(file, types) {
         const url = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(file.title)}&prop=imageinfo|categories&iiprop=url|thumburl|user|timestamp&iiurlwidth=300&cllimit=500&clshow=!hidden&format=json&origin=*`;
-        const response = await fetch(url);
-        const data = await response.json();
+        const data = await apiFetch(url);
+        if (!data || !data.query) return;
         const pages = data.query.pages;
         const pageId = Object.keys(pages)[0];
         const info = pages[pageId].imageinfo[0];
@@ -823,3 +874,4 @@
 
 </body>
 </html>
+
