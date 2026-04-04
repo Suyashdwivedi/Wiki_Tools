@@ -533,7 +533,7 @@
 <footer>
     <p>
         ✨ <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Created by Suyash Dwivedi</a> | 
-        🚀 Updated on: 04/04/2026
+        🚀 Updated on: 04/Apr/2026
     </p>
     <p style="margin-top: 10px; opacity: 0.7;">
         Powered by Wikimedia Commons API | Made with ❤️
@@ -600,8 +600,8 @@
             const allFiles = [];
             const processedTitles = new Set();
 
-            // Fetch files in small batches to avoid rate limiting
-            const batchSize = 5;
+            // Fetch files in batches
+            const batchSize = 10;
             for (let i = 0; i < allCategories.length; i += batchSize) {
                 const batch = allCategories.slice(i, i + batchSize);
                 const filesResults = await Promise.allSettled(batch.map(cat => fetchCategoryFiles(cat)));
@@ -619,7 +619,7 @@
                 
                 // Update progress during file fetching
                 statusDiv.innerHTML = `<span class="loading-spinner"></span> Fetching files from categories... (${Math.min(i + batchSize, allCategories.length)}/${allCategories.length} categories processed)`;
-                if (i + batchSize < allCategories.length) await new Promise(r => setTimeout(r, 150));
+                if (i + batchSize < allCategories.length) await new Promise(r => setTimeout(r, 60));
             }
 
             totalFiles = allFiles.length;
@@ -631,8 +631,8 @@
 
             statusDiv.innerHTML = `<span class="loading-spinner"></span> Found ${totalFiles} files. Checking assessments... (0/${totalFiles})`;
 
-            // Process files in small batches to avoid rate limiting
-            const checkBatchSize = 8;
+            // Process files in batches
+            const checkBatchSize = 15;
             for (let i = 0; i < allFiles.length; i += checkBatchSize) {
                 const batch = allFiles.slice(i, i + checkBatchSize);
                 const results = await Promise.allSettled(
@@ -654,7 +654,7 @@
                 }
 
                 statusDiv.innerHTML = `<span class="loading-spinner"></span> Checking assessments... (${processedFiles}/${totalFiles}) - Found ${foundCount} assessed image${foundCount !== 1 ? 's' : ''}`;
-                if (i + checkBatchSize < allFiles.length) await new Promise(r => setTimeout(r, 100));
+                if (i + checkBatchSize < allFiles.length) await new Promise(r => setTimeout(r, 50));
             }
 
             if (foundCount === 0) {
@@ -701,8 +701,8 @@
         const data = await apiFetch(url);
         const subcategories = (data && data.query && data.query.categorymembers) || [];
 
-        // Process subcategories sequentially in small batches to avoid rate limiting
-        const batchSize = 5;
+        // Process subcategories in batches to balance speed vs rate limiting
+        const batchSize = 10;
         for (let i = 0; i < subcategories.length; i += batchSize) {
             const batch = subcategories.slice(i, i + batchSize);
             const results = await Promise.allSettled(
@@ -717,7 +717,7 @@
             });
             // Small delay between batches to respect API rate limits
             if (i + batchSize < subcategories.length) {
-                await new Promise(r => setTimeout(r, 200));
+                await new Promise(r => setTimeout(r, 80));
             }
         }
 
@@ -727,7 +727,7 @@
     async function apiFetch(url, retries = 4) {
         for (let attempt = 0; attempt < retries; attempt++) {
             try {
-                if (attempt > 0) await new Promise(r => setTimeout(r, 700 * attempt));
+                if (attempt > 0) await new Promise(r => setTimeout(r, 400 * attempt));
                 const resp = await fetch(url, { credentials: 'omit' });
                 const text = await resp.text();
                 let data;
