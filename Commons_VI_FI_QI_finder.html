@@ -533,7 +533,7 @@
 <footer>
     <p>
         ✨ <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Created by Suyash Dwivedi</a> | 
-        🚀 Updated on: Apr 04, 2026
+        🚀 Updated on: December 27, 2025
     </p>
     <p style="margin-top: 10px; opacity: 0.7;">
         Powered by Wikimedia Commons API | Made with ❤️
@@ -694,8 +694,7 @@
         const url = `https://commons.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtitle=${encodeURIComponent(category)}&cmtype=subcat&cmlimit=500&format=json&origin=*`;
         
         try {
-            const response = await fetch(url);
-            const data = await response.json();
+            const data = await apiFetch(url);
             const subcategories = (data && data.query && data.query.categorymembers) || [];
 
             // Process subcategories in parallel batches
@@ -715,62 +714,79 @@
         return categories;
     }
 
+    async function apiFetch(url, retries = 4) {
+        for (let attempt = 0; attempt < retries; attempt++) {
+            try {
+                if (attempt > 0) await new Promise(r => setTimeout(r, 700 * attempt));
+                const resp = await fetch(url, { credentials: 'omit' });
+                const text = await resp.text();
+                let data;
+                try { data = JSON.parse(text); } catch (e) {
+                    console.warn(`Non-JSON response (attempt ${attempt + 1}):`, text.slice(0, 200));
+                    continue;
+                }
+                if (data && data.error) {
+                    console.warn(`API error (attempt ${attempt + 1}):`, data.error);
+                    continue;
+                }
+                if (data && data.query) return data;
+                console.warn(`Missing query field (attempt ${attempt + 1}):`, data);
+            } catch (e) {
+                console.error(`Fetch failed (attempt ${attempt + 1}):`, e);
+            }
+        }
+        return null;
+    }
+
     async function fetchCategoryFiles(category) {
         const allFiles = [];
         let continueToken = null;
+        let hasMorePages = true;
 
-        do {
+        while (hasMorePages) {
             let url = `https://commons.wikimedia.org/w/api.php?action=query&list=categorymembers&cmtitle=${encodeURIComponent(category)}&cmtype=file&cmlimit=500&format=json&origin=*`;
             if (continueToken) {
-                url += `&cmcontinue=${encodeURIComponent(continueToken)}`;
+                url += `&cmcontinue=${continueToken}`;
             }
 
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                if (!data || !data.query) break;
-                const members = data.query.categorymembers || [];
-                allFiles.push(...members);
-                continueToken = data.continue ? data.continue.cmcontinue : null;
-            } catch (e) {
-                console.error(`Error fetching files for ${category}:`, e);
-                break;
+            const data = await apiFetch(url);
+            if (!data) break; // all retries exhausted
+
+            const members = data.query.categorymembers || [];
+            allFiles.push(...members);
+
+            if (data.continue && data.continue.cmcontinue) {
+                continueToken = data.continue.cmcontinue;
+            } else {
+                hasMorePages = false;
             }
-        } while (continueToken);
+        }
 
         return allFiles;
     }
 
     async function checkImageAssessment(fileTitle) {
         const url = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(fileTitle)}&prop=categories&cllimit=500&format=json&origin=*`;
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            if (!data || !data.query || !data.query.pages) return { isRecognized: false, types: [] };
-            const pages = data.query.pages;
-            const pageId = Object.keys(pages)[0];
-            const categories = (pages[pageId] && pages[pageId].categories) || [];
+        const data = await apiFetch(url);
+        if (!data || !data.query || !data.query.pages) return { isRecognized: false, types: [] };
+        const pages = data.query.pages;
+        const pageId = Object.keys(pages)[0];
+        const categories = (pages[pageId] && pages[pageId].categories) || [];
 
-            const assessments = { isRecognized: false, types: [] };
-
-            categories.forEach(cat => {
-                if (cat.title.includes('Quality images')) assessments.types.push('QI');
-                if (cat.title.includes('Featured pictures on Wikimedia Commons')) assessments.types.push('FP');
-                if (cat.title.includes('Commons:Valued images')) assessments.types.push('VI');
-            });
-
-            if (assessments.types.length > 0) assessments.isRecognized = true;
-            return assessments;
-        } catch (e) {
-            console.error(`Error checking assessment for ${fileTitle}:`, e);
-            return { isRecognized: false, types: [] };
-        }
+        const assessments = { isRecognized: false, types: [] };
+        categories.forEach(cat => {
+            if (cat.title.includes('Quality images')) assessments.types.push('QI');
+            if (cat.title.includes('Featured pictures on Wikimedia Commons')) assessments.types.push('FP');
+            if (cat.title.includes('Commons:Valued images')) assessments.types.push('VI');
+        });
+        if (assessments.types.length > 0) assessments.isRecognized = true;
+        return assessments;
     }
 
     async function displayImage(file, types) {
         const url = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(file.title)}&prop=imageinfo|categories&iiprop=url|thumburl|user|timestamp&iiurlwidth=300&cllimit=500&clshow=!hidden&format=json&origin=*`;
-        const response = await fetch(url);
-        const data = await response.json();
+        const data = await apiFetch(url);
+        if (!data || !data.query) return;
         const pages = data.query.pages;
         const pageId = Object.keys(pages)[0];
         const info = pages[pageId].imageinfo[0];
