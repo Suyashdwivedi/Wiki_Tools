@@ -147,6 +147,10 @@ function buildPopup(anchorX, anchorY, text) {
       </span>
     </div>`;
 
+  // Set a rough initial position immediately (prevents flash at 0,0)
+  const vw = document.documentElement.clientWidth + window.scrollX;
+  popup.style.left = Math.max(8, Math.min(anchorX - 20, vw - 470)) + "px";
+  popup.style.top  = (anchorY + 14) + "px";
   document.body.appendChild(popup);
   positionPopup(anchorX, anchorY);
 
@@ -252,19 +256,61 @@ function removeFloatBtn() {
   if (floatBtn) { floatBtn.remove(); floatBtn = null; }
 }
 
+// ── Track mouse position for textarea fallback ────────────────────────────────
+let lastMouseX = 0, lastMouseY = 0;
+document.addEventListener("mousemove", e => {
+  lastMouseX = e.pageX;
+  lastMouseY = e.pageY;
+}, { passive: true });
+
+// ── Get selected text from EITHER normal DOM or a textarea/input ──────────────
+function getSelectionInfo() {
+  // 1. Check active element — textarea or input
+  const el = document.activeElement;
+  if (el && (el.tagName === "TEXTAREA" || el.tagName === "INPUT")) {
+    const text = el.value.substring(el.selectionStart, el.selectionEnd).trim();
+    if (text.length >= 2) {
+      // Position near the mouse cursor (best we can do inside a textarea)
+      return {
+        text,
+        x: lastMouseX + window.scrollX,
+        y: lastMouseY + window.scrollY,
+        fromTextarea: true
+      };
+    }
+  }
+  // 2. Normal DOM selection
+  const sel = window.getSelection();
+  const text = sel ? sel.toString().trim() : "";
+  if (text.length < 2 || !sel.rangeCount) return null;
+  const rect = sel.getRangeAt(0).getBoundingClientRect();
+  if (!rect.width && !rect.height) {
+    // Zero-size rect fallback — use mouse position
+    return {
+      text,
+      x: lastMouseX + window.scrollX,
+      y: lastMouseY + window.scrollY,
+      fromTextarea: false
+    };
+  }
+  return {
+    text,
+    x: rect.left + window.scrollX,
+    y: rect.top  + window.scrollY + rect.height / 2,
+    fromTextarea: false
+  };
+}
+
 // ── Selection listener ────────────────────────────────────────────────────────
 document.addEventListener("mouseup", () => {
   setTimeout(() => {
-    // Re-detect lang in case user navigated
     const p = detectPageLang(); if (p) currentLang = p;
-    const sel = window.getSelection();
-    const text = sel ? sel.toString().trim() : "";
-    if (text.length < 2) { removeFloatBtn(); return; }
-    const rect = sel.getRangeAt(0).getBoundingClientRect();
-    // Place button to the LEFT of selection, vertically centred
-    const x = rect.left + window.scrollX - 34;
-    const y = rect.top  + window.scrollY + rect.height / 2 - 14;
-    showFloatBtn(Math.max(2, x), y, text);
+    const info = getSelectionInfo();
+    if (!info) { removeFloatBtn(); return; }
+    // Place T button to the LEFT of selection, vertically centred on it
+    const btnX = Math.max(2, info.x - 38);
+    const btnY = info.y - 14;
+    showFloatBtn(btnX, btnY, info.text);
   }, 30);
 });
 
@@ -278,13 +324,9 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
   if (req.action === "translateText" && req.text) {
     if (req.lang) currentLang = req.lang;
     else { const p = detectPageLang(); if (p) currentLang = p; }
-    const sel = window.getSelection();
-    let x = window.scrollX + 80, y = window.scrollY + 140;
-    if (sel && sel.rangeCount > 0) {
-      const r = sel.getRangeAt(0).getBoundingClientRect();
-      x = r.left + window.scrollX;
-      y = r.bottom + window.scrollY + 10;
-    }
+    // Use mouse position — reliable for both textarea and normal DOM
+    const x = lastMouseX + window.scrollX;
+    const y = lastMouseY + window.scrollY + 20;
     removeFloatBtn();
     buildPopup(x, y, req.text);
     sendResponse({ ok: true });
@@ -302,9 +344,19 @@ if (window.__wtPendingTranslation) {
 // ── Utilities ─────────────────────────────────────────────────────────────────
 function positionPopup(x, y) {
   if (!popup) return;
-  const vw = document.documentElement.clientWidth + window.scrollX;
-  popup.style.left = Math.max(8, Math.min(x, vw - 470)) + "px";
-  popup.style.top  = y + "px";
+  // Measure popup height after brief paint
+  requestAnimationFrame(() => {
+    if (!popup) return;
+    const vw  = document.documentElement.clientWidth  + window.scrollX;
+    const vh  = document.documentElement.clientHeight + window.scrollY;
+    const pw  = popup.offsetWidth  || 460;
+    const ph  = popup.offsetHeight || 180;
+    const left = Math.max(8, Math.min(x - 20, vw - pw - 12));
+    // If popup would go below viewport, show it above the cursor instead
+    const top  = (y + ph + 12 > vh) ? Math.max(8, y - ph - 40) : y + 14;
+    popup.style.left = left + "px";
+    popup.style.top  = top  + "px";
+  });
 }
 function escapeHtml(s) {
   return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
