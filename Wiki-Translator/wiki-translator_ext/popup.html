@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Wiki Translator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:300px;font-family:'Segoe UI',Arial,sans-serif;background:#202124;color:#e8eaed;font-size:13px}
+
+.header{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 16px;background:#292a2d;
+  border-bottom:1px solid #3c4043;
+}
+.logo{font-size:28px}
+h1{font-size:14px;font-weight:700}
+.v{font-size:10px;color:#9aa0a6;margin-top:2px}
+
+.badge{
+  margin:14px 14px 0;padding:12px 14px;
+  background:#292a2d;border:1px solid #3c4043;border-radius:10px;
+  display:flex;align-items:center;gap:12px;
+}
+.b-flag{font-size:26px}
+.b-lbl{font-size:9px;color:#9aa0a6;text-transform:uppercase;letter-spacing:.07em}
+.b-name{font-size:15px;font-weight:700;color:#8ab4f8;margin-top:2px}
+.b-pill{
+  margin-left:auto;font-size:9px;padding:3px 9px;
+  border-radius:10px;font-weight:700;background:#1a73e8;color:#fff;
+}
+.b-pill.manual{background:#5f6368}
+
+.how{padding:14px 14px 0}
+.how-title{font-size:9px;color:#9aa0a6;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.step-icon{
+  width:28px;height:28px;border-radius:7px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;
+}
+.step-text{font-size:12px;color:#bdc1c6;line-height:1.5;padding-top:4px}
+.step-text b{color:#e8eaed}
+.s1{background:linear-gradient(135deg,#1a73e8,#12b5cb)}
+.s2{background:linear-gradient(135deg,#e8710a,#f9ab00)}
+.s3{background:linear-gradient(135deg,#34a853,#0f9d58)}
+
+.divider{height:1px;background:#3c4043;margin:14px 14px 0}
+
+.credit{padding:12px 14px;text-align:center}
+.credit p{font-size:11px;color:#9aa0a6;line-height:1.6}
+.credit a{color:#8ab4f8;text-decoration:none}
+.credit a:hover{text-decoration:underline}
+.credit .heart{color:#ea4335}
+
+.footer{
+  padding:10px 14px 14px;display:flex;flex-direction:column;gap:6px;
+}
+.btn-link{
+  display:block;text-align:center;padding:8px;border-radius:8px;
+  font-size:12px;font-weight:600;text-decoration:none;
+  background:#292a2d;border:1px solid #3c4043;color:#8ab4f8;
+  transition:background .15s;
+}
+.btn-link:hover{background:#3c4043}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">🌐</div>
+  <div>
+    <h1>Wiki Translator</h1>
+    <div class="v">Auto-detects language from Wikipedia URL</div>
+  </div>
+</div>
+
+<!-- Active language badge -->
+<div class="badge">
+  <div class="b-flag" id="bFlag">⏳</div>
+  <div>
+    <div class="b-lbl">Active language</div>
+    <div class="b-name" id="bName">Detecting…</div>
+  </div>
+  <div class="b-pill" id="bPill">AUTO</div>
+</div>
+
+<!-- How to use -->
+<div class="how">
+  <div class="how-title">How to use</div>
+
+  <div class="step">
+    <div class="step-icon s1" style="color:#fff;font-size:13px;font-weight:800">T</div>
+    <div class="step-text">
+      <b>Select any text</b> on a Wikipedia page — a small <b>T</b> button appears to the left of your selection. Click it to translate.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-icon s2" style="color:#fff;font-size:16px">🖱️</div>
+    <div class="step-text">
+      <b>Right-click</b> selected text and choose <b>"Translate to [language]"</b> from the context menu.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-icon s3" style="color:#fff;font-size:16px">📋</div>
+    <div class="step-text">
+      In the popup, switch between <b>English ↔ Target</b> tabs, click <b>Copy</b> to copy and auto-close, or <b>Translate full page</b> to open Google Translate.
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="credit">
+  <p>
+    TTS userscript &amp; Wikipedia tools by<br>
+    <span class="heart">♥</span>
+    <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">
+      Suyash Dwivedi
+    </a>
+    on Wikimedia Meta
+  </p>
+</div>
+
+<div class="footer">
+  <a class="btn-link" href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">
+    🔗 Visit Suyash Dwivedi's Meta page
+  </a>
+  <a class="btn-link" href="https://translate.google.com" target="_blank">
+    🔗 Open Google Translate
+  </a>
+</div>
+
+<script>
+chrome.runtime.sendMessage({ action: "getPageLang" }, lang => {
+  if (!lang) return;
+  document.getElementById("bFlag").textContent = lang.flag || "🌐";
+  document.getElementById("bName").textContent = lang.name + (lang.native ? " · " + lang.native : "");
+  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    const isWiki = (tabs[0]?.url || "").includes(".wikipedia.org");
+    const pill = document.getElementById("bPill");
+    pill.textContent = isWiki ? "AUTO" : "MANUAL";
+    pill.className = "b-pill" + (isWiki ? "" : " manual");
+  });
+});
+</script>
+</body>
+</html>
