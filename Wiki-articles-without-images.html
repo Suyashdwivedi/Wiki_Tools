@@ -88,7 +88,7 @@
       flex-wrap: wrap;
     }
 
-    /* ── Scope Toggle ── */
+    /* ── Scope box ── */
     .scope-box {
       width: 100%;
       max-width: 750px;
@@ -124,7 +124,7 @@
     }
     .scope-label input[type="radio"] { display: none; }
 
-    /* ── Category Section ── */
+    /* ── Category section ── */
     .category-section {
       width: 100%;
       max-width: 750px;
@@ -135,57 +135,34 @@
       background: var(--grid-bg);
     }
     .category-section-title { font-weight: bold; margin-bottom: 0.5rem; font-size: 0.93rem; }
-    .category-input-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
+    .category-input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     #categoryInput {
-      flex: 1;
-      min-width: 200px;
-      padding: 6px 8px;
-      border: 1px solid var(--grid-border);
-      border-radius: 4px;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      font-size: 0.9rem;
+      flex: 1; min-width: 200px; padding: 6px 8px;
+      border: 1px solid var(--grid-border); border-radius: 4px;
+      background-color: var(--bg-color); color: var(--text-color); font-size: 0.9rem;
     }
     #addCategoryBtn {
-      padding: 0.4rem 0.9rem;
-      font-size: 0.9rem;
-      cursor: pointer;
-      border: 1px solid var(--tag-border);
-      background-color: var(--tag-bg);
-      color: var(--tag-text);
-      border-radius: 4px;
-      white-space: nowrap;
+      padding: 0.4rem 0.9rem; font-size: 0.9rem; cursor: pointer;
+      border: 1px solid var(--tag-border); background-color: var(--tag-bg);
+      color: var(--tag-text); border-radius: 4px; white-space: nowrap;
     }
     #addCategoryBtn:hover { opacity: 0.8; }
     .category-hint { font-size: 0.78rem; color: #888; margin-top: 4px; }
 
-    /* ── Depth Selector ── */
+    /* ── Depth buttons ── */
     .depth-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 0.6rem;
-      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 0.65rem; flex-wrap: wrap;
     }
     .depth-row label { font-size: 0.88rem; font-weight: bold; }
     .depth-btn {
-      width: 32px;
-      height: 32px;
-      padding: 0;
-      font-size: 0.9rem;
-      font-weight: bold;
+      width: 32px; height: 32px; padding: 0;
+      font-size: 0.9rem; font-weight: bold;
       border: 2px solid var(--grid-border);
       background: var(--scope-inactive-bg);
       color: var(--scope-inactive-text);
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s;
-      line-height: 1;
+      border-radius: 6px; cursor: pointer;
+      transition: all 0.15s; line-height: 1;
     }
     .depth-btn.selected {
       background: var(--scope-active-bg);
@@ -194,133 +171,93 @@
     }
     .depth-hint { font-size: 0.76rem; color: #888; }
 
-    /* ── Category Tags ── */
-    #categoryTags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 0.6rem;
-      min-height: 4px;
-    }
+    /* ── Category tags ── */
+    #categoryTags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.6rem; }
     .cat-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--tag-bg);
-      color: var(--tag-text);
-      border: 1px solid var(--tag-border);
-      border-radius: 20px;
-      padding: 3px 8px 3px 12px;
-      font-size: 0.83rem;
-      max-width: 300px;
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--tag-bg); color: var(--tag-text);
+      border: 1px solid var(--tag-border); border-radius: 20px;
+      padding: 3px 8px 3px 12px; font-size: 0.83rem; max-width: 300px;
     }
-    .cat-tag span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    /* FIX: use data-index + event delegation — inline onclick with
-       JSON.stringify breaks on Unicode/special-char category names */
+    .cat-tag span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .cat-tag-remove {
-      cursor: pointer;
-      font-size: 1rem;
-      line-height: 1;
-      color: var(--tag-text);
-      background: none;
-      border: none;
-      padding: 2px 4px;
-      flex-shrink: 0;
-      border-radius: 50%;
+      cursor: pointer; font-size: 1rem; line-height: 1; color: var(--tag-text);
+      background: none; border: none; padding: 2px 4px; flex-shrink: 0; border-radius: 50%;
     }
     .cat-tag-remove:hover { opacity: 0.6; background: rgba(0,0,0,0.08); }
 
-    .no-cats-warning {
-      font-size: 0.82rem;
-      color: #c0392b;
-      margin-top: 5px;
-      display: none;
+    .no-cats-warning { font-size: 0.82rem; color: #c0392b; margin-top: 5px; display: none; }
+
+    /* ── Level heading in results ── */
+    .level-heading {
+      grid-column: 1 / -1;
+      font-weight: bold;
+      font-size: 0.92rem;
+      color: var(--scope-active-bg);
+      padding: 0.3rem 0 0.1rem;
+      border-bottom: 1px solid var(--grid-border);
+      margin-top: 0.4rem;
     }
 
     /* ── Progress bar ── */
-    #progressBar {
-      width: 100%;
-      height: 6px;
-      background: var(--grid-border);
-      border-radius: 3px;
-      margin: 0.5rem 0;
+    #progressWrap {
+      width: 100%; max-width: 750px;
+      margin: 0.5rem auto 0;
       display: none;
+    }
+    #progressBar {
+      width: 100%; height: 7px;
+      background: var(--grid-border);
+      border-radius: 4px; overflow: hidden;
     }
     #progressFill {
       height: 100%;
       background: var(--scope-active-bg);
-      border-radius: 3px;
+      border-radius: 4px;
       width: 0%;
-      transition: width 0.2s;
+      transition: width 0.3s;
+    }
+    #progressLabel {
+      font-size: 0.8rem; color: #888; margin-top: 3px; text-align: center;
     }
 
     /* ── Grid ── */
     .grid-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
+      gap: 1rem; margin-top: 1rem;
     }
     .grid-item {
-      background: var(--grid-bg);
-      padding: 0.75rem;
-      border: 1px solid var(--grid-border);
-      border-radius: 5px;
+      background: var(--grid-bg); padding: 0.75rem;
+      border: 1px solid var(--grid-border); border-radius: 5px;
       transition: background-color 0.3s, border-color 0.3s;
     }
     .recent { background-color: var(--recent-bg); }
-    .footer {
-      text-align: center;
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: var(--text-color);
-    }
+    .footer { text-align: center; margin-top: 2rem; font-size: 0.9rem; color: var(--text-color); }
     button {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      cursor: pointer;
-      border: 1px solid var(--text-color);
-      background-color: var(--header-bg);
-      color: var(--text-color);
-      border-radius: 5px;
-      transition: background-color 0.3s;
+      padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer;
+      border: 1px solid var(--text-color); background-color: var(--header-bg);
+      color: var(--text-color); border-radius: 5px; transition: background-color 0.3s;
     }
     button:hover { opacity: 0.9; }
     .night-mode-toggle {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 0.5rem;
-      cursor: pointer;
-      font-size: 1.2rem;
-      border: none;
-      background: none;
-      color: var(--text-color);
+      position: absolute; top: 10px; right: 10px; padding: 0.5rem;
+      cursor: pointer; font-size: 1.2rem; border: none; background: none; color: var(--text-color);
     }
     .scroll-button {
-      position: fixed;
-      right: 20px;
-      padding: 10px 15px;
-      background: var(--header-bg);
-      color: var(--text-color);
-      border: 1px solid var(--grid-border);
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1rem;
-      z-index: 1000;
-      display: none;
+      position: fixed; right: 20px; padding: 10px 15px;
+      background: var(--header-bg); color: var(--text-color);
+      border: 1px solid var(--grid-border); border-radius: 5px;
+      cursor: pointer; font-size: 1rem; z-index: 1000; display: none;
     }
     #go-to-top    { bottom: 70px; }
     #go-to-bottom { bottom: 20px; }
     #langCodeInput, #langSelect {
-      padding: 5px;
-      border: 1px solid var(--grid-border);
-      background-color: var(--grid-bg);
-      color: var(--text-color);
+      padding: 5px; border: 1px solid var(--grid-border);
+      background-color: var(--grid-bg); color: var(--text-color);
+    }
+    #stopBtn {
+      background: #c0392b; color: #fff; border-color: #c0392b; display: none;
     }
   </style>
 </head>
@@ -366,12 +303,12 @@
     <label><input type="checkbox" id="stubOnly" /> Stub only</label>
   </div>
 
-  <!-- Search Scope: default = category -->
+  <!-- Scope — default: category -->
   <div class="scope-box">
     <div class="scope-title">🔍 Search Scope</div>
     <div class="scope-radio-row">
-      <label class="scope-label" id="scopeLabelCat" onclick="setScope('category')">
-        <input type="radio" name="scope" value="category" />
+      <label class="scope-label active" id="scopeLabelCat" onclick="setScope('category')">
+        <input type="radio" name="scope" value="category" checked />
         📂 Selected Categories Only
       </label>
       <label class="scope-label" id="scopeLabelWiki" onclick="setScope('wiki')">
@@ -381,21 +318,21 @@
     </div>
   </div>
 
-  <!-- Category Filter (visible by default since category is default scope) -->
+  <!-- Category section (visible by default) -->
   <div class="category-section" id="categorySection">
     <div class="category-section-title">📂 Categories to Search In</div>
     <div class="category-input-row">
       <input type="text" id="categoryInput"
-             placeholder="e.g. शहर, Rivers, Cities in India …"
+             placeholder="e.g. भारत की अर्थव्यवस्था, Rivers, Cities in India …"
              onkeydown="if(event.key==='Enter') addCategory()" />
       <button id="addCategoryBtn" onclick="addCategory()">＋ Add Category</button>
     </div>
     <div class="category-hint">
-      Type a category name (without the "Category:" prefix) and press <strong>Add</strong> or hit <strong>Enter</strong>.
+      Type a category name without the "Category:" prefix and press <strong>Add</strong> or hit <strong>Enter</strong>.
       Multiple categories are merged and deduplicated.
     </div>
 
-    <!-- Subcategory depth -->
+    <!-- Depth selector -->
     <div class="depth-row">
       <label>Subcategory depth:</label>
       <button class="depth-btn selected" data-depth="0">0</button>
@@ -404,33 +341,40 @@
       <button class="depth-btn" data-depth="3">3</button>
       <button class="depth-btn" data-depth="4">4</button>
       <button class="depth-btn" data-depth="5">5</button>
-      <span class="depth-hint" id="depthHint">Search only the direct category (no subcategories)</span>
+      <span class="depth-hint" id="depthHint">Direct category only (no subcategories)</span>
     </div>
 
-    <!-- Tags rendered here by JS (event delegation — no inline onclick) -->
     <div id="categoryTags"></div>
     <div class="no-cats-warning" id="noCatsWarning">
       ⚠️ Please add at least one category, or switch scope to "Entire Wiki".
     </div>
   </div>
 
-  <div style="text-align:center; margin-top:0.75rem;">
-    <button id="load-more-button-top" style="display:none" onclick="loadMore()">Load Next 500</button>
-    <button onclick="runQuery()">Check Articles Without Images</button>
+  <!-- Action buttons -->
+  <div style="text-align:center; margin-top:0.85rem; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+    <button id="load-more-button-top" style="display:none" onclick="loadMoreWiki()">Load Next 500</button>
+    <button id="startBtn" onclick="runQuery()">Check Articles Without Images</button>
+    <button id="stopBtn" onclick="stopQuery()">⏹ Stop</button>
   </div>
 
-  <div id="progressBar"><div id="progressFill"></div></div>
-  <div id="status" style="margin:1rem; font-weight:bold; text-align:center;">
+  <!-- Progress -->
+  <div id="progressWrap">
+    <div id="progressBar"><div id="progressFill"></div></div>
+    <div id="progressLabel"></div>
+  </div>
+
+  <div id="status" style="margin:0.75rem 1rem; font-weight:bold; text-align:center;">
     Add categories above and click "Check Articles Without Images".
   </div>
+
   <div class="grid-container" id="results"></div>
 
   <div style="text-align:center">
-    <button id="load-more-button" style="display:none; margin-top:1rem;" onclick="loadMore()">Load Next 500</button>
+    <button id="load-more-button" style="display:none; margin-top:1rem;" onclick="loadMoreWiki()">Load Next 500</button>
   </div>
 
   <div class="footer">
-    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 16 April 2026
+    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 17 April 2026
   </div>
 
   <button id="go-to-top"    class="scroll-button" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Go to Top</button>
@@ -449,31 +393,29 @@
   </script>
 
   <script>
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  STATE
-  // ═══════════════════════════════════════════════════════════════════════════
-  let currentScope     = 'category'; // default is category mode
-  let activeCategories = [];         // string[]
-  let selectedDepth    = 0;          // 0–5 subcategory levels
+  // ═══════════════════════════════════════════════════════════════════════
+  //  GLOBAL STATE
+  // ═══════════════════════════════════════════════════════════════════════
+  let currentScope     = 'category';
+  let activeCategories = [];
+  let selectedDepth    = 0;
+  let isStopped        = false;   // lets the user abort mid-run
 
-  // Pagination state
-  let apContinueToken  = null;       // allpages continuation
-  // In category mode we collect ALL articles first, then check them in batches
-  let articleQueue     = [];         // all discovered articles (category mode)
-  let articleQueueIdx  = 0;          // how many have been checked so far
+  // Wiki-mode pagination
+  let apContinueToken  = null;
 
-  const BATCH_SIZE = 500;
-  const CONCURRENCY = 5; // max simultaneous API check requests (avoids flaky behavior)
+  const CONCURRENCY    = 6;       // simultaneous per-article check tasks
+  const MAX_RETRIES    = 3;       // retries for flaky API calls
+  const RETRY_DELAY_MS = 800;     // base delay between retries (doubles each attempt)
 
   const resultsDiv = document.getElementById("results");
   const statusDiv  = document.getElementById("status");
   const RECENT_EDIT_THRESHOLD = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  CONCURRENCY LIMITER
-  //  Prevents hundreds of simultaneous fetch() calls which cause flaky results
-  // ═══════════════════════════════════════════════════════════════════════════
-  function pLimit(concurrency) {
+  // ═══════════════════════════════════════════════════════════════════════
+  //  CONCURRENCY LIMITER  (reset on every new query)
+  // ═══════════════════════════════════════════════════════════════════════
+  function makeLimiter(concurrency) {
     let active = 0;
     const queue = [];
     function run() {
@@ -482,18 +424,40 @@
       const { fn, resolve, reject } = queue.shift();
       fn().then(resolve, reject).finally(() => { active--; run(); });
     }
-    return function limit(fn) {
-      return new Promise((resolve, reject) => {
-        queue.push({ fn, resolve, reject });
-        run();
-      });
-    };
+    return fn => new Promise((resolve, reject) => { queue.push({ fn, resolve, reject }); run(); });
   }
-  const limit = pLimit(CONCURRENCY);
+  let limit = makeLimiter(CONCURRENCY);
 
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
+  //  FETCH WITH RETRY  — the main cause of intermittent results
+  //  Retries up to MAX_RETRIES times with exponential backoff
+  // ═══════════════════════════════════════════════════════════════════════
+  async function fetchJSON(url) {
+    let lastErr;
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      if (isStopped) throw new Error('stopped');
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (data.error) throw new Error(data.error.info);
+        return data;
+      } catch (e) {
+        lastErr = e;
+        if (e.message === 'stopped') throw e;
+        if (attempt < MAX_RETRIES) {
+          await sleep(RETRY_DELAY_MS * Math.pow(2, attempt));
+        }
+      }
+    }
+    throw lastErr;
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // ═══════════════════════════════════════════════════════════════════════
   //  SCOPE TOGGLE
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
   function setScope(scope) {
     currentScope = scope;
     document.getElementById('scopeLabelWiki').classList.toggle('active', scope === 'wiki');
@@ -501,19 +465,18 @@
     document.getElementById('categorySection').style.display = scope === 'category' ? '' : 'none';
     document.getElementById('noCatsWarning').style.display = 'none';
   }
-  // Initialise: category is active by default
-  setScope('category');
+  setScope('category'); // default
 
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
   //  DEPTH SELECTOR
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
   const depthHints = [
-    'Search only the direct category (no subcategories)',
-    'Also search 1 level of subcategories',
-    'Also search up to 2 levels of subcategories',
-    'Also search up to 3 levels of subcategories',
-    'Also search up to 4 levels of subcategories',
-    'Also search up to 5 levels of subcategories',
+    'Direct category only (no subcategories)',
+    'Direct category + 1 level of subcategories',
+    'Direct category + up to 2 levels deep',
+    'Direct category + up to 3 levels deep',
+    'Direct category + up to 4 levels deep',
+    'Direct category + up to 5 levels deep',
   ];
   document.querySelectorAll('.depth-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -524,14 +487,13 @@
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  CATEGORY TAGS
-  //  FIX: use data-index + event delegation instead of inline onclick with
-  //  JSON.stringify, which breaks on Unicode/Hindi category names
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
+  //  CATEGORY TAGS  (event delegation — safe for all Unicode names)
+  // ═══════════════════════════════════════════════════════════════════════
   function addCategory() {
     const input = document.getElementById("categoryInput");
-    let raw = input.value.trim().replace(/^Category\s*:\s*/i, "");
+    // Strip any language's namespace prefix (Category:, श्रेणी:, Kategorie:, etc.)
+    let raw = input.value.trim().replace(/^[^:]+:\s*/, "").trim();
     if (!raw || activeCategories.includes(raw)) { input.value = ""; return; }
     activeCategories.push(raw);
     input.value = "";
@@ -548,341 +510,353 @@
     const container = document.getElementById("categoryTags");
     container.innerHTML = "";
     activeCategories.forEach((name, idx) => {
-      const tag = document.createElement("div");
+      const tag  = document.createElement("div");
       tag.className = "cat-tag";
       const span = document.createElement("span");
-      span.title = name;
+      span.title       = name;
       span.textContent = name;
-      const btn = document.createElement("button");
-      btn.className = "cat-tag-remove";
-      btn.title = "Remove";
-      btn.textContent = "✕";
-      btn.dataset.index = idx; // store index, not name — safe for any Unicode
+      const btn  = document.createElement("button");
+      btn.className    = "cat-tag-remove";
+      btn.title        = "Remove";
+      btn.textContent  = "✕";
+      btn.dataset.index = String(idx);  // index only — no Unicode in attribute
       tag.appendChild(span);
       tag.appendChild(btn);
       container.appendChild(tag);
     });
   }
 
-  // Single delegated listener on the tags container — no inline onclick at all
-  document.getElementById("categoryTags").addEventListener("click", function(e) {
+  document.getElementById("categoryTags").addEventListener("click", e => {
     const btn = e.target.closest(".cat-tag-remove");
-    if (!btn) return;
-    removeCategory(parseInt(btn.dataset.index, 10));
+    if (btn) removeCategory(parseInt(btn.dataset.index, 10));
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
   //  LANGUAGE HELPER
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
   function getLangCode() {
     const sel = document.getElementById("langSelect").value.trim().toLowerCase();
     return sel || document.getElementById("langCodeInput").value.trim().toLowerCase();
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
   //  NIGHT MODE
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
   function toggleNightMode() {
     document.body.classList.toggle('night-mode');
-    const isNight = document.body.classList.contains('night-mode');
-    localStorage.setItem('nightMode', isNight);
-    document.getElementById('night-mode-button').innerHTML = isNight ? '&#127774;' : '&#127769;';
+    const n = document.body.classList.contains('night-mode');
+    localStorage.setItem('nightMode', n);
+    document.getElementById('night-mode-button').innerHTML = n ? '&#127774;' : '&#127769;';
   }
   if (localStorage.getItem('nightMode') === 'true') {
     document.body.classList.add('night-mode');
     document.getElementById('night-mode-button').innerHTML = '&#127774;';
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
   //  SCROLL BUTTONS
-  // ═══════════════════════════════════════════════════════════════════════════
-  window.onscroll = function () {
+  // ═══════════════════════════════════════════════════════════════════════
+  window.onscroll = () => {
     const show = document.body.scrollTop > 20 || document.documentElement.scrollTop > 20;
     document.getElementById('go-to-top').style.display    = show ? "block" : "none";
     document.getElementById('go-to-bottom').style.display = show ? "block" : "none";
   };
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  RUN QUERY — fresh start
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
+  //  STOP
+  // ═══════════════════════════════════════════════════════════════════════
+  function stopQuery() {
+    isStopped = true;
+    document.getElementById('stopBtn').style.display   = 'none';
+    document.getElementById('startBtn').style.display  = 'inline-block';
+    setStatus(`Stopped. ${resultsDiv.children.length} article(s) shown so far.`);
+    progressWrap(false);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  //  RUN QUERY
+  // ═══════════════════════════════════════════════════════════════════════
   async function runQuery() {
     const lang = getLangCode();
-    if (!lang) {
-      statusDiv.textContent = "Please select a wiki or enter a valid language code to start.";
-      return;
-    }
+    if (!lang) { setStatus("Please select a wiki or enter a valid language code."); return; }
     if (currentScope === 'category' && activeCategories.length === 0) {
       document.getElementById('noCatsWarning').style.display = 'block';
       return;
     }
 
-    // Reset all state
+    // Reset everything for a fresh run
+    isStopped       = false;
     apContinueToken = null;
-    articleQueue    = [];
-    articleQueueIdx = 0;
+    limit           = makeLimiter(CONCURRENCY);  // fresh limiter — no stale queue
     resultsDiv.innerHTML = "";
-    document.getElementById("load-more-button").style.display = "none";
-    document.getElementById("load-more-button-top").style.display = "none";
-    setProgress(0);
-
-    if (currentScope === 'category') {
-      // In category mode we first collect ALL articles from the category tree,
-      // then check them in batches. This makes "Load Next 500" simple and reliable.
-      statusDiv.textContent =
-        `Discovering articles in ${activeCategories.length} category(ies)` +
-        (selectedDepth > 0 ? ` + up to ${selectedDepth} level(s) of subcategories` : '') + '…';
-      showProgress(true);
-
-      const apiBase = `https://${lang}.wikipedia.org/w/api.php?origin=*`;
-      const allArticles = new Map(); // pageid → page object
-
-      for (let i = 0; i < activeCategories.length; i++) {
-        const cat = activeCategories[i];
-        statusDiv.textContent =
-          `Discovering articles in "${cat}" (${i + 1}/${activeCategories.length})…`;
-        setProgress(Math.round((i / activeCategories.length) * 40));
-        const articles = await fetchCategoryTreeArticles(apiBase, lang, cat, selectedDepth);
-        articles.forEach(p => {
-          if (!allArticles.has(p.pageid)) allArticles.set(p.pageid, p);
-        });
-      }
-
-      articleQueue = Array.from(allArticles.values());
-      statusDiv.textContent =
-        `Found ${articleQueue.length} unique articles. Now checking for missing images…`;
-    }
-
-    await loadMore();
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  LOAD MORE — checks the next BATCH_SIZE articles
-  // ═══════════════════════════════════════════════════════════════════════════
-  async function loadMore() {
-    const lang = getLangCode();
-    if (!lang) return;
+    hideLoadMore();
+    document.getElementById('stopBtn').style.display  = 'inline-block';
+    document.getElementById('startBtn').style.display = 'none';
+    progressWrap(true);
+    setProgress(0, '');
 
     const apiBase  = `https://${lang}.wikipedia.org/w/api.php?origin=*`;
     const wikiBase = `https://${lang}.wikipedia.org/wiki/`;
     const minSize  = parseInt(document.getElementById("minSize").value) || 0;
     const stubOnly = document.getElementById("stubOnly").checked;
 
-    let pages;
-
-    if (currentScope === 'category') {
-      if (articleQueueIdx >= articleQueue.length) {
-        statusDiv.textContent =
-          `All ${articleQueue.length} articles checked on ${lang}.wikipedia.org.`;
-        hideLoadMore();
-        showProgress(false);
-        return;
-      }
-      pages = articleQueue.slice(articleQueueIdx, articleQueueIdx + BATCH_SIZE);
-    } else {
-      if (apContinueToken === 'done') {
-        statusDiv.textContent = `All articles checked on ${lang}.wikipedia.org.`;
-        hideLoadMore();
-        return;
-      }
-      pages = await getAllPages(apiBase);
-      if (!pages.length) {
-        statusDiv.textContent = `No more pages found on ${lang}.wikipedia.org.`;
-        hideLoadMore();
-        return;
-      }
-    }
-
-    const batchStart = articleQueueIdx;
-    statusDiv.textContent =
-      `Checking articles ${batchStart + 1}–${batchStart + pages.length}` +
-      (currentScope === 'category' ? ` of ${articleQueue.length}` : '') + '…';
-    showProgress(true);
-
-    const existingCount = resultsDiv.children.length;
-    let found = 0;
-
-    // FIX: fetch all page data (images + info + stub check) in a single batched
-    // API call instead of 3 separate requests per page. This eliminates the
-    // intermittent "sometimes fetches, sometimes doesn't" problem.
-    statusDiv.textContent =
-      `Fetching page data for articles ${batchStart + 1}–${batchStart + pages.length}` +
-      (currentScope === 'category' ? ` of ${articleQueue.length}` : '') + '…';
-    setProgress(55);
-
-    const titles   = pages.map(p => p.title);
-    const pageData = await fetchBatchedPageData(apiBase, titles);
-    setProgress(85);
-
-    const tasks = pages.map((page, batchIdx) => limit(async () => {
-      const prog = Math.round(85 + ((batchIdx / pages.length) * 14));
-      setProgress(prog);
-
-      const data = pageData.get(page.title);
-      if (!data) return null;
-      const { noImage, info, isStub } = data;
-
-      if (!noImage || info.length < minSize || (stubOnly && !isStub)) return null;
-
-      const div = document.createElement("div");
-      div.className = "grid-item";
-      if (new Date(info.touched) > RECENT_EDIT_THRESHOLD) div.classList.add("recent");
-
-      const catBadge = page._categories?.length
-        ? `<br><small style="color:#888;">📂 ${page._categories.join(", ")}</small>`
-        : "";
-      const depthBadge = page._depth > 0
-        ? `<small style="color:#aaa;"> (depth ${page._depth})</small>`
-        : "";
-
-      div.innerHTML =
-        `<strong>${existingCount + 1 + found}.</strong> ` +
-        `<a href="${wikiBase + encodeURIComponent(page.title)}" target="_blank">${page.title}</a>` +
-        depthBadge +
-        `<br><small>${info.length} bytes${isStub ? ' (Stub)' : ''}</small>${catBadge}`;
-
-      found++;
-      return div;
-    }));
-
-    const newElements = await Promise.all(tasks);
-    newElements.filter(Boolean).forEach(el => resultsDiv.appendChild(el));
-
-    if (currentScope === 'category') {
-      articleQueueIdx += pages.length;
-    }
-
-    const total = resultsDiv.children.length;
-    statusDiv.textContent = `Done. Total displayed: ${total} articles on ${lang}.wikipedia.org.`;
-    setProgress(100);
-    setTimeout(() => showProgress(false), 800);
-
-    // Show/hide Load More
-    const hasMore = currentScope === 'category'
-      ? articleQueueIdx < articleQueue.length
-      : apContinueToken !== 'done';
-    document.getElementById("load-more-button").style.display      = hasMore ? "inline-block" : "none";
-    document.getElementById("load-more-button-top").style.display  = hasMore ? "inline-block" : "none";
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  CATEGORY NAMESPACE PREFIX DETECTION
-  //  Different wikis use different localised prefixes for categories.
-  //  e.g. English = "Category:", Hindi = "श्रेणी:", Bengali = "বিষয়শ্রেণী:"
-  //  We detect it once per wiki by querying namespace info, then cache it.
-  // ═══════════════════════════════════════════════════════════════════════════
-  const catPrefixCache = {}; // lang → "श्रेणी" | "Category" | etc.
-
-  async function getCategoryPrefix(apiUrl, lang) {
-    if (catPrefixCache[lang]) return catPrefixCache[lang];
     try {
-      const params = new URLSearchParams({
-        action: "query",
-        meta:   "siteinfo",
-        siprop: "namespaces",
-        format: "json",
-      });
-      const res  = await fetch(`${apiUrl}&${params.toString()}`);
-      const data = await res.json();
-      // Namespace 14 is the category namespace
-      const ns14 = data.query?.namespaces?.["14"];
-      const prefix = (ns14?.["*"] || ns14?.canonical || "Category");
-      catPrefixCache[lang] = prefix;
-      return prefix;
+      if (currentScope === 'category') {
+        await runCategoryMode(apiBase, wikiBase, lang, minSize, stubOnly);
+      } else {
+        await runWikiMode(apiBase, wikiBase, lang, minSize, stubOnly);
+      }
     } catch (e) {
-      console.warn("getCategoryPrefix failed, falling back to 'Category'", e);
-      catPrefixCache[lang] = "Category";
-      return "Category";
+      if (e.message !== 'stopped') {
+        setStatus(`Error: ${e.message}`);
+        console.error(e);
+      }
     }
+
+    document.getElementById('stopBtn').style.display  = 'none';
+    document.getElementById('startBtn').style.display = 'inline-block';
+    progressWrap(false);
   }
 
-  // Strip the localised (or English) category prefix from a full title
-  // e.g. "श्रेणी:भारत की अर्थव्यवस्था" → "भारत की अर्थव्यवस्था"
-  function stripCategoryPrefix(fullTitle, localPrefix) {
-    // Accept either the localised prefix or the canonical English "Category:"
-    const escaped = localPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return fullTitle.replace(new RegExp(`^(?:${escaped}|Category)\\s*:\\s*`, 'i'), "");
-  }
+  // ═══════════════════════════════════════════════════════════════════════
+  //  CATEGORY MODE  — level-by-level BFS, results shown after each level
+  //
+  //  Flow per depth level:
+  //    1. Fetch ALL subcategories from the current level (discovery first)
+  //    2. Fetch ALL articles from the current level categories
+  //    3. Check articles for missing images and display results
+  //    4. Move discovered subcategories to next level
+  // ═══════════════════════════════════════════════════════════════════════
+  async function runCategoryMode(apiBase, wikiBase, lang, minSize, stubOnly) {
+    const globalSeenPages = new Set();  // pageid dedup across all levels
+    const visitedCats     = new Set();  // category name dedup (prevent loops)
+    activeCategories.forEach(c => visitedCats.add(normCat(c)));
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  FETCH ALL ARTICLES IN A CATEGORY TREE (BFS with depth limit)
-  //  FIX: handles localised category prefixes (e.g. Hindi "श्रेणी:")
-  //       and correctly expands subcategories BEFORE checking pages (deep mode)
-  // ═══════════════════════════════════════════════════════════════════════════
-  async function fetchCategoryTreeArticles(apiUrl, lang, rootCategory, maxDepth) {
-    const articles    = new Map(); // pageid → article
-    const visitedCats = new Set(); // prevent infinite loops from circular categories
+    let currentLevelCats = [...activeCategories];
+    let totalFound = 0;
 
-    // Detect localised category prefix once for this wiki
-    const catPrefix = await getCategoryPrefix(apiUrl, lang);
+    for (let depth = 0; depth <= selectedDepth; depth++) {
+      if (isStopped || currentLevelCats.length === 0) break;
 
-    // BFS queue: [{ name, depth }]
-    // 'name' is always WITHOUT the prefix (just the bare category name)
-    const catQueue = [{ name: rootCategory, depth: 0 }];
+      // ── Step 1: Discover subcategories first (if more depth remains) ──
+      let nextLevelCats = [];
+      if (depth < selectedDepth) {
+        setStatus(`Depth ${depth} → discovering subcategories from ${currentLevelCats.length} category(ies)…`);
+        setProgress(Math.round((depth / (selectedDepth + 1)) * 30), `Depth ${depth}: finding subcategories`);
 
-    while (catQueue.length > 0) {
-      const { name: catName, depth } = catQueue.shift();
-      if (visitedCats.has(catName)) continue;
-      visitedCats.add(catName);
-
-      // ── Step 1: Fetch subcategories first (if depth allows) ──
-      // This ensures the BFS fully expands the tree before we harvest pages,
-      // which is the correct behaviour for "deep" mode.
-      if (depth < maxDepth) {
-        const subcats = await fetchAllCategoryMembers(apiUrl, catName, 'subcat', catPrefix);
-        for (const sc of subcats) {
-          // sc.title arrives as full title e.g. "श्रेणी:Foo" — strip prefix
-          const scName = stripCategoryPrefix(sc.title, catPrefix);
-          if (!visitedCats.has(scName)) {
-            catQueue.push({ name: scName, depth: depth + 1 });
+        for (const cat of currentLevelCats) {
+          if (isStopped) break;
+          const subcats = await fetchAllMembers(apiBase, cat, 'subcat');
+          for (const sc of subcats) {
+            // BUG FIX: use /^[^:]+:/ to strip ANY language's namespace prefix
+            // e.g. "श्रेणी:Foo", "Kategorie:Foo", "Category:Foo" all become "Foo"
+            const scName = sc.title.replace(/^[^:]+:\s*/, "").trim();
+            const scKey  = normCat(scName);
+            if (scName && !visitedCats.has(scKey)) {
+              visitedCats.add(scKey);
+              nextLevelCats.push(scName);
+            }
           }
         }
       }
 
-      // ── Step 2: Fetch articles (pages) in this category ──
-      const members = await fetchAllCategoryMembers(apiUrl, catName, 'page', catPrefix);
-      members.forEach(m => {
-        if (!articles.has(m.pageid)) {
-          articles.set(m.pageid, {
-            ...m,
-            _categories: [catName],
-            _depth: depth
-          });
+      // ── Step 2: Fetch articles from all categories at this depth ──
+      setStatus(`Depth ${depth}: collecting articles from ${currentLevelCats.length} category(ies)…`);
+      const levelPages = new Map(); // pageid → page object
+
+      for (const cat of currentLevelCats) {
+        if (isStopped) break;
+        const pages = await fetchAllMembers(apiBase, cat, 'page');
+        for (const p of pages) {
+          if (!globalSeenPages.has(p.pageid) && !levelPages.has(p.pageid)) {
+            levelPages.set(p.pageid, { ...p, _cat: cat, _depth: depth });
+          }
         }
-      });
+      }
+
+      // Mark all as seen
+      levelPages.forEach((_, pid) => globalSeenPages.add(pid));
+      const pageArr = Array.from(levelPages.values());
+
+      if (pageArr.length === 0) {
+        setStatus(`Depth ${depth}: no articles found. Moving on…`);
+        currentLevelCats = nextLevelCats;
+        continue;
+      }
+
+      // ── Step 3: Check articles for missing images and display ──
+      setStatus(`Depth ${depth}: checking ${pageArr.length} article(s) for missing images…`);
+      setProgress(
+        Math.round(((depth + 0.5) / (selectedDepth + 1)) * 90),
+        `Depth ${depth}: checking ${pageArr.length} article(s)`
+      );
+
+      // Add a level heading
+      const heading = document.createElement("div");
+      heading.className = "level-heading";
+      heading.textContent =
+        depth === 0
+          ? `📂 Direct category articles (depth 0)`
+          : `📂 Subcategory depth ${depth}`;
+      resultsDiv.appendChild(heading);
+
+      let checked = 0;
+      const tasks = pageArr.map(page => limit(async () => {
+        if (isStopped) return null;
+
+        const [noImage, info, isStub] = await Promise.all([
+          checkNoImage(apiBase, page.title),
+          getPageInfo(apiBase, page.title),
+          checkStubCategory(apiBase, page.title),
+        ]);
+
+        checked++;
+        if (checked % 20 === 0) {
+          setProgress(
+            Math.round(((depth + (checked / pageArr.length) * 0.9) / (selectedDepth + 1)) * 90),
+            `Depth ${depth}: checked ${checked}/${pageArr.length}`
+          );
+        }
+
+        if (!noImage || info.length < minSize || (stubOnly && !isStub)) return null;
+
+        totalFound++;
+        const div = document.createElement("div");
+        div.className = "grid-item";
+        if (new Date(info.touched) > RECENT_EDIT_THRESHOLD) div.classList.add("recent");
+
+        div.innerHTML =
+          `<strong>${totalFound}.</strong> ` +
+          `<a href="${wikiBase + encodeURIComponent(page.title)}" target="_blank">${page.title}</a>` +
+          (depth > 0 ? ` <small style="color:#aaa;">(depth ${depth})</small>` : '') +
+          `<br><small>${info.length} bytes${isStub ? ' · Stub' : ''}</small>` +
+          `<br><small style="color:#888;">📂 ${page._cat}</small>`;
+        return div;
+      }));
+
+      const els = await Promise.all(tasks);
+      els.filter(Boolean).forEach(el => resultsDiv.appendChild(el));
+
+      setStatus(
+        `Depth ${depth} done — ${pageArr.length} checked, ${totalFound} without images so far.`
+      );
+      currentLevelCats = nextLevelCats;
     }
 
-    return Array.from(articles.values());
+    if (!isStopped) {
+      setProgress(100, 'Complete');
+      setStatus(`✅ Done. ${totalFound} article(s) without images found on ${lang}.wikipedia.org.`);
+      setTimeout(() => progressWrap(false), 1000);
+    }
   }
 
-  // Fetch ALL members of a category (handles cmcontinue internally)
-  // FIX: uses the localised prefix when constructing cmtitle
-  async function fetchAllCategoryMembers(apiUrl, categoryName, cmtype, catPrefix) {
+  // ═══════════════════════════════════════════════════════════════════════
+  //  WIKI MODE  — allpages with apcontinue, Load More button
+  // ═══════════════════════════════════════════════════════════════════════
+  async function runWikiMode(apiBase, wikiBase, lang, minSize, stubOnly) {
+    apContinueToken = null;
+    setStatus(`Fetching first 500 articles from ${lang}.wikipedia.org…`);
+    await checkWikiBatch(apiBase, wikiBase, lang, minSize, stubOnly);
+  }
+
+  async function loadMoreWiki() {
+    const lang = getLangCode();
+    if (!lang) return;
+    const apiBase  = `https://${lang}.wikipedia.org/w/api.php?origin=*`;
+    const wikiBase = `https://${lang}.wikipedia.org/wiki/`;
+    const minSize  = parseInt(document.getElementById("minSize").value) || 0;
+    const stubOnly = document.getElementById("stubOnly").checked;
+    isStopped = false;
+    limit = makeLimiter(CONCURRENCY);
+    progressWrap(true);
+    document.getElementById('stopBtn').style.display  = 'inline-block';
+    document.getElementById('startBtn').style.display = 'none';
+    await checkWikiBatch(apiBase, wikiBase, lang, minSize, stubOnly);
+    document.getElementById('stopBtn').style.display  = 'none';
+    document.getElementById('startBtn').style.display = 'inline-block';
+    progressWrap(false);
+  }
+
+  async function checkWikiBatch(apiBase, wikiBase, lang, minSize, stubOnly) {
+    if (apContinueToken === 'done') {
+      setStatus(`All articles checked on ${lang}.wikipedia.org.`);
+      hideLoadMore();
+      return;
+    }
+
+    const pages = await getAllPages(apiBase);
+    if (!pages.length) {
+      setStatus(`No more pages found on ${lang}.wikipedia.org.`);
+      hideLoadMore();
+      return;
+    }
+
+    setStatus(`Checking ${pages.length} articles…`);
+    setProgress(10, `Checking ${pages.length} articles`);
+
+    const existingCount = resultsDiv.children.length;
+    let found = 0;
+
+    const tasks = pages.map((page, i) => limit(async () => {
+      if (isStopped) return null;
+      const [noImage, info, isStub] = await Promise.all([
+        checkNoImage(apiBase, page.title),
+        getPageInfo(apiBase, page.title),
+        checkStubCategory(apiBase, page.title),
+      ]);
+      if (i % 30 === 0) setProgress(10 + Math.round((i / pages.length) * 85), `Checked ${i}/${pages.length}`);
+      if (!noImage || info.length < minSize || (stubOnly && !isStub)) return null;
+
+      found++;
+      const div = document.createElement("div");
+      div.className = "grid-item";
+      if (new Date(info.touched) > RECENT_EDIT_THRESHOLD) div.classList.add("recent");
+      div.innerHTML =
+        `<strong>${existingCount + found}.</strong> ` +
+        `<a href="${wikiBase + encodeURIComponent(page.title)}" target="_blank">${page.title}</a>` +
+        `<br><small>${info.length} bytes${isStub ? ' · Stub' : ''}</small>`;
+      return div;
+    }));
+
+    const els = await Promise.all(tasks);
+    els.filter(Boolean).forEach(el => resultsDiv.appendChild(el));
+
+    setProgress(100, 'Done');
+    setStatus(`Done. Total: ${resultsDiv.children.length} on ${lang}.wikipedia.org.`);
+    setTimeout(() => progressWrap(false), 800);
+
+    const hasMore = apContinueToken !== 'done';
+    document.getElementById('load-more-button').style.display     = hasMore ? 'inline-block' : 'none';
+    document.getElementById('load-more-button-top').style.display = hasMore ? 'inline-block' : 'none';
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  //  fetchAllMembers — fetch ALL pages/subcats from one category
+  //  Uses fetchJSON (retry-capable), handles cmcontinue internally
+  // ═══════════════════════════════════════════════════════════════════════
+  async function fetchAllMembers(apiUrl, categoryName, cmtype) {
     const all = [];
-    let cmcontinue = undefined;
-    // Use the localised prefix if available, else fall back to "Category"
-    const prefix = catPrefix || "Category";
+    let cmcontinue;
 
     do {
       const params = new URLSearchParams({
-        action:      "query",
-        list:        "categorymembers",
-        cmtitle:     `${prefix}:${categoryName}`,
-        cmnamespace: cmtype === 'subcat' ? "14" : "0",
-        cmlimit:     "500",
+        action:      'query',
+        list:        'categorymembers',
+        cmtitle:     `Category:${categoryName}`,   // MediaWiki accepts "Category:" on all wikis
+        cmnamespace: cmtype === 'subcat' ? '14' : '0',
+        cmlimit:     '500',
         cmtype,
-        format:      "json",
+        format:      'json',
       });
-      if (cmcontinue) params.set("cmcontinue", cmcontinue);
+      if (cmcontinue) params.set('cmcontinue', cmcontinue);
 
       try {
-        const res  = await fetch(`${apiUrl}&${params.toString()}`);
-        const data = await res.json();
-        if (data.error) throw new Error(data.error.info);
-        const members = data.query?.categorymembers || [];
-        all.push(...members);
+        const data = await fetchJSON(`${apiUrl}&${params.toString()}`);
+        all.push(...(data.query?.categorymembers || []));
         cmcontinue = data.continue?.cmcontinue;
       } catch (e) {
-        console.warn(`fetchAllCategoryMembers failed for "${categoryName}" (${cmtype}):`, e);
+        if (e.message === 'stopped') throw e;
+        console.warn(`fetchAllMembers failed for "${categoryName}" (${cmtype}):`, e.message);
         break;
       }
     } while (cmcontinue);
@@ -890,102 +864,106 @@
     return all;
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  ALLPAGES (entire-wiki mode) with proper apcontinue
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
+  //  getAllPages — entire-wiki allpages with apcontinue
+  // ═══════════════════════════════════════════════════════════════════════
   async function getAllPages(apiUrl) {
     const params = new URLSearchParams({
-      action:      "query",
-      list:        "allpages",
-      apnamespace: "0",
-      aplimit:     "500",
-      format:      "json",
+      action: 'query', list: 'allpages',
+      apnamespace: '0', aplimit: '500', format: 'json',
     });
-    if (apContinueToken) params.set("apcontinue", apContinueToken);
-
+    if (apContinueToken) params.set('apcontinue', apContinueToken);
     try {
-      const res  = await fetch(`${apiUrl}&${params.toString()}`);
-      const data = await res.json();
-      if (data.error) throw new Error(data.error.info);
+      const data = await fetchJSON(`${apiUrl}&${params.toString()}`);
       apContinueToken = data.continue?.apcontinue ?? 'done';
       return data.query?.allpages || [];
     } catch (e) {
-      statusDiv.textContent =
-        `API Error: ${e.message}. Check if the language code is valid.`;
-      console.error("getAllPages failed", e);
+      setStatus(`API Error: ${e.message}`);
       return [];
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  BATCHED PAGE DATA  (images + pageimages + info + categories in ONE call)
-  //  FIX: replaces the three separate checkNoImage / getPageInfo / checkStubCategory
-  //       calls that were fired per-page, causing intermittent failures.
-  //  Accepts up to 50 titles at once; returns a Map<title → {noImage,info,isStub}>
-  // ═══════════════════════════════════════════════════════════════════════════
-  async function fetchBatchedPageData(apiUrl, titles) {
-    const result = new Map();
-    // Wikipedia allows up to 50 titles per query
-    const CHUNK = 50;
-    for (let i = 0; i < titles.length; i += CHUNK) {
-      const chunk = titles.slice(i, i + CHUNK);
-      const params = new URLSearchParams({
-        action:  "query",
-        prop:    "images|pageimages|info|categories",
-        titles:  chunk.join("|"),
-        format:  "json",
-        imlimit: "1",
-        piprop:  "name",
-        inprop:  "url|talkid|size|touched",
-        cllimit: "max",
-      });
-      try {
-        const res  = await fetch(`${apiUrl}&${params.toString()}`);
-        const data = await res.json();
-        const pages = data.query?.pages || {};
-        for (const page of Object.values(pages)) {
-          const noImage = !(page.images?.length) && !page.pageimage;
-          const info = {
-            length:  page.length  || 0,
-            touched: page.touched || new Date(0),
-            url:     page.fullurl || '#',
-            talkid:  page.talkid,
-          };
-          const isStub = (page.categories || []).some(cat =>
-            /stubs?|articles with a stub template|अधूरे लेख|स्टब/i.test(cat.title)
-          );
-          result.set(page.title, { noImage, info, isStub });
-        }
-      } catch (e) {
-        console.warn("fetchBatchedPageData failed for chunk starting at", i, e);
-        // On failure, fill defaults so the page is skipped (not falsely shown)
-        chunk.forEach(t => result.set(t, {
-          noImage: false,
-          info: { length: 0, touched: new Date(0), url: '#' },
-          isStub: false,
-        }));
-      }
+  // ═══════════════════════════════════════════════════════════════════════
+  //  IMAGE CHECK  — prop=images + prop=pageimages (covers infobox images)
+  // ═══════════════════════════════════════════════════════════════════════
+  async function checkNoImage(apiUrl, title) {
+    const params = new URLSearchParams({
+      action: 'query', prop: 'images|pageimages',
+      titles: title, format: 'json', imlimit: '1', piprop: 'name',
+    });
+    try {
+      const data = await fetchJSON(`${apiUrl}&${params.toString()}`);
+      const page = Object.values(data.query.pages)[0];
+      return !(page.images?.length) && !page.pageimage;
+    } catch (e) {
+      if (e.message === 'stopped') throw e;
+      // On persistent failure: assume article might have no image (include it)
+      return true;
     }
-    return result;
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  PROGRESS BAR HELPERS
-  // ═══════════════════════════════════════════════════════════════════════════
-  function showProgress(visible) {
-    document.getElementById("progressBar").style.display = visible ? "block" : "none";
+  // ═══════════════════════════════════════════════════════════════════════
+  //  PAGE INFO
+  // ═══════════════════════════════════════════════════════════════════════
+  async function getPageInfo(apiUrl, title) {
+    const params = new URLSearchParams({
+      action: 'query', prop: 'info', titles: title,
+      inprop: 'url|touched', format: 'json',
+    });
+    try {
+      const data = await fetchJSON(`${apiUrl}&${params.toString()}`);
+      const page = Object.values(data.query.pages)[0];
+      return { length: page.length || 0, touched: page.touched || new Date(0) };
+    } catch (e) {
+      if (e.message === 'stopped') throw e;
+      return { length: 0, touched: new Date(0) };
+    }
   }
-  function setProgress(pct) {
-    document.getElementById("progressFill").style.width = pct + "%";
+
+  // ═══════════════════════════════════════════════════════════════════════
+  //  STUB CHECK
+  // ═══════════════════════════════════════════════════════════════════════
+  async function checkStubCategory(apiUrl, title) {
+    const params = new URLSearchParams({
+      action: 'query', prop: 'categories', titles: title,
+      format: 'json', cllimit: 'max',
+    });
+    try {
+      const data = await fetchJSON(`${apiUrl}&${params.toString()}`);
+      const page = Object.values(data.query.pages)[0];
+      if (!page.categories) return false;
+      return page.categories.some(c =>
+        /stubs?|articles with a stub template|अधूरे लेख|स्टब/i.test(c.title)
+      );
+    } catch (e) {
+      if (e.message === 'stopped') throw e;
+      return false;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  //  HELPERS
+  // ═══════════════════════════════════════════════════════════════════════
+  // Normalize a category name for deduplication (lowercase, trimmed)
+  function normCat(name) { return name.trim().toLowerCase(); }
+
+  function setStatus(msg) { statusDiv.textContent = msg; }
+
+  function progressWrap(visible) {
+    document.getElementById('progressWrap').style.display = visible ? 'block' : 'none';
+  }
+  function setProgress(pct, label) {
+    document.getElementById('progressFill').style.width = pct + '%';
+    if (label !== undefined) document.getElementById('progressLabel').textContent = label;
   }
   function hideLoadMore() {
-    document.getElementById("load-more-button").style.display = "none";
-    document.getElementById("load-more-button-top").style.display = "none";
+    document.getElementById('load-more-button').style.display     = 'none';
+    document.getElementById('load-more-button-top').style.display = 'none';
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
   //  INIT
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════════
   document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('nightMode') === 'true') {
       document.body.classList.add('night-mode');
