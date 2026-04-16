@@ -17,8 +17,8 @@
   <meta property="twitter:description" content="Find Wikipedia articles across any language that are missing images. Filter by language, size, and stub status." />
   <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
   <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
-
   <title>Wikipedia articles without images finder</title>
+
   <style>
     :root {
       --bg-color: #fefefe;
@@ -27,6 +27,13 @@
       --grid-bg: #f9f9f9;
       --grid-border: #ccc;
       --recent-bg: #ffffcc;
+      --tag-bg: #d0e8ff;
+      --tag-border: #4a90d9;
+      --tag-text: #1a4a7a;
+      --scope-active-bg: #1a5cb8;
+      --scope-active-text: #fff;
+      --scope-inactive-bg: #e8e8e8;
+      --scope-inactive-text: #555;
     }
     body.night-mode {
       --bg-color: #121212;
@@ -35,6 +42,13 @@
       --grid-bg: #1e1e1e;
       --grid-border: #555;
       --recent-bg: #3c3c12;
+      --tag-bg: #1a3a5c;
+      --tag-border: #4a90d9;
+      --tag-text: #90c8ff;
+      --scope-active-bg: #2a70d8;
+      --scope-active-text: #fff;
+      --scope-inactive-bg: #2a2a2a;
+      --scope-inactive-text: #aaa;
     }
     body {
       font-family: Arial, sans-serif;
@@ -50,9 +64,7 @@
       justify-content: center;
       gap: 10px;
     }
-    .logo {
-      height: 75px; /* Big and colorful logo height */
-    }
+    .logo { height: 75px; }
     .banner {
       background: var(--header-bg);
       padding: 1rem;
@@ -69,11 +81,184 @@
       align-items: center;
     }
     .lang-filter-group {
-        display: flex;
-        flex-direction: row; /* Changed to row for side-by-side */
-        gap: 10px; /* Space between dropdown and input */
-        align-items: center;
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
     }
+
+    /* ── Scope Toggle ── */
+    .scope-box {
+      width: 100%;
+      max-width: 750px;
+      margin: 0.5rem auto 0;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--grid-border);
+      border-radius: 8px;
+      background: var(--grid-bg);
+    }
+    .scope-title { font-weight: bold; font-size: 0.93rem; margin-bottom: 0.55rem; }
+    .scope-radio-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .scope-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .scope-label.active {
+      background: var(--scope-active-bg);
+      color: var(--scope-active-text);
+      border-color: var(--scope-active-bg);
+    }
+    .scope-label:not(.active) {
+      background: var(--scope-inactive-bg);
+      color: var(--scope-inactive-text);
+      border-color: var(--grid-border);
+    }
+    .scope-label input[type="radio"] { display: none; }
+
+    /* ── Category Section ── */
+    .category-section {
+      width: 100%;
+      max-width: 750px;
+      margin: 0.5rem auto 0;
+      border: 2px solid var(--tag-border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      background: var(--grid-bg);
+    }
+    .category-section-title { font-weight: bold; margin-bottom: 0.5rem; font-size: 0.93rem; }
+    .category-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    #categoryInput {
+      flex: 1;
+      min-width: 200px;
+      padding: 6px 8px;
+      border: 1px solid var(--grid-border);
+      border-radius: 4px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-size: 0.9rem;
+    }
+    #addCategoryBtn {
+      padding: 0.4rem 0.9rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: 1px solid var(--tag-border);
+      background-color: var(--tag-bg);
+      color: var(--tag-text);
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    #addCategoryBtn:hover { opacity: 0.8; }
+    .category-hint { font-size: 0.78rem; color: #888; margin-top: 4px; }
+
+    /* ── Depth Selector ── */
+    .depth-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .depth-row label { font-size: 0.88rem; font-weight: bold; }
+    .depth-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      font-size: 0.9rem;
+      font-weight: bold;
+      border: 2px solid var(--grid-border);
+      background: var(--scope-inactive-bg);
+      color: var(--scope-inactive-text);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+      line-height: 1;
+    }
+    .depth-btn.selected {
+      background: var(--scope-active-bg);
+      color: var(--scope-active-text);
+      border-color: var(--scope-active-bg);
+    }
+    .depth-hint { font-size: 0.76rem; color: #888; }
+
+    /* ── Category Tags ── */
+    #categoryTags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 0.6rem;
+      min-height: 4px;
+    }
+    .cat-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      border: 1px solid var(--tag-border);
+      border-radius: 20px;
+      padding: 3px 8px 3px 12px;
+      font-size: 0.83rem;
+      max-width: 300px;
+    }
+    .cat-tag span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* FIX: use data-index + event delegation — inline onclick with
+       JSON.stringify breaks on Unicode/special-char category names */
+    .cat-tag-remove {
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      color: var(--tag-text);
+      background: none;
+      border: none;
+      padding: 2px 4px;
+      flex-shrink: 0;
+      border-radius: 50%;
+    }
+    .cat-tag-remove:hover { opacity: 0.6; background: rgba(0,0,0,0.08); }
+
+    .no-cats-warning {
+      font-size: 0.82rem;
+      color: #c0392b;
+      margin-top: 5px;
+      display: none;
+    }
+
+    /* ── Progress bar ── */
+    #progressBar {
+      width: 100%;
+      height: 6px;
+      background: var(--grid-border);
+      border-radius: 3px;
+      margin: 0.5rem 0;
+      display: none;
+    }
+    #progressFill {
+      height: 100%;
+      background: var(--scope-active-bg);
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.2s;
+    }
+
+    /* ── Grid ── */
     .grid-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -87,9 +272,7 @@
       border-radius: 5px;
       transition: background-color 0.3s, border-color 0.3s;
     }
-    .recent {
-      background-color: var(--recent-bg);
-    }
+    .recent { background-color: var(--recent-bg); }
     .footer {
       text-align: center;
       margin-top: 2rem;
@@ -106,10 +289,7 @@
       border-radius: 5px;
       transition: background-color 0.3s;
     }
-    button:hover {
-      opacity: 0.9;
-    }
-    /* Night Mode Button Styling */
+    button:hover { opacity: 0.9; }
     .night-mode-toggle {
       position: absolute;
       top: 10px;
@@ -121,7 +301,6 @@
       background: none;
       color: var(--text-color);
     }
-    /* Go to Top/Bottom Buttons */
     .scroll-button {
       position: fixed;
       right: 20px;
@@ -133,19 +312,15 @@
       cursor: pointer;
       font-size: 1rem;
       z-index: 1000;
-      display: none; /* Hidden by default */
+      display: none;
     }
-    #go-to-top {
-      bottom: 70px;
-    }
-    #go-to-bottom {
-      bottom: 20px;
-    }
+    #go-to-top    { bottom: 70px; }
+    #go-to-bottom { bottom: 20px; }
     #langCodeInput, #langSelect {
-        padding: 5px;
-        border: 1px solid var(--grid-border);
-        background-color: var(--grid-bg);
-        color: var(--text-color);
+      padding: 5px;
+      border: 1px solid var(--grid-border);
+      background-color: var(--grid-bg);
+      color: var(--text-color);
     }
   </style>
 </head>
@@ -155,59 +330,111 @@
   <h1>
     <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" class="logo" />
     Wikipedia articles without images finder
-  </h1 >
+  </h1>
   <div class="banner">Wikipedia Articles Without Images (Global)</div>
-  
+
+  <!-- Language & basic filters -->
   <div class="filters">
     <div class="lang-filter-group">
-        <label for="langSelect">Select Wiki:</label>
-        <select id="langSelect">
-				<option value="awa" selected>Awadhi (awa)</option>    			
-                <option value="en">English (en)</option>
-                <option value="de">German (de)</option>
-                <option value="fr">French (fr)</option>
-                <option value="es">Spanish (es)</option>
-                <option value="ru">Russian (ru)</option>
-                <option value="zh">Chinese (zh)</option>        
-                <option value="hi">Hindi (hi)</option>
-                <option value="bn">Bengali (bn)</option>
-                <option value="gu">Gujarati (gu)</option>
-                <option value="kn">Kannada (kn)</option>
-                <option value="ml">Malayalam (ml)</option>
-                <option value="mr">Marathi (mr)</option>
-                <option value="ne">Nepali (ne)</option>
-                <option value="or">Odia (or)</option>
-                <option value="pa">Punjabi (pa)</option>
-                <option value="sa">Sanskrit (sa)</option>
-                <option value="ta">Tamil (ta)</option>
-                <option value="te">Telugu (te)</option>
-                <option value="">-- Other --</option>
-        </select>
-        <label for="langCodeInput">Or Enter Code:</label>
-        <input type="text" id="langCodeInput" placeholder="e.g. 'it', 'kn'"/>
+      <label for="langSelect">Select Wiki:</label>
+      <select id="langSelect">
+        <option value="awa" selected>Awadhi (awa)</option>
+        <option value="en">English (en)</option>
+        <option value="de">German (de)</option>
+        <option value="fr">French (fr)</option>
+        <option value="es">Spanish (es)</option>
+        <option value="ru">Russian (ru)</option>
+        <option value="zh">Chinese (zh)</option>
+        <option value="hi">Hindi (hi)</option>
+        <option value="bn">Bengali (bn)</option>
+        <option value="gu">Gujarati (gu)</option>
+        <option value="kn">Kannada (kn)</option>
+        <option value="ml">Malayalam (ml)</option>
+        <option value="mr">Marathi (mr)</option>
+        <option value="ne">Nepali (ne)</option>
+        <option value="or">Odia (or)</option>
+        <option value="pa">Punjabi (pa)</option>
+        <option value="sa">Sanskrit (sa)</option>
+        <option value="ta">Tamil (ta)</option>
+        <option value="te">Telugu (te)</option>
+        <option value="">-- Other --</option>
+      </select>
+      <label for="langCodeInput">Or Enter Code:</label>
+      <input type="text" id="langCodeInput" placeholder="e.g. 'it', 'kn'" />
     </div>
     <label>Min Size (bytes): <input type="number" id="minSize" value="0" /></label>
     <label><input type="checkbox" id="stubOnly" /> Stub only</label>
   </div>
-  
-  <div style="text-align:center">
+
+  <!-- Search Scope: default = category -->
+  <div class="scope-box">
+    <div class="scope-title">🔍 Search Scope</div>
+    <div class="scope-radio-row">
+      <label class="scope-label" id="scopeLabelCat" onclick="setScope('category')">
+        <input type="radio" name="scope" value="category" />
+        📂 Selected Categories Only
+      </label>
+      <label class="scope-label" id="scopeLabelWiki" onclick="setScope('wiki')">
+        <input type="radio" name="scope" value="wiki" />
+        🌐 Entire Wiki
+      </label>
+    </div>
+  </div>
+
+  <!-- Category Filter (visible by default since category is default scope) -->
+  <div class="category-section" id="categorySection">
+    <div class="category-section-title">📂 Categories to Search In</div>
+    <div class="category-input-row">
+      <input type="text" id="categoryInput"
+             placeholder="e.g. शहर, Rivers, Cities in India …"
+             onkeydown="if(event.key==='Enter') addCategory()" />
+      <button id="addCategoryBtn" onclick="addCategory()">＋ Add Category</button>
+    </div>
+    <div class="category-hint">
+      Type a category name (without the "Category:" prefix) and press <strong>Add</strong> or hit <strong>Enter</strong>.
+      Multiple categories are merged and deduplicated.
+    </div>
+
+    <!-- Subcategory depth -->
+    <div class="depth-row">
+      <label>Subcategory depth:</label>
+      <button class="depth-btn selected" data-depth="0">0</button>
+      <button class="depth-btn" data-depth="1">1</button>
+      <button class="depth-btn" data-depth="2">2</button>
+      <button class="depth-btn" data-depth="3">3</button>
+      <button class="depth-btn" data-depth="4">4</button>
+      <button class="depth-btn" data-depth="5">5</button>
+      <span class="depth-hint" id="depthHint">Search only the direct category (no subcategories)</span>
+    </div>
+
+    <!-- Tags rendered here by JS (event delegation — no inline onclick) -->
+    <div id="categoryTags"></div>
+    <div class="no-cats-warning" id="noCatsWarning">
+      ⚠️ Please add at least one category, or switch scope to "Entire Wiki".
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:0.75rem;">
     <button id="load-more-button-top" style="display:none" onclick="loadMore()">Load Next 500</button>
     <button onclick="runQuery()">Check Articles Without Images</button>
   </div>
-  
-  <div id="status" style="margin:1rem; font-weight:bold; text-align:center;">Select a wiki or enter a code to start.</div>
-  <div class="grid-container" id="results"></div>
-  
-  <div style="text-align:center">
-    <button id="load-more-button" style="display: none; margin-top:1rem;" onclick="loadMore()">Load Next 500</button>
+
+  <div id="progressBar"><div id="progressFill"></div></div>
+  <div id="status" style="margin:1rem; font-weight:bold; text-align:center;">
+    Add categories above and click "Check Articles Without Images".
   </div>
-  
-  <div class="footer">
-    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 31 August 2025
+  <div class="grid-container" id="results"></div>
+
+  <div style="text-align:center">
+    <button id="load-more-button" style="display:none; margin-top:1rem;" onclick="loadMore()">Load Next 500</button>
   </div>
 
-  <button id="go-to-top" class="scroll-button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑ Go to Top</button>
-  <button id="go-to-bottom" class="scroll-button" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})">↓ Go to Bottom</button>
+  <div class="footer">
+    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 16 April 2026
+  </div>
+
+  <button id="go-to-top"    class="scroll-button" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Go to Top</button>
+  <button id="go-to-bottom" class="scroll-button" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">↓ Go to Bottom</button>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
   <script>
@@ -222,212 +449,515 @@
   </script>
 
   <script>
-    let offset = 0;
-    const resultsDiv = document.getElementById("results");
-    const statusDiv = document.getElementById("status");
-    const RECENT_EDIT_THRESHOLD = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30); // last 30 days
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  STATE
+  // ═══════════════════════════════════════════════════════════════════════════
+  let currentScope     = 'category'; // default is category mode
+  let activeCategories = [];         // string[]
+  let selectedDepth    = 0;          // 0–5 subcategory levels
 
-    // Function to determine the language code: uses dropdown, then falls back to input box
-    function getLangCode() {
-        const selectedLang = document.getElementById("langSelect").value.trim().toLowerCase();
-        if (selectedLang) {
-            return selectedLang;
+  // Pagination state
+  let apContinueToken  = null;       // allpages continuation
+  // In category mode we collect ALL articles first, then check them in batches
+  let articleQueue     = [];         // all discovered articles (category mode)
+  let articleQueueIdx  = 0;          // how many have been checked so far
+
+  const BATCH_SIZE = 500;
+  const CONCURRENCY = 5; // max simultaneous API check requests (avoids flaky behavior)
+
+  const resultsDiv = document.getElementById("results");
+  const statusDiv  = document.getElementById("status");
+  const RECENT_EDIT_THRESHOLD = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  CONCURRENCY LIMITER
+  //  Prevents hundreds of simultaneous fetch() calls which cause flaky results
+  // ═══════════════════════════════════════════════════════════════════════════
+  function pLimit(concurrency) {
+    let active = 0;
+    const queue = [];
+    function run() {
+      if (active >= concurrency || !queue.length) return;
+      active++;
+      const { fn, resolve, reject } = queue.shift();
+      fn().then(resolve, reject).finally(() => { active--; run(); });
+    }
+    return function limit(fn) {
+      return new Promise((resolve, reject) => {
+        queue.push({ fn, resolve, reject });
+        run();
+      });
+    };
+  }
+  const limit = pLimit(CONCURRENCY);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  SCOPE TOGGLE
+  // ═══════════════════════════════════════════════════════════════════════════
+  function setScope(scope) {
+    currentScope = scope;
+    document.getElementById('scopeLabelWiki').classList.toggle('active', scope === 'wiki');
+    document.getElementById('scopeLabelCat').classList.toggle('active', scope === 'category');
+    document.getElementById('categorySection').style.display = scope === 'category' ? '' : 'none';
+    document.getElementById('noCatsWarning').style.display = 'none';
+  }
+  // Initialise: category is active by default
+  setScope('category');
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  DEPTH SELECTOR
+  // ═══════════════════════════════════════════════════════════════════════════
+  const depthHints = [
+    'Search only the direct category (no subcategories)',
+    'Also search 1 level of subcategories',
+    'Also search up to 2 levels of subcategories',
+    'Also search up to 3 levels of subcategories',
+    'Also search up to 4 levels of subcategories',
+    'Also search up to 5 levels of subcategories',
+  ];
+  document.querySelectorAll('.depth-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.depth-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedDepth = parseInt(btn.dataset.depth, 10);
+      document.getElementById('depthHint').textContent = depthHints[selectedDepth];
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  CATEGORY TAGS
+  //  FIX: use data-index + event delegation instead of inline onclick with
+  //  JSON.stringify, which breaks on Unicode/Hindi category names
+  // ═══════════════════════════════════════════════════════════════════════════
+  function addCategory() {
+    const input = document.getElementById("categoryInput");
+    let raw = input.value.trim().replace(/^Category\s*:\s*/i, "");
+    if (!raw || activeCategories.includes(raw)) { input.value = ""; return; }
+    activeCategories.push(raw);
+    input.value = "";
+    renderCategoryTags();
+    document.getElementById('noCatsWarning').style.display = 'none';
+  }
+
+  function removeCategory(index) {
+    activeCategories.splice(index, 1);
+    renderCategoryTags();
+  }
+
+  function renderCategoryTags() {
+    const container = document.getElementById("categoryTags");
+    container.innerHTML = "";
+    activeCategories.forEach((name, idx) => {
+      const tag = document.createElement("div");
+      tag.className = "cat-tag";
+      const span = document.createElement("span");
+      span.title = name;
+      span.textContent = name;
+      const btn = document.createElement("button");
+      btn.className = "cat-tag-remove";
+      btn.title = "Remove";
+      btn.textContent = "✕";
+      btn.dataset.index = idx; // store index, not name — safe for any Unicode
+      tag.appendChild(span);
+      tag.appendChild(btn);
+      container.appendChild(tag);
+    });
+  }
+
+  // Single delegated listener on the tags container — no inline onclick at all
+  document.getElementById("categoryTags").addEventListener("click", function(e) {
+    const btn = e.target.closest(".cat-tag-remove");
+    if (!btn) return;
+    removeCategory(parseInt(btn.dataset.index, 10));
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  LANGUAGE HELPER
+  // ═══════════════════════════════════════════════════════════════════════════
+  function getLangCode() {
+    const sel = document.getElementById("langSelect").value.trim().toLowerCase();
+    return sel || document.getElementById("langCodeInput").value.trim().toLowerCase();
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  NIGHT MODE
+  // ═══════════════════════════════════════════════════════════════════════════
+  function toggleNightMode() {
+    document.body.classList.toggle('night-mode');
+    const isNight = document.body.classList.contains('night-mode');
+    localStorage.setItem('nightMode', isNight);
+    document.getElementById('night-mode-button').innerHTML = isNight ? '&#127774;' : '&#127769;';
+  }
+  if (localStorage.getItem('nightMode') === 'true') {
+    document.body.classList.add('night-mode');
+    document.getElementById('night-mode-button').innerHTML = '&#127774;';
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  SCROLL BUTTONS
+  // ═══════════════════════════════════════════════════════════════════════════
+  window.onscroll = function () {
+    const show = document.body.scrollTop > 20 || document.documentElement.scrollTop > 20;
+    document.getElementById('go-to-top').style.display    = show ? "block" : "none";
+    document.getElementById('go-to-bottom').style.display = show ? "block" : "none";
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  RUN QUERY — fresh start
+  // ═══════════════════════════════════════════════════════════════════════════
+  async function runQuery() {
+    const lang = getLangCode();
+    if (!lang) {
+      statusDiv.textContent = "Please select a wiki or enter a valid language code to start.";
+      return;
+    }
+    if (currentScope === 'category' && activeCategories.length === 0) {
+      document.getElementById('noCatsWarning').style.display = 'block';
+      return;
+    }
+
+    // Reset all state
+    apContinueToken = null;
+    articleQueue    = [];
+    articleQueueIdx = 0;
+    resultsDiv.innerHTML = "";
+    document.getElementById("load-more-button").style.display = "none";
+    document.getElementById("load-more-button-top").style.display = "none";
+    setProgress(0);
+
+    if (currentScope === 'category') {
+      // In category mode we first collect ALL articles from the category tree,
+      // then check them in batches. This makes "Load Next 500" simple and reliable.
+      statusDiv.textContent =
+        `Discovering articles in ${activeCategories.length} category(ies)` +
+        (selectedDepth > 0 ? ` + up to ${selectedDepth} level(s) of subcategories` : '') + '…';
+      showProgress(true);
+
+      const apiBase = `https://${lang}.wikipedia.org/w/api.php?origin=*`;
+      const allArticles = new Map(); // pageid → page object
+
+      for (let i = 0; i < activeCategories.length; i++) {
+        const cat = activeCategories[i];
+        statusDiv.textContent =
+          `Discovering articles in "${cat}" (${i + 1}/${activeCategories.length})…`;
+        setProgress(Math.round((i / activeCategories.length) * 40));
+        const articles = await fetchCategoryTreeArticles(apiBase, cat, selectedDepth);
+        articles.forEach(p => {
+          if (!allArticles.has(p.pageid)) allArticles.set(p.pageid, p);
+        });
+      }
+
+      articleQueue = Array.from(allArticles.values());
+      statusDiv.textContent =
+        `Found ${articleQueue.length} unique articles. Now checking for missing images…`;
+    }
+
+    await loadMore();
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  LOAD MORE — checks the next BATCH_SIZE articles
+  // ═══════════════════════════════════════════════════════════════════════════
+  async function loadMore() {
+    const lang = getLangCode();
+    if (!lang) return;
+
+    const apiBase  = `https://${lang}.wikipedia.org/w/api.php?origin=*`;
+    const wikiBase = `https://${lang}.wikipedia.org/wiki/`;
+    const minSize  = parseInt(document.getElementById("minSize").value) || 0;
+    const stubOnly = document.getElementById("stubOnly").checked;
+
+    let pages;
+
+    if (currentScope === 'category') {
+      if (articleQueueIdx >= articleQueue.length) {
+        statusDiv.textContent =
+          `All ${articleQueue.length} articles checked on ${lang}.wikipedia.org.`;
+        hideLoadMore();
+        showProgress(false);
+        return;
+      }
+      pages = articleQueue.slice(articleQueueIdx, articleQueueIdx + BATCH_SIZE);
+    } else {
+      if (apContinueToken === 'done') {
+        statusDiv.textContent = `All articles checked on ${lang}.wikipedia.org.`;
+        hideLoadMore();
+        return;
+      }
+      pages = await getAllPages(apiBase);
+      if (!pages.length) {
+        statusDiv.textContent = `No more pages found on ${lang}.wikipedia.org.`;
+        hideLoadMore();
+        return;
+      }
+    }
+
+    const batchStart = articleQueueIdx;
+    statusDiv.textContent =
+      `Checking articles ${batchStart + 1}–${batchStart + pages.length}` +
+      (currentScope === 'category' ? ` of ${articleQueue.length}` : '') + '…';
+    showProgress(true);
+
+    const existingCount = resultsDiv.children.length;
+    let found = 0;
+
+    // FIX: use concurrency limiter so we never fire >CONCURRENCY requests at once.
+    // Previously all pages were checked simultaneously, overloading the API and
+    // causing intermittent failures / missing results.
+    const tasks = pages.map((page, batchIdx) => limit(async () => {
+      const prog = Math.round(40 + ((batchIdx / pages.length) * 55));
+      setProgress(prog);
+
+      const [noImage, info, isStub] = await Promise.all([
+        checkNoImage(apiBase, page.title),
+        getPageInfo(apiBase, page.title),
+        checkStubCategory(apiBase, page.title)
+      ]);
+
+      if (!noImage || info.length < minSize || (stubOnly && !isStub)) return null;
+
+      const div = document.createElement("div");
+      div.className = "grid-item";
+      if (new Date(info.touched) > RECENT_EDIT_THRESHOLD) div.classList.add("recent");
+
+      const catBadge = page._categories?.length
+        ? `<br><small style="color:#888;">📂 ${page._categories.join(", ")}</small>`
+        : "";
+      const depthBadge = page._depth > 0
+        ? `<small style="color:#aaa;"> (depth ${page._depth})</small>`
+        : "";
+
+      div.innerHTML =
+        `<strong>${existingCount + 1 + found}.</strong> ` +
+        `<a href="${wikiBase + encodeURIComponent(page.title)}" target="_blank">${page.title}</a>` +
+        depthBadge +
+        `<br><small>${info.length} bytes${isStub ? ' (Stub)' : ''}</small>${catBadge}`;
+
+      found++;
+      return div;
+    }));
+
+    const newElements = await Promise.all(tasks);
+    newElements.filter(Boolean).forEach(el => resultsDiv.appendChild(el));
+
+    if (currentScope === 'category') {
+      articleQueueIdx += pages.length;
+    }
+
+    const total = resultsDiv.children.length;
+    statusDiv.textContent = `Done. Total displayed: ${total} articles on ${lang}.wikipedia.org.`;
+    setProgress(100);
+    setTimeout(() => showProgress(false), 800);
+
+    // Show/hide Load More
+    const hasMore = currentScope === 'category'
+      ? articleQueueIdx < articleQueue.length
+      : apContinueToken !== 'done';
+    document.getElementById("load-more-button").style.display      = hasMore ? "inline-block" : "none";
+    document.getElementById("load-more-button-top").style.display  = hasMore ? "inline-block" : "none";
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  FETCH ALL ARTICLES IN A CATEGORY TREE (BFS with depth limit)
+  // ═══════════════════════════════════════════════════════════════════════════
+  async function fetchCategoryTreeArticles(apiUrl, rootCategory, maxDepth) {
+    const articles    = new Map(); // pageid → article
+    const visitedCats = new Set(); // prevent infinite loops from circular categories
+
+    // BFS queue: [{ name, depth }]
+    const catQueue = [{ name: rootCategory, depth: 0 }];
+
+    while (catQueue.length > 0) {
+      const { name: catName, depth } = catQueue.shift();
+      if (visitedCats.has(catName)) continue;
+      visitedCats.add(catName);
+
+      // Fetch articles in this category (all pages via continuation)
+      const members = await fetchAllCategoryMembers(apiUrl, catName, 'page');
+      members.forEach(m => {
+        if (!articles.has(m.pageid)) {
+          articles.set(m.pageid, {
+            ...m,
+            _categories: [catName],
+            _depth: depth
+          });
         }
-        return document.getElementById("langCodeInput").value.trim().toLowerCase();
+      });
+
+      // Fetch subcategories if depth allows
+      if (depth < maxDepth) {
+        const subcats = await fetchAllCategoryMembers(apiUrl, catName, 'subcat');
+        for (const sc of subcats) {
+          // sc.title is like "Category:Foo" — strip prefix
+          const scName = sc.title.replace(/^Category:/i, "");
+          if (!visitedCats.has(scName)) {
+            catQueue.push({ name: scName, depth: depth + 1 });
+          }
+        }
+      }
     }
 
-    // Night Mode Script
-    function toggleNightMode() {
-      document.body.classList.toggle('night-mode');
-      let isNight = document.body.classList.contains('night-mode');
-      localStorage.setItem('nightMode', isNight);
-      document.getElementById('night-mode-button').innerHTML = isNight ? '&#127774;' : '&#127769;'; // Sun/Moon emoji
+    return Array.from(articles.values());
+  }
+
+  // Fetch ALL members of a category (handles cmcontinue internally)
+  async function fetchAllCategoryMembers(apiUrl, categoryName, cmtype) {
+    const all = [];
+    let cmcontinue = undefined;
+
+    do {
+      const params = new URLSearchParams({
+        action:      "query",
+        list:        "categorymembers",
+        cmtitle:     `Category:${categoryName}`,
+        cmnamespace: cmtype === 'subcat' ? "14" : "0",
+        cmlimit:     "500",
+        cmtype,
+        format:      "json",
+      });
+      if (cmcontinue) params.set("cmcontinue", cmcontinue);
+
+      try {
+        const res  = await fetch(`${apiUrl}&${params.toString()}`);
+        const data = await res.json();
+        if (data.error) throw new Error(data.error.info);
+        const members = data.query?.categorymembers || [];
+        all.push(...members);
+        cmcontinue = data.continue?.cmcontinue;
+      } catch (e) {
+        console.warn(`fetchAllCategoryMembers failed for "${categoryName}" (${cmtype}):`, e);
+        break;
+      }
+    } while (cmcontinue);
+
+    return all;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  ALLPAGES (entire-wiki mode) with proper apcontinue
+  // ═══════════════════════════════════════════════════════════════════════════
+  async function getAllPages(apiUrl) {
+    const params = new URLSearchParams({
+      action:      "query",
+      list:        "allpages",
+      apnamespace: "0",
+      aplimit:     "500",
+      format:      "json",
+    });
+    if (apContinueToken) params.set("apcontinue", apContinueToken);
+
+    try {
+      const res  = await fetch(`${apiUrl}&${params.toString()}`);
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.info);
+      apContinueToken = data.continue?.apcontinue ?? 'done';
+      return data.query?.allpages || [];
+    } catch (e) {
+      statusDiv.textContent =
+        `API Error: ${e.message}. Check if the language code is valid.`;
+      console.error("getAllPages failed", e);
+      return [];
     }
-    // Check local storage for night mode preference on load
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  IMAGE CHECK  (prop=images + prop=pageimages)
+  // ═══════════════════════════════════════════════════════════════════════════
+  async function checkNoImage(apiUrl, title) {
+    const params = new URLSearchParams({
+      action:  "query",
+      prop:    "images|pageimages",
+      titles:  title,
+      format:  "json",
+      imlimit: "1",
+      piprop:  "name",
+    });
+    try {
+      const res  = await fetch(`${apiUrl}&${params.toString()}`);
+      const data = await res.json();
+      const page = Object.values(data.query.pages)[0];
+      return !(page.images?.length) && !page.pageimage;
+    } catch (e) {
+      console.warn("Image check failed for", title, e);
+      return false; // if check fails, skip rather than show false positive
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  PAGE INFO
+  // ═══════════════════════════════════════════════════════════════════════════
+  async function getPageInfo(apiUrl, title) {
+    const params = new URLSearchParams({
+      action:  "query",
+      prop:    "info",
+      titles:  title,
+      inprop:  "url|talkid|size|touched",
+      format:  "json",
+    });
+    try {
+      const res  = await fetch(`${apiUrl}&${params.toString()}`);
+      const data = await res.json();
+      const page = Object.values(data.query.pages)[0];
+      return {
+        length:  page.length  || 0,
+        touched: page.touched || new Date(0),
+        url:     page.fullurl || '#',
+        talkid:  page.talkid,
+      };
+    } catch (e) {
+      console.warn("Page info failed for", title, e);
+      return { length: 0, touched: new Date(0) };
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  STUB CHECK
+  // ═══════════════════════════════════════════════════════════════════════════
+  async function checkStubCategory(apiUrl, title) {
+    const params = new URLSearchParams({
+      action:  "query",
+      prop:    "categories",
+      titles:  title,
+      format:  "json",
+      cllimit: "max",
+    });
+    try {
+      const res  = await fetch(`${apiUrl}&${params.toString()}`);
+      const data = await res.json();
+      const page = Object.values(data.query.pages)[0];
+      if (!page.categories) return false;
+      return page.categories.some(cat =>
+        /stubs?|articles with a stub template|अधूरे लेख|स्टब/i.test(cat.title)
+      );
+    } catch (e) {
+      console.warn("Stub check failed for", title, e);
+      return false;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  PROGRESS BAR HELPERS
+  // ═══════════════════════════════════════════════════════════════════════════
+  function showProgress(visible) {
+    document.getElementById("progressBar").style.display = visible ? "block" : "none";
+  }
+  function setProgress(pct) {
+    document.getElementById("progressFill").style.width = pct + "%";
+  }
+  function hideLoadMore() {
+    document.getElementById("load-more-button").style.display = "none";
+    document.getElementById("load-more-button-top").style.display = "none";
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  INIT
+  // ═══════════════════════════════════════════════════════════════════════════
+  document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('nightMode') === 'true') {
       document.body.classList.add('night-mode');
       document.getElementById('night-mode-button').innerHTML = '&#127774;';
     }
-
-    // Scroll Button Visibility Script
-    window.onscroll = function() {
-      const topButton = document.getElementById('go-to-top');
-      const bottomButton = document.getElementById('go-to-bottom');
-      if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-        topButton.style.display = "block";
-        bottomButton.style.display = "block";
-      } else {
-        topButton.style.display = "none";
-        bottomButton.style.display = "none";
-      }
-    };
-
-    async function runQuery() {
-      const lang = getLangCode();
-      if (!lang) {
-          statusDiv.textContent = "Please select a wiki or enter a valid language code to start.";
-          return;
-      }
-      offset = 0;
-      resultsDiv.innerHTML = "";
-      document.getElementById("load-more-button").style.display = "none";
-      document.getElementById("load-more-button-top").style.display = "none";
-      statusDiv.textContent = `Starting query for ${lang}.wikipedia.org...`;
-      await loadMore();
-    }
-
-    async function loadMore() {
-      const lang = getLangCode();
-      if (!lang) return; 
-
-      const apiBase = `https://${lang}.wikipedia.org/w/api.php?origin=*`;
-      const wikiBase = `https://${lang}.wikipedia.org/wiki/`;
-      const minSize = parseInt(document.getElementById("minSize").value) || 0;
-      const stubOnly = document.getElementById("stubOnly").checked;
-      
-      statusDiv.textContent = `Fetching articles from ${lang}.wikipedia.org (Batch ${Math.floor(offset / 500) + 1})...`;
-
-      const pages = await getAllPages(apiBase, offset);
-      
-      if (!pages || !pages.length) {
-        statusDiv.textContent = `No more pages found on ${lang}.wikipedia.org.`;
-        document.getElementById("load-more-button").style.display = "none";
-        document.getElementById("load-more-button-top").style.display = "none";
-        return;
-      }
-      
-      statusDiv.textContent = `Checking ${pages.length} articles for images and filters...`;
-
-      let count = resultsDiv.children.length;
-      let displayed = 0;
-      let checkPromises = [];
-      
-      for (const page of pages) {
-        checkPromises.push((async () => {
-          const [noImage, info, isStub] = await Promise.all([
-            checkNoImage(apiBase, page.title),
-            getPageInfo(apiBase, page.title),
-            checkStubCategory(apiBase, page.title)
-          ]);
-
-          if (!noImage || info.length < minSize || (stubOnly && !isStub)) return;
-
-          const div = document.createElement("div");
-          div.className = "grid-item";
-          if (new Date(info.touched) > RECENT_EDIT_THRESHOLD) {
-            div.classList.add("recent");
-          }
-          div.innerHTML = `<strong>${count + 1 + displayed}.</strong> <a href="${wikiBase + encodeURIComponent(page.title)}" target="_blank">${page.title}</a><br><small>${info.length} bytes${isStub ? ' (Stub)' : ''}</small>`;
-          
-          displayed++;
-          return div;
-        })());
-      }
-
-      const newElements = await Promise.all(checkPromises);
-      newElements.filter(el => el).forEach(el => resultsDiv.appendChild(el));
-
-      statusDiv.textContent = `Done. Total displayed: ${resultsDiv.children.length} articles on ${lang}.wikipedia.org.`;
-      
-      offset += pages.length;
-      document.getElementById("load-more-button").style.display = "inline-block";
-      document.getElementById("load-more-button-top").style.display = "inline-block";
-    }
-    
-    async function getAllPages(apiUrl, offset = 0) {
-      const params_fetch = new URLSearchParams({
-        action: "query",
-        list: "allpages",
-        apnamespace: "0",
-        aplimit: "500", 
-        format: "json",
-      });
-
-       try {
-          const response = await fetch(`${apiUrl}&${params_fetch.toString()}`);
-          const data = await response.json();
-          if (data.error) throw new Error(data.error.info);
-          return data.query?.allpages || [];
-        } catch (e) {
-          statusDiv.textContent = `API Error for ${apiUrl}: ${e.message}. Check if the language code is valid.`;
-          console.error("Failed to get pages", e);
-          return [];
-        }
-    }
-
-    async function checkNoImage(apiUrl, title) {
-      const params = new URLSearchParams({
-        action: "query",
-        prop: "images",
-        titles: title,
-        format: "json",
-        imlimit: "1" 
-      });
-      try {
-        const res = await fetch(`${apiUrl}&${params.toString()}`);
-        const data = await res.json();
-        const page = Object.values(data.query.pages)[0];
-        return !page.images || page.images.length === 0;
-      } catch (e) {
-        console.warn("Image check failed", e);
-        return false;
-      }
-    }
-
-    async function getPageInfo(apiUrl, title) {
-      const params = new URLSearchParams({
-        action: "query",
-        prop: "info",
-        titles: title,
-        inprop: "url|talkid|size|touched", 
-        format: "json"
-      });
-      try {
-        const res = await fetch(`${apiUrl}&${params.toString()}`);
-        const data = await res.json();
-        const page = Object.values(data.query.pages)[0];
-        return {
-          length: page.length || 0,
-          touched: page.touched || new Date(0),
-          url: page.fullurl || '#',
-          talkid: page.talkid
-        };
-      } catch (e) {
-        console.warn("Page info failed", e);
-        return { length: 0, touched: new Date(0) };
-      }
-    }
-
-    async function checkStubCategory(apiUrl, title) {
-      const params = new URLSearchParams({
-        action: "query",
-        prop: "categories",
-        titles: title,
-        format: "json",
-        cllimit: "max"
-      });
-      try {
-        const res = await fetch(`${apiUrl}&${params.toString()}`);
-        const data = await res.json();
-        const page = Object.values(data.query.pages)[0];
-        if (!page.categories) return false;
-        return page.categories.some(cat => 
-          /stubs?|articles with a stub template|अधूरे लेख|स्टब/i.test(cat.title)
-        );
-      } catch (e) {
-        console.warn("Stub category check failed", e);
-        return false;
-      }
-    }
-
-    // Initial load: run Night Mode setup
-    document.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('nightMode') === 'true') {
-          document.body.classList.add('night-mode');
-          document.getElementById('night-mode-button').innerHTML = '&#127774;';
-      }
-    });
-
+  });
   </script>
 </body>
 </html>
