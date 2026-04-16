@@ -641,7 +641,7 @@
         statusDiv.textContent =
           `Discovering articles in "${cat}" (${i + 1}/${activeCategories.length})…`;
         setProgress(Math.round((i / activeCategories.length) * 40));
-        const articles = await fetchCategoryTreeArticles(apiBase, cat, selectedDepth);
+        const articles = await fetchCategoryTreeArticles(apiBase, lang, cat, selectedDepth);
         articles.forEach(p => {
           if (!allArticles.has(p.pageid)) allArticles.set(p.pageid, p);
         });
@@ -701,18 +701,25 @@
     const existingCount = resultsDiv.children.length;
     let found = 0;
 
-    // FIX: use concurrency limiter so we never fire >CONCURRENCY requests at once.
-    // Previously all pages were checked simultaneously, overloading the API and
-    // causing intermittent failures / missing results.
+    // FIX: fetch all page data (images + info + stub check) in a single batched
+    // API call instead of 3 separate requests per page. This eliminates the
+    // intermittent "sometimes fetches, sometimes doesn't" problem.
+    statusDiv.textContent =
+      `Fetching page data for articles ${batchStart + 1}–${batchStart + pages.length}` +
+      (currentScope === 'category' ? ` of ${articleQueue.length}` : '') + '…';
+    setProgress(55);
+
+    const titles   = pages.map(p => p.title);
+    const pageData = await fetchBatchedPageData(apiBase, titles);
+    setProgress(85);
+
     const tasks = pages.map((page, batchIdx) => limit(async () => {
-      const prog = Math.round(40 + ((batchIdx / pages.length) * 55));
+      const prog = Math.round(85 + ((batchIdx / pages.length) * 14));
       setProgress(prog);
 
-      const [noImage, info, isStub] = await Promise.all([
-        checkNoImage(apiBase, page.title),
-        getPageInfo(apiBase, page.title),
-        checkStubCategory(apiBase, page.title)
-      ]);
+      const data = pageData.get(page.title);
+      if (!data) return null;
+      const { noImage, info, isStub } = data;
 
       if (!noImage || info.length < minSize || (stubOnly && !isStub)) return null;
 
@@ -758,13 +765,58 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  //  FETCH ALL ARTICLES IN A CATEGORY TREE (BFS with depth limit)
+  //  CATEGORY NAMESPACE PREFIX DETECTION
+  //  Different wikis use different localised prefixes for categories.
+  //  e.g. English = "Category:", Hindi = "श्रेणी:", Bengali = "বিষয়শ্রেণী:"
+  //  We detect it once per wiki by querying namespace info, then cache it.
   // ═══════════════════════════════════════════════════════════════════════════
-  async function fetchCategoryTreeArticles(apiUrl, rootCategory, maxDepth) {
+  const catPrefixCache = {}; // lang → "श्रेणी" | "Category" | etc.
+
+  async function getCategoryPrefix(apiUrl, lang) {
+    if (catPrefixCache[lang]) return catPrefixCache[lang];
+    try {
+      const params = new URLSearchParams({
+        action: "query",
+        meta:   "siteinfo",
+        siprop: "namespaces",
+        format: "json",
+      });
+      const res  = await fetch(`${apiUrl}&${params.toString()}`);
+      const data = await res.json();
+      // Namespace 14 is the category namespace
+      const ns14 = data.query?.namespaces?.["14"];
+      const prefix = (ns14?.["*"] || ns14?.canonical || "Category");
+      catPrefixCache[lang] = prefix;
+      return prefix;
+    } catch (e) {
+      console.warn("getCategoryPrefix failed, falling back to 'Category'", e);
+      catPrefixCache[lang] = "Category";
+      return "Category";
+    }
+  }
+
+  // Strip the localised (or English) category prefix from a full title
+  // e.g. "श्रेणी:भारत की अर्थव्यवस्था" → "भारत की अर्थव्यवस्था"
+  function stripCategoryPrefix(fullTitle, localPrefix) {
+    // Accept either the localised prefix or the canonical English "Category:"
+    const escaped = localPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return fullTitle.replace(new RegExp(`^(?:${escaped}|Category)\\s*:\\s*`, 'i'), "");
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  FETCH ALL ARTICLES IN A CATEGORY TREE (BFS with depth limit)
+  //  FIX: handles localised category prefixes (e.g. Hindi "श्रेणी:")
+  //       and correctly expands subcategories BEFORE checking pages (deep mode)
+  // ═══════════════════════════════════════════════════════════════════════════
+  async function fetchCategoryTreeArticles(apiUrl, lang, rootCategory, maxDepth) {
     const articles    = new Map(); // pageid → article
     const visitedCats = new Set(); // prevent infinite loops from circular categories
 
+    // Detect localised category prefix once for this wiki
+    const catPrefix = await getCategoryPrefix(apiUrl, lang);
+
     // BFS queue: [{ name, depth }]
+    // 'name' is always WITHOUT the prefix (just the bare category name)
     const catQueue = [{ name: rootCategory, depth: 0 }];
 
     while (catQueue.length > 0) {
@@ -772,8 +824,22 @@
       if (visitedCats.has(catName)) continue;
       visitedCats.add(catName);
 
-      // Fetch articles in this category (all pages via continuation)
-      const members = await fetchAllCategoryMembers(apiUrl, catName, 'page');
+      // ── Step 1: Fetch subcategories first (if depth allows) ──
+      // This ensures the BFS fully expands the tree before we harvest pages,
+      // which is the correct behaviour for "deep" mode.
+      if (depth < maxDepth) {
+        const subcats = await fetchAllCategoryMembers(apiUrl, catName, 'subcat', catPrefix);
+        for (const sc of subcats) {
+          // sc.title arrives as full title e.g. "श्रेणी:Foo" — strip prefix
+          const scName = stripCategoryPrefix(sc.title, catPrefix);
+          if (!visitedCats.has(scName)) {
+            catQueue.push({ name: scName, depth: depth + 1 });
+          }
+        }
+      }
+
+      // ── Step 2: Fetch articles (pages) in this category ──
+      const members = await fetchAllCategoryMembers(apiUrl, catName, 'page', catPrefix);
       members.forEach(m => {
         if (!articles.has(m.pageid)) {
           articles.set(m.pageid, {
@@ -783,33 +849,24 @@
           });
         }
       });
-
-      // Fetch subcategories if depth allows
-      if (depth < maxDepth) {
-        const subcats = await fetchAllCategoryMembers(apiUrl, catName, 'subcat');
-        for (const sc of subcats) {
-          // sc.title is like "Category:Foo" — strip prefix
-          const scName = sc.title.replace(/^Category:/i, "");
-          if (!visitedCats.has(scName)) {
-            catQueue.push({ name: scName, depth: depth + 1 });
-          }
-        }
-      }
     }
 
     return Array.from(articles.values());
   }
 
   // Fetch ALL members of a category (handles cmcontinue internally)
-  async function fetchAllCategoryMembers(apiUrl, categoryName, cmtype) {
+  // FIX: uses the localised prefix when constructing cmtitle
+  async function fetchAllCategoryMembers(apiUrl, categoryName, cmtype, catPrefix) {
     const all = [];
     let cmcontinue = undefined;
+    // Use the localised prefix if available, else fall back to "Category"
+    const prefix = catPrefix || "Category";
 
     do {
       const params = new URLSearchParams({
         action:      "query",
         list:        "categorymembers",
-        cmtitle:     `Category:${categoryName}`,
+        cmtitle:     `${prefix}:${categoryName}`,
         cmnamespace: cmtype === 'subcat' ? "14" : "0",
         cmlimit:     "500",
         cmtype,
@@ -861,78 +918,55 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  //  IMAGE CHECK  (prop=images + prop=pageimages)
+  //  BATCHED PAGE DATA  (images + pageimages + info + categories in ONE call)
+  //  FIX: replaces the three separate checkNoImage / getPageInfo / checkStubCategory
+  //       calls that were fired per-page, causing intermittent failures.
+  //  Accepts up to 50 titles at once; returns a Map<title → {noImage,info,isStub}>
   // ═══════════════════════════════════════════════════════════════════════════
-  async function checkNoImage(apiUrl, title) {
-    const params = new URLSearchParams({
-      action:  "query",
-      prop:    "images|pageimages",
-      titles:  title,
-      format:  "json",
-      imlimit: "1",
-      piprop:  "name",
-    });
-    try {
-      const res  = await fetch(`${apiUrl}&${params.toString()}`);
-      const data = await res.json();
-      const page = Object.values(data.query.pages)[0];
-      return !(page.images?.length) && !page.pageimage;
-    } catch (e) {
-      console.warn("Image check failed for", title, e);
-      return false; // if check fails, skip rather than show false positive
+  async function fetchBatchedPageData(apiUrl, titles) {
+    const result = new Map();
+    // Wikipedia allows up to 50 titles per query
+    const CHUNK = 50;
+    for (let i = 0; i < titles.length; i += CHUNK) {
+      const chunk = titles.slice(i, i + CHUNK);
+      const params = new URLSearchParams({
+        action:  "query",
+        prop:    "images|pageimages|info|categories",
+        titles:  chunk.join("|"),
+        format:  "json",
+        imlimit: "1",
+        piprop:  "name",
+        inprop:  "url|talkid|size|touched",
+        cllimit: "max",
+      });
+      try {
+        const res  = await fetch(`${apiUrl}&${params.toString()}`);
+        const data = await res.json();
+        const pages = data.query?.pages || {};
+        for (const page of Object.values(pages)) {
+          const noImage = !(page.images?.length) && !page.pageimage;
+          const info = {
+            length:  page.length  || 0,
+            touched: page.touched || new Date(0),
+            url:     page.fullurl || '#',
+            talkid:  page.talkid,
+          };
+          const isStub = (page.categories || []).some(cat =>
+            /stubs?|articles with a stub template|अधूरे लेख|स्टब/i.test(cat.title)
+          );
+          result.set(page.title, { noImage, info, isStub });
+        }
+      } catch (e) {
+        console.warn("fetchBatchedPageData failed for chunk starting at", i, e);
+        // On failure, fill defaults so the page is skipped (not falsely shown)
+        chunk.forEach(t => result.set(t, {
+          noImage: false,
+          info: { length: 0, touched: new Date(0), url: '#' },
+          isStub: false,
+        }));
+      }
     }
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  PAGE INFO
-  // ═══════════════════════════════════════════════════════════════════════════
-  async function getPageInfo(apiUrl, title) {
-    const params = new URLSearchParams({
-      action:  "query",
-      prop:    "info",
-      titles:  title,
-      inprop:  "url|talkid|size|touched",
-      format:  "json",
-    });
-    try {
-      const res  = await fetch(`${apiUrl}&${params.toString()}`);
-      const data = await res.json();
-      const page = Object.values(data.query.pages)[0];
-      return {
-        length:  page.length  || 0,
-        touched: page.touched || new Date(0),
-        url:     page.fullurl || '#',
-        talkid:  page.talkid,
-      };
-    } catch (e) {
-      console.warn("Page info failed for", title, e);
-      return { length: 0, touched: new Date(0) };
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  STUB CHECK
-  // ═══════════════════════════════════════════════════════════════════════════
-  async function checkStubCategory(apiUrl, title) {
-    const params = new URLSearchParams({
-      action:  "query",
-      prop:    "categories",
-      titles:  title,
-      format:  "json",
-      cllimit: "max",
-    });
-    try {
-      const res  = await fetch(`${apiUrl}&${params.toString()}`);
-      const data = await res.json();
-      const page = Object.values(data.query.pages)[0];
-      if (!page.categories) return false;
-      return page.categories.some(cat =>
-        /stubs?|articles with a stub template|अधूरे लेख|स्टब/i.test(cat.title)
-      );
-    } catch (e) {
-      console.warn("Stub check failed for", title, e);
-      return false;
-    }
+    return result;
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
