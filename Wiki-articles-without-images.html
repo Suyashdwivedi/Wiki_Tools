@@ -16,960 +16,580 @@
   <meta property="twitter:title" content="Wikipedia articles without images finder" />
   <meta property="twitter:description" content="Find Wikipedia articles across any language that are missing images. Filter by language, size, and stub status." />
   <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
-  <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+  <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
   <title>Wikipedia articles without images finder</title>
-
-  <style>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  
+<style>
     :root {
-      --bg-color: #fefefe;
-      --text-color: #000;
-      --header-bg: #e0e0e0;
-      --grid-bg: #f9f9f9;
-      --grid-border: #ccc;
-      --recent-bg: #ffffcc;
-      --tag-bg: #d0e8ff;
-      --tag-border: #4a90d9;
-      --tag-text: #1a4a7a;
-      --scope-active-bg: #1a5cb8;
-      --scope-active-text: #fff;
-      --scope-inactive-bg: #e8e8e8;
-      --scope-inactive-text: #555;
+      --bg:       #0f1117;
+      --surface:  #181c27;
+      --card:     #1e2335;
+      --border:   #2e3450;
+      --accent:   #5b8dee;
+      --accent2:  #e0ac4b;
+      --text:     #d8dce8;
+      --muted:    #7a829e;
+      --success:  #4caf82;
+      --danger:   #e05b5b;
+      --warn-bg:  rgba(224,172,75,.10);
+      --warn-bdr: rgba(224,172,75,.30);
+      --radius:   10px;
     }
-    body.night-mode {
-      --bg-color: #121212;
-      --text-color: #e0e0e0;
-      --header-bg: #333;
-      --grid-bg: #1e1e1e;
-      --grid-border: #555;
-      --recent-bg: #3c3c12;
-      --tag-bg: #1a3a5c;
-      --tag-border: #4a90d9;
-      --tag-text: #90c8ff;
-      --scope-active-bg: #2a70d8;
-      --scope-active-text: #fff;
-      --scope-inactive-bg: #2a2a2a;
-      --scope-inactive-text: #aaa;
+    body.light {
+      --bg:       #f4f6fb;
+      --surface:  #ffffff;
+      --card:     #edf0f7;
+      --border:   #d0d6e8;
+      --accent:   #2a5ec7;
+      --accent2:  #b07d10;
+      --text:     #1a1f30;
+      --muted:    #606880;
+      --success:  #276e4c;
+      --danger:   #b83030;
+      --warn-bg:  rgba(176,125,16,.08);
+      --warn-bdr: rgba(176,125,16,.28);
     }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: Arial, sans-serif;
-      margin: 1rem;
-      background: var(--bg-color);
-      color: var(--text-color);
-      transition: background-color 0.3s, color 0.3s;
+      font-family: 'Source Sans 3', sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; position: relative;
+      transition: background .25s, color .25s;
     }
-    h1 {
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 10% 0%, rgba(91,141,238,.10) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 35% at 90% 100%, rgba(224,172,75,.07) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
     }
-    .logo { height: 75px; }
     .banner {
-      background: var(--header-bg);
-      padding: 1rem;
-      text-align: center;
-      font-weight: bold;
-      border-radius: 8px;
+      background: linear-gradient(90deg, var(--accent) 0%, #3a6ecc 100%);
+      color: #fff; text-align: center;
+      padding: 9px 20px; font-size: 13px; font-weight: 600;
+      letter-spacing: .04em; position: relative; z-index: 2;
     }
-    .filters {
-      margin: 1rem 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      justify-content: center;
-      align-items: center;
-    }
-    .lang-filter-group {
-      display: flex;
-      flex-direction: row;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    /* ── Scope box ── */
-    .scope-box {
-      width: 100%;
-      max-width: 750px;
-      margin: 0.5rem auto 0;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--grid-border);
-      border-radius: 8px;
-      background: var(--grid-bg);
-    }
-    .scope-title { font-weight: bold; font-size: 0.93rem; margin-bottom: 0.55rem; }
-    .scope-radio-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .scope-label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      border: 2px solid transparent;
-      transition: all 0.2s;
-      user-select: none;
-    }
-    .scope-label.active {
-      background: var(--scope-active-bg);
-      color: var(--scope-active-text);
-      border-color: var(--scope-active-bg);
-    }
-    .scope-label:not(.active) {
-      background: var(--scope-inactive-bg);
-      color: var(--scope-inactive-text);
-      border-color: var(--grid-border);
-    }
-    .scope-label input[type="radio"] { display: none; }
-
-    /* ── Category section ── */
-    .category-section {
-      width: 100%;
-      max-width: 750px;
-      margin: 0.5rem auto 0;
-      border: 2px solid var(--tag-border);
-      border-radius: 8px;
-      padding: 0.75rem 1rem;
-      background: var(--grid-bg);
-    }
-    .category-section-title { font-weight: bold; margin-bottom: 0.5rem; font-size: 0.93rem; }
-    .category-input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    #categoryInput {
-      flex: 1; min-width: 200px; padding: 6px 8px;
-      border: 1px solid var(--grid-border); border-radius: 4px;
-      background-color: var(--bg-color); color: var(--text-color); font-size: 0.9rem;
-    }
-    #addCategoryBtn {
-      padding: 0.4rem 0.9rem; font-size: 0.9rem; cursor: pointer;
-      border: 1px solid var(--tag-border); background-color: var(--tag-bg);
-      color: var(--tag-text); border-radius: 4px; white-space: nowrap;
-    }
-    #addCategoryBtn:hover { opacity: 0.8; }
-    .category-hint { font-size: 0.78rem; color: #888; margin-top: 4px; }
-
-    /* ── Depth buttons ── */
-    .depth-row {
-      display: flex; align-items: center; gap: 8px;
-      margin-top: 0.65rem; flex-wrap: wrap;
-    }
-    .depth-row label { font-size: 0.88rem; font-weight: bold; }
-    .depth-btn {
-      width: 32px; height: 32px; padding: 0;
-      font-size: 0.9rem; font-weight: bold;
-      border: 2px solid var(--grid-border);
-      background: var(--scope-inactive-bg);
-      color: var(--scope-inactive-text);
-      border-radius: 6px; cursor: pointer;
-      transition: all 0.15s; line-height: 1;
-    }
-    .depth-btn.selected {
-      background: var(--scope-active-bg);
-      color: var(--scope-active-text);
-      border-color: var(--scope-active-bg);
-    }
-    .depth-hint { font-size: 0.76rem; color: #888; }
-
-    /* ── Category tags ── */
-    #categoryTags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.6rem; }
-    .cat-tag {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: var(--tag-bg); color: var(--tag-text);
-      border: 1px solid var(--tag-border); border-radius: 20px;
-      padding: 3px 8px 3px 12px; font-size: 0.83rem; max-width: 300px;
-    }
-    .cat-tag span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .cat-tag-remove {
-      cursor: pointer; font-size: 1rem; line-height: 1; color: var(--tag-text);
-      background: none; border: none; padding: 2px 4px; flex-shrink: 0; border-radius: 50%;
-    }
-    .cat-tag-remove:hover { opacity: 0.6; background: rgba(0,0,0,0.08); }
-
-    .no-cats-warning { font-size: 0.82rem; color: #c0392b; margin-top: 5px; display: none; }
-
-    /* ── Level heading in results ── */
-    .level-heading {
-      grid-column: 1 / -1;
-      font-weight: bold;
-      font-size: 0.92rem;
-      color: var(--scope-active-bg);
-      padding: 0.3rem 0 0.1rem;
-      border-bottom: 1px solid var(--grid-border);
-      margin-top: 0.4rem;
-    }
-
-    /* ── Progress bar ── */
-    #progressWrap {
-      width: 100%; max-width: 750px;
-      margin: 0.5rem auto 0;
-      display: none;
-    }
-    #progressBar {
-      width: 100%; height: 7px;
-      background: var(--grid-border);
-      border-radius: 4px; overflow: hidden;
-    }
-    #progressFill {
-      height: 100%;
-      background: var(--scope-active-bg);
-      border-radius: 4px;
-      width: 0%;
-      transition: width 0.3s;
-    }
-    #progressLabel {
-      font-size: 0.8rem; color: #888; margin-top: 3px; text-align: center;
-    }
-
-    /* ── Grid ── */
-    .grid-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem; margin-top: 1rem;
-    }
-    .grid-item {
-      background: var(--grid-bg); padding: 0.75rem;
-      border: 1px solid var(--grid-border); border-radius: 5px;
-      transition: background-color 0.3s, border-color 0.3s;
-    }
-    .recent { background-color: var(--recent-bg); }
-    .footer { text-align: center; margin-top: 2rem; font-size: 0.9rem; color: var(--text-color); }
-    button {
-      padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer;
-      border: 1px solid var(--text-color); background-color: var(--header-bg);
-      color: var(--text-color); border-radius: 5px; transition: background-color 0.3s;
-    }
-    button:hover { opacity: 0.9; }
     .night-mode-toggle {
-      position: absolute; top: 10px; right: 10px; padding: 0.5rem;
-      cursor: pointer; font-size: 1.2rem; border: none; background: none; color: var(--text-color);
+      position: fixed; top: 14px; right: 18px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 50%; width: 40px; height: 40px;
+      font-size: 18px; cursor: pointer;
+      display: grid; place-items: center;
+      z-index: 9999; transition: all .2s;
+      box-shadow: 0 2px 10px rgba(0,0,0,.2);
     }
+    .night-mode-toggle:hover { border-color: var(--accent); transform: scale(1.08); }
+    .wrapper { max-width: 1100px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+    header { padding: 36px 0 28px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+    .logo-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .logo-img { width: 54px; height: 54px; object-fit: contain; flex-shrink: 0; }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(20px, 4vw, 33px);
+      color: var(--text); line-height: 1.2;
+    }
+    .tagline { color: var(--muted); font-size: 14px; margin-top: 5px; }
+    /* Notice */
+    .notice {
+      display: flex; gap: 12px; align-items: flex-start;
+      background: var(--warn-bg); border: 1px solid var(--warn-bdr);
+      border-radius: var(--radius); padding: 13px 17px;
+      font-size: 13px; color: var(--accent2);
+      margin-bottom: 20px; line-height: 1.65;
+    }
+    .notice .ni { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .notice a { color: var(--accent2); }
+    /* Panel */
+    .panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; margin-bottom: 20px;
+      transition: background .25s, border-color .25s;
+    }
+    .panel-title { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width:640px){ .controls { grid-template-columns: 1fr; } }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    select, input {
+      width: 100%; background: var(--card); border: 1px solid var(--border);
+      color: var(--text); padding: 10px 14px; border-radius: var(--radius);
+      font-family: inherit; font-size: 14px; appearance: none; cursor: pointer;
+      outline: none; transition: border-color .2s, background .25s;
+    }
+    select:focus { border-color: var(--accent); }
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); pointer-events: none; font-size: 12px;
+    }
+    .filter-row {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border);
+    }
+    .toggle-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .toggle-btn {
+      padding: 7px 15px; border-radius: 20px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); font-size: 13px;
+      cursor: pointer; transition: all .18s; font-family: inherit;
+    }
+    .toggle-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .filter-label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+    .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 22px; border-radius: var(--radius); border: none;
+      font-family: inherit; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all .18s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #3a6ecc);
+      color: #fff; box-shadow: 0 4px 18px rgba(91,141,238,.3);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(91,141,238,.4); }
+    .btn-primary:disabled { opacity: .55; transform: none; cursor: not-allowed; }
+    .btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-secondary:disabled { opacity: .45; cursor: not-allowed; }
+    .status-bar {
+      display: none; align-items: center; gap: 10px;
+      padding: 11px 16px; background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: 13px; color: var(--muted); margin-bottom: 16px;
+    }
+    .status-bar.show { display: flex; }
+    .spinner {
+      width: 15px; height: 15px; border: 2px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin .7s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .stats-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+    .chip { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+    .chip-blue  { background: rgba(91,141,238,.15); color: var(--accent);  border: 1px solid rgba(91,141,238,.3); }
+    .chip-gold  { background: rgba(224,172,75,.12); color: var(--accent2); border: 1px solid rgba(224,172,75,.25); }
+    .chip-green { background: rgba(76,175,130,.12); color: var(--success); border: 1px solid rgba(76,175,130,.25); }
+    .results-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead tr { background: var(--card); border-bottom: 2px solid var(--border); }
+    th { text-align: left; padding: 11px 15px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
+    tbody tr:hover { background: rgba(91,141,238,.06); }
+    td { padding: 10px 15px; vertical-align: middle; }
+    td:first-child { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .item-link { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .item-link:hover { text-decoration: underline; }
+    .wd-link { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; text-decoration: none; }
+    .wd-link:hover { color: var(--accent2); }
+    .error-box {
+      background: rgba(224,91,91,.10); border: 1px solid rgba(224,91,91,.3);
+      border-radius: var(--radius); padding: 13px 17px;
+      color: var(--danger); font-size: 14px; margin-bottom: 16px; display: none;
+    }
+    .error-box.show { display: block; }
+    .empty-state { text-align: center; padding: 52px 20px; color: var(--muted); }
+    .empty-state .icon { font-size: 42px; margin-bottom: 12px; }
+    .pagination-row { display: flex; gap: 10px; align-items: center; margin-top: 20px; flex-wrap: wrap; }
+    .page-info { font-size: 13px; color: var(--muted); margin-left: auto; }
+    .sparql-toggle {
+      font-size: 12px; color: var(--muted); cursor: pointer;
+      text-decoration: underline dotted; background: none; border: none; font-family: inherit;
+    }
+    .sparql-box {
+      display: none; margin-top: 12px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 13px;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #a8c4ff; white-space: pre-wrap; word-break: break-all;
+      max-height: 210px; overflow-y: auto;
+    }
+    .footer {
+      text-align: center; padding: 32px 20px 90px;
+      font-size: 13px; color: var(--muted);
+      border-top: 1px solid var(--border); margin-top: 40px;
+    }
+    .footer a { color: var(--accent2); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
     .scroll-button {
-      position: fixed; right: 20px; padding: 10px 15px;
-      background: var(--header-bg); color: var(--text-color);
-      border: 1px solid var(--grid-border); border-radius: 5px;
-      cursor: pointer; font-size: 1rem; z-index: 1000; display: none;
+      position: fixed; right: 18px;
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--text); width: 42px; height: 42px;
+      border-radius: 50%; font-size: 16px; cursor: pointer;
+      display: grid; place-items: center;
+      transition: all .18s; z-index: 999;
+      box-shadow: 0 4px 14px rgba(0,0,0,.22);
     }
-    #go-to-top    { bottom: 70px; }
-    #go-to-bottom { bottom: 20px; }
-    #langCodeInput, #langSelect {
-      padding: 5px; border: 1px solid var(--grid-border);
-      background-color: var(--grid-bg); color: var(--text-color);
-    }
-    #stopBtn {
-      background: #c0392b; color: #fff; border-color: #c0392b; display: none;
-    }
+    .scroll-button:hover { border-color: var(--accent); color: var(--accent); }
+    #go-to-top    { bottom: 72px; }
+    #go-to-bottom { bottom: 22px; }
   </style>
 </head>
 <body>
-  <button class="night-mode-toggle" id="night-mode-button" onclick="toggleNightMode()">&#127769;</button>
 
-  <h1>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" class="logo" />
-    Wikipedia articles without images finder
-  </h1>
-  <div class="banner">Wikipedia Articles Without Images (Global)</div>
+<div class="banner">Wikipedia Articles Without Images (Global)</div>
+<button class="night-mode-toggle" id="night-mode-button" onclick="toggleNightMode()" title="Toggle light/dark mode">🌙</button>
 
-  <!-- Language & basic filters -->
-  <div class="filters">
-    <div class="lang-filter-group">
-      <label for="langSelect">Select Wiki:</label>
-      <select id="langSelect">
-        <option value="awa" selected>Awadhi (awa)</option>
-        <option value="en">English (en)</option>
-        <option value="de">German (de)</option>
-        <option value="fr">French (fr)</option>
-        <option value="es">Spanish (es)</option>
-        <option value="ru">Russian (ru)</option>
-        <option value="zh">Chinese (zh)</option>
-        <option value="hi">Hindi (hi)</option>
-        <option value="bn">Bengali (bn)</option>
-        <option value="gu">Gujarati (gu)</option>
-        <option value="kn">Kannada (kn)</option>
-        <option value="ml">Malayalam (ml)</option>
-        <option value="mr">Marathi (mr)</option>
-        <option value="ne">Nepali (ne)</option>
-        <option value="or">Odia (or)</option>
-        <option value="pa">Punjabi (pa)</option>
-        <option value="sa">Sanskrit (sa)</option>
-        <option value="ta">Tamil (ta)</option>
-        <option value="te">Telugu (te)</option>
-        <option value="">-- Other --</option>
-      </select>
-      <label for="langCodeInput">Or Enter Code:</label>
-      <input type="text" id="langCodeInput" placeholder="e.g. 'it', 'kn'" />
+<div class="wrapper">
+
+  <header>
+    <div class="logo-row">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png"
+           alt="Wiki's Lazy Coders Logo" class="logo-img" />
+      <div>
+        <h1>Wikipedia articles without images finder</h1>
+        <p class="tagline">Find Wikipedia articles missing images — pick a language, category &amp; explore in batches</p>
+      </div>
     </div>
-    <label>Min Size (bytes): <input type="number" id="minSize" value="0" /></label>
-    <label><input type="checkbox" id="stubOnly" /> Stub only</label>
+  </header>
+
+  <!-- P18 accuracy notice -->
+  <div class="notice">
+    <span class="ni">⚠️</span>
+    <span>
+      <strong>Note on accuracy:</strong> Results are based on Wikidata's <strong>P18 (image)</strong> property.
+      Some Wikipedia articles may still display an image sourced via infobox templates, Commons categories,
+      or a linked item — without P18 being set in Wikidata. Such articles may appear in "Without Images" results
+      even though the article itself shows a photo. Always verify by opening the article link.
+      <a href="https://www.wikidata.org/wiki/Property:P18" target="_blank">Learn about P18 →</a>
+    </span>
   </div>
 
-  <!-- Scope — default: category -->
-  <div class="scope-box">
-    <div class="scope-title">🔍 Search Scope</div>
-    <div class="scope-radio-row">
-      <label class="scope-label active" id="scopeLabelCat" onclick="setScope('category')">
-        <input type="radio" name="scope" value="category" checked />
-        📂 Selected Categories Only
-      </label>
-      <label class="scope-label" id="scopeLabelWiki" onclick="setScope('wiki')">
-        <input type="radio" name="scope" value="wiki" />
-        🌐 Entire Wiki
-      </label>
+  <div class="panel">
+    <div class="panel-title">Query Settings</div>
+    <div class="controls">
+
+      <div>
+        <label for="lang">Wikipedia Language Project</label>
+        <div class="select-wrap">
+          <select id="lang">
+            <option value="hi">Hindi (hi)</option>
+            <option value="ar">Arabic (ar)</option>
+            <option value="awa">Awadhi (awa)</option>
+            <option value="en">English (en)</option>
+            <option value="fr">French (fr)</option>
+            <option value="de">German (de)</option>
+            <option value="es">Spanish (es)</option>
+            <option value="pt">Portuguese (pt)</option>
+            <option value="ru">Russian (ru)</option>
+            <option value="zh">Chinese (zh)</option>
+            <option value="ja">Japanese (ja)</option>
+            <option value="it">Italian (it)</option>
+            <option value="pl">Polish (pl)</option>
+            <option value="nl">Dutch (nl)</option>
+            <option value="fa">Persian (fa)</option>
+            <option value="ur">Urdu (ur)</option>
+            <option value="bn">Bengali (bn)</option>
+            <option value="pa">Punjabi (pa)</option>
+            <option value="ta">Tamil (ta)</option>
+            <option value="te">Telugu (te)</option>
+            <option value="ml">Malayalam (ml)</option>
+            <option value="mr">Marathi (mr)</option>
+            <option value="gu">Gujarati (gu)</option>
+            <option value="kn">Kannada (kn)</option>
+            <option value="bho">Bhojpuri (bho)</option>
+            <option value="mai">Maithili (mai)</option>
+            <option value="new">Newari (new)</option>
+            <option value="ne">Nepali (ne)</option>
+            <option value="ko">Korean (ko)</option>
+            <option value="vi">Vietnamese (vi)</option>
+            <option value="tr">Turkish (tr)</option>
+            <option value="sv">Swedish (sv)</option>
+            <option value="uk">Ukrainian (uk)</option>
+            <option value="he">Hebrew (he)</option>
+            <option value="id">Indonesian (id)</option>
+            <option value="ms">Malay (ms)</option>
+            <option value="th">Thai (th)</option>
+            <option value="ca">Catalan (ca)</option>
+            <option value="simple">Simple English (simple)</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="category">Article Category (Wikidata P31 type)</label>
+        <div class="select-wrap">
+          <select id="category">
+            <option value="Q5">Human / Person</option>
+            <option value="Q515">City</option>
+            <option value="Q3624078">Sovereign State / Country</option>
+            <option value="Q41176">Building</option>
+            <option value="Q8502">Mountain</option>
+            <option value="Q4022">River</option>
+            <option value="Q23397">Lake</option>
+            <option value="Q34763">Village</option>
+            <option value="Q532">Village (alternate)</option>
+            <option value="Q11424">Film / Movie</option>
+            <option value="Q571">Book</option>
+            <option value="Q191067">Article (Wikipedia)</option>
+            <option value="Q5633421">Scientific journal</option>
+            <option value="Q43229">Organization</option>
+            <option value="Q891723">Public company</option>
+            <option value="Q16970">Church building</option>
+            <option value="Q839954">Archaeological site</option>
+            <option value="Q16917">Hospital</option>
+            <option value="Q3918">University</option>
+            <option value="Q9826">High school</option>
+            <option value="Q484170">Municipality</option>
+            <option value="Q46">National park</option>
+            <option value="Q55488">Railway station</option>
+            <option value="Q1248784">Airport</option>
+            <option value="Q12280">Bridge</option>
+            <option value="Q34038">Waterfall</option>
+            <option value="Q16521">Taxon / Species</option>
+            <option value="Q756">Plant</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="batchSize">Batch Size (results per load)</label>
+        <div class="select-wrap">
+          <select id="batchSize">
+            <option value="50">50</option>
+            <option value="100" selected>100</option>
+            <option value="200">200</option>
+            <option value="500">500</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="labelLang">Label Language Fallback</label>
+        <div class="select-wrap">
+          <select id="labelLang">
+            <option value="hi,en">Hindi → English</option>
+            <option value="ar,en">Arabic → English</option>
+            <option value="en">English only</option>
+            <option value="en,hi">English → Hindi</option>
+            <option value="fr,en">French → English</option>
+            <option value="de,en">German → English</option>
+            <option value="ur,en">Urdu → English</option>
+            <option value="bn,en">Bengali → English</option>
+            <option value="ta,en">Tamil → English</option>
+            <option value="te,en">Telugu → English</option>
+            <option value="mr,en">Marathi → English</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="filter-row">
+      <span class="filter-label">Filter Mode:</span>
+      <div class="toggle-group">
+        <button class="toggle-btn active" data-mode="without">🚫 Without Images (P18 missing)</button>
+        <button class="toggle-btn" data-mode="with">🖼️ With Images (P18 set)</button>
+        <button class="toggle-btn" data-mode="all">📋 All Articles</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="runBtn" onclick="runQuery(true)">▶ Run Query</button>
+      <button class="btn btn-secondary" id="nextBtn" onclick="runQuery(false)" disabled>→ Next Batch</button>
+      <button class="btn btn-secondary" onclick="resetQuery()">↺ Reset</button>
+      <button class="sparql-toggle" onclick="toggleSparql()">view SPARQL ▾</button>
+    </div>
+
+    <pre class="sparql-box" id="sparqlBox"></pre>
+  </div>
+
+  <div class="status-bar" id="statusBar">
+    <div class="spinner"></div>
+    <span>Querying Wikidata SPARQL endpoint…</span>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="panel" id="resultsPanel" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+      <div class="panel-title" style="margin:0;">Results</div>
+      <div class="stats-row" style="margin:0;gap:8px;">
+        <span class="chip chip-blue"  id="chipBatch">Batch 1</span>
+        <span class="chip chip-gold"  id="chipCount">— items</span>
+        <span class="chip chip-green" id="chipOffset">Total loaded: 0</span>
+      </div>
+    </div>
+
+    <div class="results-wrap">
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Label</th>
+            <th>Wikipedia Article</th>
+            <th>Wikidata Item</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <div id="emptyState" class="empty-state" style="display:none;">
+      <div class="icon">🔎</div>
+      <p>No articles found for this combination. Try a different category or language.</p>
+    </div>
+
+    <div class="pagination-row">
+      <button class="btn btn-secondary" id="nextBtn2" onclick="runQuery(false)" disabled>→ Load Next Batch</button>
+      <button class="btn btn-secondary" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to Top</button>
+      <div class="page-info" id="pageInfo">Batch 1 · 0 items loaded</div>
     </div>
   </div>
 
-  <!-- Category section (visible by default) -->
-  <div class="category-section" id="categorySection">
-    <div class="category-section-title">📂 Categories to Search In</div>
-    <div class="category-input-row">
-      <input type="text" id="categoryInput"
-             placeholder="e.g. भारत की अर्थव्यवस्था, Rivers, Cities in India …"
-             onkeydown="if(event.key==='Enter') addCategory()" />
-      <button id="addCategoryBtn" onclick="addCategory()">＋ Add Category</button>
-    </div>
-    <div class="category-hint">
-      Type a category name without the "Category:" prefix and press <strong>Add</strong> or hit <strong>Enter</strong>.
-      Multiple categories are merged and deduplicated.
-    </div>
+</div>
 
-    <!-- Depth selector -->
-    <div class="depth-row">
-      <label>Subcategory depth:</label>
-      <button class="depth-btn selected" data-depth="0">0</button>
-      <button class="depth-btn" data-depth="1">1</button>
-      <button class="depth-btn" data-depth="2">2</button>
-      <button class="depth-btn" data-depth="3">3</button>
-      <button class="depth-btn" data-depth="4">4</button>
-      <button class="depth-btn" data-depth="5">5</button>
-      <span class="depth-hint" id="depthHint">Direct category only (no subcategories)</span>
-    </div>
+<div class="footer">
+  Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 18 April 2026
+</div>
 
-    <div id="categoryTags"></div>
-    <div class="no-cats-warning" id="noCatsWarning">
-      ⚠️ Please add at least one category, or switch scope to "Entire Wiki".
-    </div>
-  </div>
+<button id="go-to-top"    class="scroll-button" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Go to top">↑</button>
+<button id="go-to-bottom" class="scroll-button" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})" title="Go to bottom">↓</button>
 
-  <!-- Action buttons -->
-  <div style="text-align:center; margin-top:0.85rem; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-    <button id="load-more-button-top" style="display:none" onclick="loadMoreWiki()">Load Next 500</button>
-    <button id="startBtn" onclick="runQuery()">Check Articles Without Images</button>
-    <button id="stopBtn" onclick="stopQuery()">⏹ Stop</button>
-  </div>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GC8PGC89NB');
+</script>
+<script src="https://cdn.counter.dev/script.js" data-id="cc7a036d-a904-4d76-bcac-37ea4196c014" data-utcoffset="6"></script>
 
-  <!-- Progress -->
-  <div id="progressWrap">
-    <div id="progressBar"><div id="progressFill"></div></div>
-    <div id="progressLabel"></div>
-  </div>
+<script>
+  let currentOffset = 0, currentBatch = 0, totalLoaded = 0, currentMode = 'without';
 
-  <div id="status" style="margin:0.75rem 1rem; font-weight:bold; text-align:center;">
-    Add categories above and click "Check Articles Without Images".
-  </div>
-
-  <div class="grid-container" id="results"></div>
-
-  <div style="text-align:center">
-    <button id="load-more-button" style="display:none; margin-top:1rem;" onclick="loadMoreWiki()">Load Next 500</button>
-  </div>
-
-  <div class="footer">
-    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 18 April 2026
-  </div>
-
-  <button id="go-to-top"    class="scroll-button" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Go to Top</button>
-  <button id="go-to-bottom" class="scroll-button" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">↓ Go to Bottom</button>
-
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-GC8PGC89NB');
-  </script>
-  <script src="https://cdn.counter.dev/script.js"
-    data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
-    data-utcoffset="6">
-  </script>
-
-  <script>
-  // ═══════════════════════════════════════════════════════════════════════
-  //  GLOBAL STATE
-  // ═══════════════════════════════════════════════════════════════════════
-  let currentScope     = 'category';
-  let activeCategories = [];
-  let selectedDepth    = 0;
-  let isStopped        = false;   // lets the user abort mid-run
-
-  // Wiki-mode pagination
-  let apContinueToken  = null;
-
-  const CONCURRENCY    = 6;       // simultaneous per-article check tasks
-  const MAX_RETRIES    = 3;       // retries for flaky API calls
-  const RETRY_DELAY_MS = 800;     // base delay between retries (doubles each attempt)
-
-  const resultsDiv = document.getElementById("results");
-  const statusDiv  = document.getElementById("status");
-  const RECENT_EDIT_THRESHOLD = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  CONCURRENCY LIMITER  (reset on every new query)
-  // ═══════════════════════════════════════════════════════════════════════
-  function makeLimiter(concurrency) {
-    let active = 0;
-    const queue = [];
-    function run() {
-      if (active >= concurrency || !queue.length) return;
-      active++;
-      const { fn, resolve, reject } = queue.shift();
-      fn().then(resolve, reject).finally(() => { active--; run(); });
-    }
-    return fn => new Promise((resolve, reject) => { queue.push({ fn, resolve, reject }); run(); });
-  }
-  let limit = makeLimiter(CONCURRENCY);
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  FETCH WITH RETRY  — the main cause of intermittent results
-  //  Retries up to MAX_RETRIES times with exponential backoff
-  // ═══════════════════════════════════════════════════════════════════════
-  async function fetchJSON(url) {
-    let lastErr;
-    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-      if (isStopped) throw new Error('stopped');
-      try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (data.error) throw new Error(data.error.info);
-        return data;
-      } catch (e) {
-        lastErr = e;
-        if (e.message === 'stopped') throw e;
-        if (attempt < MAX_RETRIES) {
-          await sleep(RETRY_DELAY_MS * Math.pow(2, attempt));
-        }
-      }
-    }
-    throw lastErr;
-  }
-
-  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  SCOPE TOGGLE
-  // ═══════════════════════════════════════════════════════════════════════
-  function setScope(scope) {
-    currentScope = scope;
-    document.getElementById('scopeLabelWiki').classList.toggle('active', scope === 'wiki');
-    document.getElementById('scopeLabelCat').classList.toggle('active', scope === 'category');
-    document.getElementById('categorySection').style.display = scope === 'category' ? '' : 'none';
-    document.getElementById('noCatsWarning').style.display = 'none';
-  }
-  setScope('category'); // default
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  DEPTH SELECTOR
-  // ═══════════════════════════════════════════════════════════════════════
-  const depthHints = [
-    'Direct category only (no subcategories)',
-    'Direct category + 1 level of subcategories',
-    'Direct category + up to 2 levels deep',
-    'Direct category + up to 3 levels deep',
-    'Direct category + up to 4 levels deep',
-    'Direct category + up to 5 levels deep',
-  ];
-  document.querySelectorAll('.depth-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.depth-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedDepth = parseInt(btn.dataset.depth, 10);
-      document.getElementById('depthHint').textContent = depthHints[selectedDepth];
-    });
-  });
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  CATEGORY TAGS  (event delegation — safe for all Unicode names)
-  // ═══════════════════════════════════════════════════════════════════════
-  function addCategory() {
-    const input = document.getElementById("categoryInput");
-    // Strip any language's namespace prefix (Category:, श्रेणी:, Kategorie:, etc.)
-    let raw = input.value.trim().replace(/^[^:]+:\s*/, "").trim();
-    if (!raw || activeCategories.includes(raw)) { input.value = ""; return; }
-    activeCategories.push(raw);
-    input.value = "";
-    renderCategoryTags();
-    document.getElementById('noCatsWarning').style.display = 'none';
-  }
-
-  function removeCategory(index) {
-    activeCategories.splice(index, 1);
-    renderCategoryTags();
-  }
-
-  function renderCategoryTags() {
-    const container = document.getElementById("categoryTags");
-    container.innerHTML = "";
-    activeCategories.forEach((name, idx) => {
-      const tag  = document.createElement("div");
-      tag.className = "cat-tag";
-      const span = document.createElement("span");
-      span.title       = name;
-      span.textContent = name;
-      const btn  = document.createElement("button");
-      btn.className    = "cat-tag-remove";
-      btn.title        = "Remove";
-      btn.textContent  = "✕";
-      btn.dataset.index = String(idx);  // index only — no Unicode in attribute
-      tag.appendChild(span);
-      tag.appendChild(btn);
-      container.appendChild(tag);
-    });
-  }
-
-  document.getElementById("categoryTags").addEventListener("click", e => {
-    const btn = e.target.closest(".cat-tag-remove");
-    if (btn) removeCategory(parseInt(btn.dataset.index, 10));
-  });
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  LANGUAGE HELPER
-  // ═══════════════════════════════════════════════════════════════════════
-  function getLangCode() {
-    const sel = document.getElementById("langSelect").value.trim().toLowerCase();
-    return sel || document.getElementById("langCodeInput").value.trim().toLowerCase();
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  NIGHT MODE
-  // ═══════════════════════════════════════════════════════════════════════
+  // Night mode
   function toggleNightMode() {
-    document.body.classList.toggle('night-mode');
-    const n = document.body.classList.contains('night-mode');
-    localStorage.setItem('nightMode', n);
-    document.getElementById('night-mode-button').innerHTML = n ? '&#127774;' : '&#127769;';
+    const light = document.body.classList.toggle('light');
+    document.getElementById('night-mode-button').textContent = light ? '🌞' : '🌙';
+    localStorage.setItem('wiki-theme', light ? 'light' : 'dark');
   }
-  if (localStorage.getItem('nightMode') === 'true') {
-    document.body.classList.add('night-mode');
-    document.getElementById('night-mode-button').innerHTML = '&#127774;';
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  SCROLL BUTTONS
-  // ═══════════════════════════════════════════════════════════════════════
-  window.onscroll = () => {
-    const show = document.body.scrollTop > 20 || document.documentElement.scrollTop > 20;
-    document.getElementById('go-to-top').style.display    = show ? "block" : "none";
-    document.getElementById('go-to-bottom').style.display = show ? "block" : "none";
-  };
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  STOP
-  // ═══════════════════════════════════════════════════════════════════════
-  function stopQuery() {
-    isStopped = true;
-    document.getElementById('stopBtn').style.display   = 'none';
-    document.getElementById('startBtn').style.display  = 'inline-block';
-    setStatus(`Stopped. ${resultsDiv.children.length} article(s) shown so far.`);
-    progressWrap(false);
+  if (localStorage.getItem('wiki-theme') === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('night-mode-button').textContent = '🌞';
   }
 
-  // ═══════════════════════════════════════════════════════════════════════
-  //  RUN QUERY
-  // ═══════════════════════════════════════════════════════════════════════
-  async function runQuery() {
-    const lang = getLangCode();
-    if (!lang) { setStatus("Please select a wiki or enter a valid language code."); return; }
-    if (currentScope === 'category' && activeCategories.length === 0) {
-      document.getElementById('noCatsWarning').style.display = 'block';
-      return;
-    }
-
-    // Reset everything for a fresh run
-    isStopped       = false;
-    apContinueToken = null;
-    limit           = makeLimiter(CONCURRENCY);  // fresh limiter — no stale queue
-    resultsDiv.innerHTML = "";
-    hideLoadMore();
-    document.getElementById('stopBtn').style.display  = 'inline-block';
-    document.getElementById('startBtn').style.display = 'none';
-    progressWrap(true);
-    setProgress(0, '');
-
-    const apiBase  = `https://${lang}.wikipedia.org/w/api.php?origin=*`;
-    const wikiBase = `https://${lang}.wikipedia.org/wiki/`;
-    const minSize  = parseInt(document.getElementById("minSize").value) || 0;
-    const stubOnly = document.getElementById("stubOnly").checked;
-
-    try {
-      if (currentScope === 'category') {
-        await runCategoryMode(apiBase, wikiBase, lang, minSize, stubOnly);
-      } else {
-        await runWikiMode(apiBase, wikiBase, lang, minSize, stubOnly);
-      }
-    } catch (e) {
-      if (e.message !== 'stopped') {
-        setStatus(`Error: ${e.message}`);
-        console.error(e);
-      }
-    }
-
-    document.getElementById('stopBtn').style.display  = 'none';
-    document.getElementById('startBtn').style.display = 'inline-block';
-    progressWrap(false);
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  CATEGORY MODE  — level-by-level BFS, results shown after each level
-  //
-  //  Flow per depth level:
-  //    1. Fetch ALL subcategories from the current level (discovery first)
-  //    2. Fetch ALL articles from the current level categories
-  //    3. Check articles for missing images and display results
-  //    4. Move discovered subcategories to next level
-  // ═══════════════════════════════════════════════════════════════════════
-  async function runCategoryMode(apiBase, wikiBase, lang, minSize, stubOnly) {
-    const globalSeenPages = new Set();  // pageid dedup across all levels
-    const visitedCats     = new Set();  // category name dedup (prevent loops)
-    activeCategories.forEach(c => visitedCats.add(normCat(c)));
-
-    let currentLevelCats = [...activeCategories];
-    let totalFound = 0;
-
-    for (let depth = 0; depth <= selectedDepth; depth++) {
-      if (isStopped || currentLevelCats.length === 0) break;
-
-      // ── Step 1: Discover subcategories first (if more depth remains) ──
-      let nextLevelCats = [];
-      if (depth < selectedDepth) {
-        setStatus(`Depth ${depth} → discovering subcategories from ${currentLevelCats.length} category(ies)…`);
-        setProgress(Math.round((depth / (selectedDepth + 1)) * 30), `Depth ${depth}: finding subcategories`);
-
-        for (const cat of currentLevelCats) {
-          if (isStopped) break;
-          const subcats = await fetchAllMembers(apiBase, cat, 'subcat');
-          for (const sc of subcats) {
-            // BUG FIX: use /^[^:]+:/ to strip ANY language's namespace prefix
-            // e.g. "श्रेणी:Foo", "Kategorie:Foo", "Category:Foo" all become "Foo"
-            const scName = sc.title.replace(/^[^:]+:\s*/, "").trim();
-            const scKey  = normCat(scName);
-            if (scName && !visitedCats.has(scKey)) {
-              visitedCats.add(scKey);
-              nextLevelCats.push(scName);
-            }
-          }
-        }
-      }
-
-      // ── Step 2: Fetch articles from all categories at this depth ──
-      setStatus(`Depth ${depth}: collecting articles from ${currentLevelCats.length} category(ies)…`);
-      const levelPages = new Map(); // pageid → page object
-
-      for (const cat of currentLevelCats) {
-        if (isStopped) break;
-        const pages = await fetchAllMembers(apiBase, cat, 'page');
-        for (const p of pages) {
-          if (!globalSeenPages.has(p.pageid) && !levelPages.has(p.pageid)) {
-            levelPages.set(p.pageid, { ...p, _cat: cat, _depth: depth });
-          }
-        }
-      }
-
-      // Mark all as seen
-      levelPages.forEach((_, pid) => globalSeenPages.add(pid));
-      const pageArr = Array.from(levelPages.values());
-
-      if (pageArr.length === 0) {
-        setStatus(`Depth ${depth}: no articles found. Moving on…`);
-        currentLevelCats = nextLevelCats;
-        continue;
-      }
-
-      // ── Step 3: Check articles for missing images and display ──
-      setStatus(`Depth ${depth}: checking ${pageArr.length} article(s) for missing images…`);
-      setProgress(
-        Math.round(((depth + 0.5) / (selectedDepth + 1)) * 90),
-        `Depth ${depth}: checking ${pageArr.length} article(s)`
-      );
-
-      // Add a level heading
-      const heading = document.createElement("div");
-      heading.className = "level-heading";
-      heading.textContent =
-        depth === 0
-          ? `📂 Direct category articles (depth 0)`
-          : `📂 Subcategory depth ${depth}`;
-      resultsDiv.appendChild(heading);
-
-      let checked = 0;
-      const tasks = pageArr.map(page => limit(async () => {
-        if (isStopped) return null;
-
-        const [noImage, info, isStub] = await Promise.all([
-          checkNoImage(apiBase, page.title),
-          getPageInfo(apiBase, page.title),
-          checkStubCategory(apiBase, page.title),
-        ]);
-
-        checked++;
-        if (checked % 20 === 0) {
-          setProgress(
-            Math.round(((depth + (checked / pageArr.length) * 0.9) / (selectedDepth + 1)) * 90),
-            `Depth ${depth}: checked ${checked}/${pageArr.length}`
-          );
-        }
-
-        if (!noImage || info.length < minSize || (stubOnly && !isStub)) return null;
-
-        totalFound++;
-        const div = document.createElement("div");
-        div.className = "grid-item";
-        if (new Date(info.touched) > RECENT_EDIT_THRESHOLD) div.classList.add("recent");
-
-        div.innerHTML =
-          `<strong>${totalFound}.</strong> ` +
-          `<a href="${wikiBase + encodeURIComponent(page.title)}" target="_blank">${page.title}</a>` +
-          (depth > 0 ? ` <small style="color:#aaa;">(depth ${depth})</small>` : '') +
-          `<br><small>${info.length} bytes${isStub ? ' · Stub' : ''}</small>` +
-          `<br><small style="color:#888;">📂 ${page._cat}</small>`;
-        return div;
-      }));
-
-      const els = await Promise.all(tasks);
-      els.filter(Boolean).forEach(el => resultsDiv.appendChild(el));
-
-      setStatus(
-        `Depth ${depth} done — ${pageArr.length} checked, ${totalFound} without images so far.`
-      );
-      currentLevelCats = nextLevelCats;
-    }
-
-    if (!isStopped) {
-      setProgress(100, 'Complete');
-      setStatus(`✅ Done. ${totalFound} article(s) without images found on ${lang}.wikipedia.org.`);
-      setTimeout(() => progressWrap(false), 1000);
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  WIKI MODE  — allpages with apcontinue, Load More button
-  // ═══════════════════════════════════════════════════════════════════════
-  async function runWikiMode(apiBase, wikiBase, lang, minSize, stubOnly) {
-    apContinueToken = null;
-    setStatus(`Fetching first 500 articles from ${lang}.wikipedia.org…`);
-    await checkWikiBatch(apiBase, wikiBase, lang, minSize, stubOnly);
-  }
-
-  async function loadMoreWiki() {
-    const lang = getLangCode();
-    if (!lang) return;
-    const apiBase  = `https://${lang}.wikipedia.org/w/api.php?origin=*`;
-    const wikiBase = `https://${lang}.wikipedia.org/wiki/`;
-    const minSize  = parseInt(document.getElementById("minSize").value) || 0;
-    const stubOnly = document.getElementById("stubOnly").checked;
-    isStopped = false;
-    limit = makeLimiter(CONCURRENCY);
-    progressWrap(true);
-    document.getElementById('stopBtn').style.display  = 'inline-block';
-    document.getElementById('startBtn').style.display = 'none';
-    await checkWikiBatch(apiBase, wikiBase, lang, minSize, stubOnly);
-    document.getElementById('stopBtn').style.display  = 'none';
-    document.getElementById('startBtn').style.display = 'inline-block';
-    progressWrap(false);
-  }
-
-  async function checkWikiBatch(apiBase, wikiBase, lang, minSize, stubOnly) {
-    if (apContinueToken === 'done') {
-      setStatus(`All articles checked on ${lang}.wikipedia.org.`);
-      hideLoadMore();
-      return;
-    }
-
-    const pages = await getAllPages(apiBase);
-    if (!pages.length) {
-      setStatus(`No more pages found on ${lang}.wikipedia.org.`);
-      hideLoadMore();
-      return;
-    }
-
-    setStatus(`Checking ${pages.length} articles…`);
-    setProgress(10, `Checking ${pages.length} articles`);
-
-    const existingCount = resultsDiv.children.length;
-    let found = 0;
-
-    const tasks = pages.map((page, i) => limit(async () => {
-      if (isStopped) return null;
-      const [noImage, info, isStub] = await Promise.all([
-        checkNoImage(apiBase, page.title),
-        getPageInfo(apiBase, page.title),
-        checkStubCategory(apiBase, page.title),
-      ]);
-      if (i % 30 === 0) setProgress(10 + Math.round((i / pages.length) * 85), `Checked ${i}/${pages.length}`);
-      if (!noImage || info.length < minSize || (stubOnly && !isStub)) return null;
-
-      found++;
-      const div = document.createElement("div");
-      div.className = "grid-item";
-      if (new Date(info.touched) > RECENT_EDIT_THRESHOLD) div.classList.add("recent");
-      div.innerHTML =
-        `<strong>${existingCount + found}.</strong> ` +
-        `<a href="${wikiBase + encodeURIComponent(page.title)}" target="_blank">${page.title}</a>` +
-        `<br><small>${info.length} bytes${isStub ? ' · Stub' : ''}</small>`;
-      return div;
-    }));
-
-    const els = await Promise.all(tasks);
-    els.filter(Boolean).forEach(el => resultsDiv.appendChild(el));
-
-    setProgress(100, 'Done');
-    setStatus(`Done. Total: ${resultsDiv.children.length} on ${lang}.wikipedia.org.`);
-    setTimeout(() => progressWrap(false), 800);
-
-    const hasMore = apContinueToken !== 'done';
-    document.getElementById('load-more-button').style.display     = hasMore ? 'inline-block' : 'none';
-    document.getElementById('load-more-button-top').style.display = hasMore ? 'inline-block' : 'none';
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  fetchAllMembers — fetch ALL pages/subcats from one category
-  //  Uses fetchJSON (retry-capable), handles cmcontinue internally
-  // ═══════════════════════════════════════════════════════════════════════
-  async function fetchAllMembers(apiUrl, categoryName, cmtype) {
-    const all = [];
-    let cmcontinue;
-
-    do {
-      const params = new URLSearchParams({
-        action:      'query',
-        list:        'categorymembers',
-        cmtitle:     `Category:${categoryName}`,   // MediaWiki accepts "Category:" on all wikis
-        cmnamespace: cmtype === 'subcat' ? '14' : '0',
-        cmlimit:     '500',
-        cmtype,
-        format:      'json',
-      });
-      if (cmcontinue) params.set('cmcontinue', cmcontinue);
-
-      try {
-        const data = await fetchJSON(`${apiUrl}&${params.toString()}`);
-        all.push(...(data.query?.categorymembers || []));
-        cmcontinue = data.continue?.cmcontinue;
-      } catch (e) {
-        if (e.message === 'stopped') throw e;
-        console.warn(`fetchAllMembers failed for "${categoryName}" (${cmtype}):`, e.message);
-        break;
-      }
-    } while (cmcontinue);
-
-    return all;
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  getAllPages — entire-wiki allpages with apcontinue
-  // ═══════════════════════════════════════════════════════════════════════
-  async function getAllPages(apiUrl) {
-    const params = new URLSearchParams({
-      action: 'query', list: 'allpages',
-      apnamespace: '0', aplimit: '500', format: 'json',
+  // Filter toggle
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentMode = btn.dataset.mode;
     });
-    if (apContinueToken) params.set('apcontinue', apContinueToken);
-    try {
-      const data = await fetchJSON(`${apiUrl}&${params.toString()}`);
-      apContinueToken = data.continue?.apcontinue ?? 'done';
-      return data.query?.allpages || [];
-    } catch (e) {
-      setStatus(`API Error: ${e.message}`);
-      return [];
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  IMAGE CHECK  — prop=images + prop=pageimages (covers infobox images)
-  // ═══════════════════════════════════════════════════════════════════════
-  async function checkNoImage(apiUrl, title) {
-    const params = new URLSearchParams({
-      action: 'query', prop: 'images|pageimages',
-      titles: title, format: 'json', imlimit: '1', piprop: 'name',
-    });
-    try {
-      const data = await fetchJSON(`${apiUrl}&${params.toString()}`);
-      const page = Object.values(data.query.pages)[0];
-      return !(page.images?.length) && !page.pageimage;
-    } catch (e) {
-      if (e.message === 'stopped') throw e;
-      // On persistent failure: assume article might have no image (include it)
-      return true;
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  PAGE INFO
-  // ═══════════════════════════════════════════════════════════════════════
-  async function getPageInfo(apiUrl, title) {
-    const params = new URLSearchParams({
-      action: 'query', prop: 'info', titles: title,
-      inprop: 'url|touched', format: 'json',
-    });
-    try {
-      const data = await fetchJSON(`${apiUrl}&${params.toString()}`);
-      const page = Object.values(data.query.pages)[0];
-      return { length: page.length || 0, touched: page.touched || new Date(0) };
-    } catch (e) {
-      if (e.message === 'stopped') throw e;
-      return { length: 0, touched: new Date(0) };
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  STUB CHECK
-  // ═══════════════════════════════════════════════════════════════════════
-  async function checkStubCategory(apiUrl, title) {
-    const params = new URLSearchParams({
-      action: 'query', prop: 'categories', titles: title,
-      format: 'json', cllimit: 'max',
-    });
-    try {
-      const data = await fetchJSON(`${apiUrl}&${params.toString()}`);
-      const page = Object.values(data.query.pages)[0];
-      if (!page.categories) return false;
-      return page.categories.some(c =>
-        /stubs?|articles with a stub template|अधूरे लेख|स्टब/i.test(c.title)
-      );
-    } catch (e) {
-      if (e.message === 'stopped') throw e;
-      return false;
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  HELPERS
-  // ═══════════════════════════════════════════════════════════════════════
-  // Normalize a category name for deduplication (lowercase, trimmed)
-  function normCat(name) { return name.trim().toLowerCase(); }
-
-  function setStatus(msg) { statusDiv.textContent = msg; }
-
-  function progressWrap(visible) {
-    document.getElementById('progressWrap').style.display = visible ? 'block' : 'none';
-  }
-  function setProgress(pct, label) {
-    document.getElementById('progressFill').style.width = pct + '%';
-    if (label !== undefined) document.getElementById('progressLabel').textContent = label;
-  }
-  function hideLoadMore() {
-    document.getElementById('load-more-button').style.display     = 'none';
-    document.getElementById('load-more-button-top').style.display = 'none';
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  //  INIT
-  // ═══════════════════════════════════════════════════════════════════════
-  document.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('nightMode') === 'true') {
-      document.body.classList.add('night-mode');
-      document.getElementById('night-mode-button').innerHTML = '&#127774;';
-    }
   });
-  </script>
+
+  function buildSPARQL(lang, cat, ll, bs, offset) {
+    const wikiUrl = `https://${lang}.wikipedia.org/`;
+    let imageFilter = '';
+    if      (currentMode === 'without') imageFilter = `\n  FILTER NOT EXISTS { ?item wdt:P18 ?image. }`;
+    else if (currentMode === 'with')    imageFilter = `\n  ?item wdt:P18 ?image.`;
+    return `SELECT ?item ?itemLabel ?article WHERE {
+  ?article schema:about ?item ;
+           schema:isPartOf <${wikiUrl}> .
+
+  ?item wdt:P31 wd:${cat} .${imageFilter}
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "${ll}". }
+}
+LIMIT ${bs}
+OFFSET ${offset}`;
+  }
+
+  async function runQuery(fresh) {
+    const lang = document.getElementById('lang').value;
+    const cat  = document.getElementById('category').value;
+    const ll   = document.getElementById('labelLang').value;
+    const bs   = parseInt(document.getElementById('batchSize').value, 10);
+
+    if (fresh) {
+      currentOffset = currentBatch = totalLoaded = 0;
+      document.getElementById('resultsBody').innerHTML = '';
+    }
+
+    const sparql = buildSPARQL(lang, cat, ll, bs, currentOffset);
+    document.getElementById('sparqlBox').textContent = sparql;
+    setLoading(true); hideError();
+
+    try {
+      const resp = await fetch(
+        `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparql)}&format=json`,
+        { headers: { 'Accept': 'application/sparql-results+json' } }
+      );
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+      const data = await resp.json();
+      const rows = data.results.bindings;
+
+      currentBatch++;
+      renderRows(rows, currentOffset, fresh);
+      totalLoaded   += rows.length;
+      currentOffset += bs;
+
+      document.getElementById('chipBatch').textContent  = `Batch ${currentBatch}`;
+      document.getElementById('chipCount').textContent  = `${rows.length} items`;
+      document.getElementById('chipOffset').textContent = `Total loaded: ${totalLoaded}`;
+      document.getElementById('pageInfo').textContent   = `Batch ${currentBatch} · ${totalLoaded} items loaded`;
+
+      const hasMore = rows.length === bs;
+      ['nextBtn','nextBtn2'].forEach(id => document.getElementById(id).disabled = !hasMore);
+
+      document.getElementById('resultsPanel').style.display = 'block';
+      document.getElementById('emptyState').style.display   = rows.length === 0 ? 'block' : 'none';
+      document.getElementById('resultsTable').style.display = rows.length > 0  ? 'table' : 'none';
+
+    } catch(err) {
+      showError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function renderRows(rows, startOffset, fresh) {
+    const tbody = document.getElementById('resultsBody');
+    if (fresh) tbody.innerHTML = '';
+    rows.forEach((row, i) => {
+      const label   = row.itemLabel?.value ?? '(no label)';
+      const article = row.article?.value   ?? '';
+      const item    = row.item?.value      ?? '';
+      const qid     = item.replace('http://www.wikidata.org/entity/', '');
+      const rowNum  = startOffset + i + 1;
+      let artCell = '<span style="color:var(--muted)">—</span>';
+      if (article) {
+        let title = article;
+        try { title = decodeURIComponent(article.split('/wiki/')[1] || article); } catch(e){}
+        artCell = `<a class="item-link" href="${esc(article)}" target="_blank">${esc(title)}</a>`;
+      }
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${rowNum}</td><td>${esc(label)}</td><td>${artCell}</td>
+        <td>${qid ? `<a class="wd-link" href="${esc(item)}" target="_blank">${esc(qid)}</a>` : '—'}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function resetQuery() {
+    currentOffset = currentBatch = totalLoaded = 0;
+    document.getElementById('resultsBody').innerHTML = '';
+    document.getElementById('resultsPanel').style.display = 'none';
+    ['nextBtn','nextBtn2'].forEach(id => document.getElementById(id).disabled = true);
+    hideError();
+  }
+  function setLoading(on) {
+    document.getElementById('statusBar').classList.toggle('show', on);
+    document.getElementById('runBtn').disabled = on;
+  }
+  function showError(msg) {
+    const b = document.getElementById('errorBox');
+    b.textContent = '⚠ ' + msg; b.classList.add('show');
+  }
+  function hideError() { document.getElementById('errorBox').classList.remove('show'); }
+  function toggleSparql() {
+    const box = document.getElementById('sparqlBox');
+    box.style.display = box.style.display === 'block' ? 'none' : 'block';
+  }
+  document.getElementById('lang').addEventListener('change', function() {
+    const ll = document.getElementById('labelLang');
+    const f  = [...ll.options].find(o => o.value.startsWith(this.value + ','));
+    if (f) ll.value = f.value;
+  });
+</script>
 </body>
 </html>
