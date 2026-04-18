@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Find Wikipedia articles across any language that are missing images. Filter by language, size, and stub status. Contribute to making Wikipedia better!" />
+  <meta name="keywords" content="Wikipedia, articles without images, stub articles, multilingual, Wikimedia, global" />
+  <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/Wiki-articles-without-images.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/Wiki-articles-without-images.html" />
+  <meta property="og:title" content="Wikipedia articles without images finder" />
+  <meta property="og:description" content="Find Wikipedia articles across any language that are missing images. Filter by language, size, and stub status." />
+  <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://suyashdwivedi.github.io/Wiki_Tools/Wiki-articles-without-images.html" />
+  <meta property="twitter:title" content="Wikipedia articles without images finder" />
+  <meta property="twitter:description" content="Find Wikipedia articles across any language that are missing images. Filter by language, size, and stub status." />
+  <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
+  <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
+  <title>Wikipedia articles without images finder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  
+<style>
+    :root {
+      --bg:       #0f1117;
+      --surface:  #181c27;
+      --card:     #1e2335;
+      --border:   #2e3450;
+      --accent:   #5b8dee;
+      --accent2:  #e0ac4b;
+      --text:     #d8dce8;
+      --muted:    #7a829e;
+      --success:  #4caf82;
+      --danger:   #e05b5b;
+      --warn-bg:  rgba(224,172,75,.10);
+      --warn-bdr: rgba(224,172,75,.30);
+      --radius:   10px;
+    }
+    body.light {
+      --bg:       #f4f6fb;
+      --surface:  #ffffff;
+      --card:     #edf0f7;
+      --border:   #d0d6e8;
+      --accent:   #2a5ec7;
+      --accent2:  #b07d10;
+      --text:     #1a1f30;
+      --muted:    #606880;
+      --success:  #276e4c;
+      --danger:   #b83030;
+      --warn-bg:  rgba(176,125,16,.08);
+      --warn-bdr: rgba(176,125,16,.28);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; position: relative;
+      transition: background .25s, color .25s;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 10% 0%, rgba(91,141,238,.10) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 35% at 90% 100%, rgba(224,172,75,.07) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    .banner {
+      background: linear-gradient(90deg, var(--accent) 0%, #3a6ecc 100%);
+      color: #fff; text-align: center;
+      padding: 9px 20px; font-size: 13px; font-weight: 600;
+      letter-spacing: .04em; position: relative; z-index: 2;
+    }
+    .night-mode-toggle {
+      position: fixed; top: 14px; right: 18px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 50%; width: 40px; height: 40px;
+      font-size: 18px; cursor: pointer;
+      display: grid; place-items: center;
+      z-index: 9999; transition: all .2s;
+      box-shadow: 0 2px 10px rgba(0,0,0,.2);
+    }
+    .night-mode-toggle:hover { border-color: var(--accent); transform: scale(1.08); }
+    .wrapper { max-width: 1100px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+    header { padding: 36px 0 28px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+    .logo-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .logo-img { width: 54px; height: 54px; object-fit: contain; flex-shrink: 0; }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(20px, 4vw, 33px);
+      color: var(--text); line-height: 1.2;
+    }
+    .tagline { color: var(--muted); font-size: 14px; margin-top: 5px; }
+    /* Notice */
+    .notice {
+      display: flex; gap: 12px; align-items: flex-start;
+      background: var(--warn-bg); border: 1px solid var(--warn-bdr);
+      border-radius: var(--radius); padding: 13px 17px;
+      font-size: 13px; color: var(--accent2);
+      margin-bottom: 20px; line-height: 1.65;
+    }
+    .notice .ni { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .notice a { color: var(--accent2); }
+    /* Panel */
+    .panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; margin-bottom: 20px;
+      transition: background .25s, border-color .25s;
+    }
+    .panel-title { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width:640px){ .controls { grid-template-columns: 1fr; } }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    select, input {
+      width: 100%; background: var(--card); border: 1px solid var(--border);
+      color: var(--text); padding: 10px 14px; border-radius: var(--radius);
+      font-family: inherit; font-size: 14px; appearance: none; cursor: pointer;
+      outline: none; transition: border-color .2s, background .25s;
+    }
+    select:focus { border-color: var(--accent); }
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); pointer-events: none; font-size: 12px;
+    }
+    .filter-row {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border);
+    }
+    .toggle-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .toggle-btn {
+      padding: 7px 15px; border-radius: 20px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); font-size: 13px;
+      cursor: pointer; transition: all .18s; font-family: inherit;
+    }
+    .toggle-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .filter-label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+    .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 22px; border-radius: var(--radius); border: none;
+      font-family: inherit; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all .18s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #3a6ecc);
+      color: #fff; box-shadow: 0 4px 18px rgba(91,141,238,.3);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(91,141,238,.4); }
+    .btn-primary:disabled { opacity: .55; transform: none; cursor: not-allowed; }
+    .btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-secondary:disabled { opacity: .45; cursor: not-allowed; }
+    .status-bar {
+      display: none; align-items: center; gap: 10px;
+      padding: 11px 16px; background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: 13px; color: var(--muted); margin-bottom: 16px;
+    }
+    .status-bar.show { display: flex; }
+    .spinner {
+      width: 15px; height: 15px; border: 2px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin .7s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .stats-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+    .chip { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+    .chip-blue  { background: rgba(91,141,238,.15); color: var(--accent);  border: 1px solid rgba(91,141,238,.3); }
+    .chip-gold  { background: rgba(224,172,75,.12); color: var(--accent2); border: 1px solid rgba(224,172,75,.25); }
+    .chip-green { background: rgba(76,175,130,.12); color: var(--success); border: 1px solid rgba(76,175,130,.25); }
+    .results-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead tr { background: var(--card); border-bottom: 2px solid var(--border); }
+    th { text-align: left; padding: 11px 15px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
+    tbody tr:hover { background: rgba(91,141,238,.06); }
+    td { padding: 10px 15px; vertical-align: middle; }
+    td:first-child { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .item-link { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .item-link:hover { text-decoration: underline; }
+    .wd-link { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 12px; text-decoration: none; }
+    .wd-link:hover { color: var(--accent2); }
+    .error-box {
+      background: rgba(224,91,91,.10); border: 1px solid rgba(224,91,91,.3);
+      border-radius: var(--radius); padding: 13px 17px;
+      color: var(--danger); font-size: 14px; margin-bottom: 16px; display: none;
+    }
+    .error-box.show { display: block; }
+    .empty-state { text-align: center; padding: 52px 20px; color: var(--muted); }
+    .empty-state .icon { font-size: 42px; margin-bottom: 12px; }
+    .pagination-row { display: flex; gap: 10px; align-items: center; margin-top: 20px; flex-wrap: wrap; }
+    .page-info { font-size: 13px; color: var(--muted); margin-left: auto; }
+    .sparql-toggle {
+      font-size: 12px; color: var(--muted); cursor: pointer;
+      text-decoration: underline dotted; background: none; border: none; font-family: inherit;
+    }
+    .sparql-box {
+      display: none; margin-top: 12px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 13px;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #a8c4ff; white-space: pre-wrap; word-break: break-all;
+      max-height: 210px; overflow-y: auto;
+    }
+    .footer {
+      text-align: center; padding: 32px 20px 90px;
+      font-size: 13px; color: var(--muted);
+      border-top: 1px solid var(--border); margin-top: 40px;
+    }
+    .footer a { color: var(--accent2); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+    .scroll-button {
+      position: fixed; right: 18px;
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--text); width: 42px; height: 42px;
+      border-radius: 50%; font-size: 16px; cursor: pointer;
+      display: grid; place-items: center;
+      transition: all .18s; z-index: 999;
+      box-shadow: 0 4px 14px rgba(0,0,0,.22);
+    }
+    .scroll-button:hover { border-color: var(--accent); color: var(--accent); }
+    #go-to-top    { bottom: 72px; }
+    #go-to-bottom { bottom: 22px; }
+  </style>
+</head>
+<body>
+
+<div class="banner">Wikipedia Articles Without Images (Global)</div>
+<button class="night-mode-toggle" id="night-mode-button" onclick="toggleNightMode()" title="Toggle light/dark mode">🌙</button>
+
+<div class="wrapper">
+
+  <header>
+    <div class="logo-row">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png"
+           alt="Wiki's Lazy Coders Logo" class="logo-img" />
+      <div>
+        <h1>Wikipedia articles without images finder</h1>
+        <p class="tagline">Find Wikipedia articles missing images — pick a language, category &amp; explore in batches</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- P18 accuracy notice -->
+  <div class="notice">
+    <span class="ni">⚠️</span>
+    <span>
+      <strong>Note on accuracy:</strong> Results are based on Wikidata's <strong>P18 (image)</strong> property.
+      Some Wikipedia articles may still display an image sourced via infobox templates, Commons categories,
+      or a linked item — without P18 being set in Wikidata. Such articles may appear in "Without Images" results
+      even though the article itself shows a photo. Always verify by opening the article link.
+      <a href="https://www.wikidata.org/wiki/Property:P18" target="_blank">Learn about P18 →</a>
+    </span>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Query Settings</div>
+    <div class="controls">
+
+      <div>
+        <label for="lang">Wikipedia Language Project</label>
+        <div class="select-wrap">
+          <select id="lang">
+            <option value="hi">Hindi (hi)</option>
+            <option value="ar">Arabic (ar)</option>
+            <option value="awa">Awadhi (awa)</option>
+            <option value="en">English (en)</option>
+            <option value="fr">French (fr)</option>
+            <option value="de">German (de)</option>
+            <option value="es">Spanish (es)</option>
+            <option value="pt">Portuguese (pt)</option>
+            <option value="ru">Russian (ru)</option>
+            <option value="zh">Chinese (zh)</option>
+            <option value="ja">Japanese (ja)</option>
+            <option value="it">Italian (it)</option>
+            <option value="pl">Polish (pl)</option>
+            <option value="nl">Dutch (nl)</option>
+            <option value="fa">Persian (fa)</option>
+            <option value="ur">Urdu (ur)</option>
+            <option value="bn">Bengali (bn)</option>
+            <option value="pa">Punjabi (pa)</option>
+            <option value="ta">Tamil (ta)</option>
+            <option value="te">Telugu (te)</option>
+            <option value="ml">Malayalam (ml)</option>
+            <option value="mr">Marathi (mr)</option>
+            <option value="gu">Gujarati (gu)</option>
+            <option value="kn">Kannada (kn)</option>
+            <option value="bho">Bhojpuri (bho)</option>
+            <option value="mai">Maithili (mai)</option>
+            <option value="new">Newari (new)</option>
+            <option value="ne">Nepali (ne)</option>
+            <option value="ko">Korean (ko)</option>
+            <option value="vi">Vietnamese (vi)</option>
+            <option value="tr">Turkish (tr)</option>
+            <option value="sv">Swedish (sv)</option>
+            <option value="uk">Ukrainian (uk)</option>
+            <option value="he">Hebrew (he)</option>
+            <option value="id">Indonesian (id)</option>
+            <option value="ms">Malay (ms)</option>
+            <option value="th">Thai (th)</option>
+            <option value="ca">Catalan (ca)</option>
+            <option value="simple">Simple English (simple)</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="category">Article Category (Wikidata P31 type)</label>
+        <div class="select-wrap">
+          <select id="category">
+            <option value="Q5">Human / Person</option>
+            <option value="Q515">City</option>
+            <option value="Q3624078">Sovereign State / Country</option>
+            <option value="Q41176">Building</option>
+            <option value="Q8502">Mountain</option>
+            <option value="Q4022">River</option>
+            <option value="Q23397">Lake</option>
+            <option value="Q34763">Village</option>
+            <option value="Q532">Village (alternate)</option>
+            <option value="Q11424">Film / Movie</option>
+            <option value="Q571">Book</option>
+            <option value="Q191067">Article (Wikipedia)</option>
+            <option value="Q5633421">Scientific journal</option>
+            <option value="Q43229">Organization</option>
+            <option value="Q891723">Public company</option>
+            <option value="Q16970">Church building</option>
+            <option value="Q839954">Archaeological site</option>
+            <option value="Q16917">Hospital</option>
+            <option value="Q3918">University</option>
+            <option value="Q9826">High school</option>
+            <option value="Q484170">Municipality</option>
+            <option value="Q46">National park</option>
+            <option value="Q55488">Railway station</option>
+            <option value="Q1248784">Airport</option>
+            <option value="Q12280">Bridge</option>
+            <option value="Q34038">Waterfall</option>
+            <option value="Q16521">Taxon / Species</option>
+            <option value="Q756">Plant</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="batchSize">Batch Size (results per load)</label>
+        <div class="select-wrap">
+          <select id="batchSize">
+            <option value="50">50</option>
+            <option value="100" selected>100</option>
+            <option value="200">200</option>
+            <option value="500">500</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="labelLang">Label Language Fallback</label>
+        <div class="select-wrap">
+          <select id="labelLang">
+            <option value="hi,en">Hindi → English</option>
+            <option value="ar,en">Arabic → English</option>
+            <option value="en">English only</option>
+            <option value="en,hi">English → Hindi</option>
+            <option value="fr,en">French → English</option>
+            <option value="de,en">German → English</option>
+            <option value="ur,en">Urdu → English</option>
+            <option value="bn,en">Bengali → English</option>
+            <option value="ta,en">Tamil → English</option>
+            <option value="te,en">Telugu → English</option>
+            <option value="mr,en">Marathi → English</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="filter-row">
+      <span class="filter-label">Filter Mode:</span>
+      <div class="toggle-group">
+        <button class="toggle-btn active" data-mode="without">🚫 Without Images (P18 missing)</button>
+        <button class="toggle-btn" data-mode="with">🖼️ With Images (P18 set)</button>
+        <button class="toggle-btn" data-mode="all">📋 All Articles</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="runBtn" onclick="runQuery(true)">▶ Run Query</button>
+      <button class="btn btn-secondary" id="nextBtn" onclick="runQuery(false)" disabled>→ Next Batch</button>
+      <button class="btn btn-secondary" onclick="resetQuery()">↺ Reset</button>
+      <button class="sparql-toggle" onclick="toggleSparql()">view SPARQL ▾</button>
+    </div>
+
+    <pre class="sparql-box" id="sparqlBox"></pre>
+  </div>
+
+  <div class="status-bar" id="statusBar">
+    <div class="spinner"></div>
+    <span>Querying Wikidata SPARQL endpoint…</span>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="panel" id="resultsPanel" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+      <div class="panel-title" style="margin:0;">Results</div>
+      <div class="stats-row" style="margin:0;gap:8px;">
+        <span class="chip chip-blue"  id="chipBatch">Batch 1</span>
+        <span class="chip chip-gold"  id="chipCount">— items</span>
+        <span class="chip chip-green" id="chipOffset">Total loaded: 0</span>
+      </div>
+    </div>
+
+    <div class="results-wrap">
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Label</th>
+            <th>Wikipedia Article</th>
+            <th>Wikidata Item</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <div id="emptyState" class="empty-state" style="display:none;">
+      <div class="icon">🔎</div>
+      <p>No articles found for this combination. Try a different category or language.</p>
+    </div>
+
+    <div class="pagination-row">
+      <button class="btn btn-secondary" id="nextBtn2" onclick="runQuery(false)" disabled>→ Load Next Batch</button>
+      <button class="btn btn-secondary" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to Top</button>
+      <div class="page-info" id="pageInfo">Batch 1 · 0 items loaded</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 18 April 2026
+</div>
+
+<button id="go-to-top"    class="scroll-button" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Go to top">↑</button>
+<button id="go-to-bottom" class="scroll-button" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})" title="Go to bottom">↓</button>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GC8PGC89NB');
+</script>
+<script src="https://cdn.counter.dev/script.js" data-id="cc7a036d-a904-4d76-bcac-37ea4196c014" data-utcoffset="6"></script>
+
+<script>
+  let currentOffset = 0, currentBatch = 0, totalLoaded = 0, currentMode = 'without';
+
+  // Night mode
+  function toggleNightMode() {
+    const light = document.body.classList.toggle('light');
+    document.getElementById('night-mode-button').textContent = light ? '🌞' : '🌙';
+    localStorage.setItem('wiki-theme', light ? 'light' : 'dark');
+  }
+  if (localStorage.getItem('wiki-theme') === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('night-mode-button').textContent = '🌞';
+  }
+
+  // Filter toggle
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentMode = btn.dataset.mode;
+    });
+  });
+
+  function buildSPARQL(lang, cat, ll, bs, offset) {
+    const wikiUrl = `https://${lang}.wikipedia.org/`;
+    let imageFilter = '';
+    if      (currentMode === 'without') imageFilter = `\n  FILTER NOT EXISTS { ?item wdt:P18 ?image. }`;
+    else if (currentMode === 'with')    imageFilter = `\n  ?item wdt:P18 ?image.`;
+    return `SELECT ?item ?itemLabel ?article WHERE {
+  ?article schema:about ?item ;
+           schema:isPartOf <${wikiUrl}> .
+
+  ?item wdt:P31 wd:${cat} .${imageFilter}
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "${ll}". }
+}
+LIMIT ${bs}
+OFFSET ${offset}`;
+  }
+
+  async function runQuery(fresh) {
+    const lang = document.getElementById('lang').value;
+    const cat  = document.getElementById('category').value;
+    const ll   = document.getElementById('labelLang').value;
+    const bs   = parseInt(document.getElementById('batchSize').value, 10);
+
+    if (fresh) {
+      currentOffset = currentBatch = totalLoaded = 0;
+      document.getElementById('resultsBody').innerHTML = '';
+    }
+
+    const sparql = buildSPARQL(lang, cat, ll, bs, currentOffset);
+    document.getElementById('sparqlBox').textContent = sparql;
+    setLoading(true); hideError();
+
+    try {
+      const resp = await fetch(
+        `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparql)}&format=json`,
+        { headers: { 'Accept': 'application/sparql-results+json' } }
+      );
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+      const data = await resp.json();
+      const rows = data.results.bindings;
+
+      currentBatch++;
+      renderRows(rows, currentOffset, fresh);
+      totalLoaded   += rows.length;
+      currentOffset += bs;
+
+      document.getElementById('chipBatch').textContent  = `Batch ${currentBatch}`;
+      document.getElementById('chipCount').textContent  = `${rows.length} items`;
+      document.getElementById('chipOffset').textContent = `Total loaded: ${totalLoaded}`;
+      document.getElementById('pageInfo').textContent   = `Batch ${currentBatch} · ${totalLoaded} items loaded`;
+
+      const hasMore = rows.length === bs;
+      ['nextBtn','nextBtn2'].forEach(id => document.getElementById(id).disabled = !hasMore);
+
+      document.getElementById('resultsPanel').style.display = 'block';
+      document.getElementById('emptyState').style.display   = rows.length === 0 ? 'block' : 'none';
+      document.getElementById('resultsTable').style.display = rows.length > 0  ? 'table' : 'none';
+
+    } catch(err) {
+      showError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function renderRows(rows, startOffset, fresh) {
+    const tbody = document.getElementById('resultsBody');
+    if (fresh) tbody.innerHTML = '';
+    rows.forEach((row, i) => {
+      const label   = row.itemLabel?.value ?? '(no label)';
+      const article = row.article?.value   ?? '';
+      const item    = row.item?.value      ?? '';
+      const qid     = item.replace('http://www.wikidata.org/entity/', '');
+      const rowNum  = startOffset + i + 1;
+      let artCell = '<span style="color:var(--muted)">—</span>';
+      if (article) {
+        let title = article;
+        try { title = decodeURIComponent(article.split('/wiki/')[1] || article); } catch(e){}
+        artCell = `<a class="item-link" href="${esc(article)}" target="_blank">${esc(title)}</a>`;
+      }
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${rowNum}</td><td>${esc(label)}</td><td>${artCell}</td>
+        <td>${qid ? `<a class="wd-link" href="${esc(item)}" target="_blank">${esc(qid)}</a>` : '—'}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function resetQuery() {
+    currentOffset = currentBatch = totalLoaded = 0;
+    document.getElementById('resultsBody').innerHTML = '';
+    document.getElementById('resultsPanel').style.display = 'none';
+    ['nextBtn','nextBtn2'].forEach(id => document.getElementById(id).disabled = true);
+    hideError();
+  }
+  function setLoading(on) {
+    document.getElementById('statusBar').classList.toggle('show', on);
+    document.getElementById('runBtn').disabled = on;
+  }
+  function showError(msg) {
+    const b = document.getElementById('errorBox');
+    b.textContent = '⚠ ' + msg; b.classList.add('show');
+  }
+  function hideError() { document.getElementById('errorBox').classList.remove('show'); }
+  function toggleSparql() {
+    const box = document.getElementById('sparqlBox');
+    box.style.display = box.style.display === 'block' ? 'none' : 'block';
+  }
+  document.getElementById('lang').addEventListener('change', function() {
+    const ll = document.getElementById('labelLang');
+    const f  = [...ll.options].find(o => o.value.startsWith(this.value + ','));
+    if (f) ll.value = f.value;
+  });
+</script>
+</body>
+</html>
