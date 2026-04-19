@@ -1,15 +1,21 @@
 {
   "manifest_version": 3,
   "name": "Wikipedia Citation Generator",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Generate Wikipedia citations - by Suyash Dwivedi",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "tabs",
+    "scripting"
   ],
   "host_permissions": [
     "https://citer.toolforge.org/*",
-    "https://suyashdwivedi.github.io/*"
+    "https://suyashdwivedi.github.io/*",
+    "https://*.wikipedia.org/*"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

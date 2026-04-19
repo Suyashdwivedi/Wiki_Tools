@@ -1,3 +1,4 @@
+/* ── Floating citation button ── */
 #wiki-cite-btn {
   position: fixed;
   top: 100px;
@@ -18,17 +19,100 @@
   justify-content: center;
   padding: 0;
 }
-
 #wiki-cite-btn:hover {
   transform: scale(1.1);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
+#wiki-cite-btn:active  { transform: scale(0.95); }
+#wiki-cite-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-#wiki-cite-btn:active {
-  transform: scale(0.95);
+/* ── Tab picker panel ── */
+#wiki-cite-picker {
+  position: fixed;
+  top: 100px;
+  right: 70px;
+  width: 280px;
+  background: #1e1e2e;
+  border: 1px solid #667eea;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  z-index: 999998;
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+  animation: wcp-slide-in 0.2s ease;
+}
+@keyframes wcp-slide-in {
+  from { opacity: 0; transform: translateX(10px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-#wiki-cite-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.wcp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+}
+.wcp-close {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.8;
+}
+.wcp-close:hover { opacity: 1; }
+
+.wcp-hint {
+  padding: 8px 14px;
+  font-size: 11px;
+  color: #888;
+  border-bottom: 1px solid #2a2a3e;
+}
+
+.wcp-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.wcp-list li + li {
+  border-top: 1px solid #2a2a3e;
+}
+
+.wcp-tab-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  transition: background 0.15s;
+}
+.wcp-tab-btn:hover { background: #2a2a3e; }
+.wcp-tab-btn:disabled { opacity: 0.5; cursor: default; }
+
+.wcp-tab-title {
+  font-size: 12px;
+  color: #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+.wcp-fill-label {
+  font-size: 11px;
+  color: #667eea;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
