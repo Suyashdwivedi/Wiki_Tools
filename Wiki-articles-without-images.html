@@ -304,41 +304,176 @@
       </div>
 
       <div>
-        <label for="category">Article Category (Wikidata P31 type)</label>
-        <div class="select-wrap">
-          <select id="category">
-            <option value="Q5">Human / Person</option>
-            <option value="Q515">City</option>
-            <option value="Q3624078">Sovereign State / Country</option>
-            <option value="Q41176">Building</option>
-            <option value="Q8502">Mountain</option>
-            <option value="Q4022">River</option>
-            <option value="Q23397">Lake</option>
-            <option value="Q34763">Village</option>
-            <option value="Q532">Village (alternate)</option>
-            <option value="Q11424">Film / Movie</option>
-            <option value="Q571">Book</option>
-            <option value="Q191067">Article (Wikipedia)</option>
-            <option value="Q5633421">Scientific journal</option>
-            <option value="Q43229">Organization</option>
-            <option value="Q891723">Public company</option>
-            <option value="Q16970">Church building</option>
-            <option value="Q839954">Archaeological site</option>
-            <option value="Q16917">Hospital</option>
-            <option value="Q3918">University</option>
-            <option value="Q9826">High school</option>
-            <option value="Q484170">Municipality</option>
-            <option value="Q46">National park</option>
-            <option value="Q55488">Railway station</option>
-            <option value="Q1248784">Airport</option>
-            <option value="Q12280">Bridge</option>
-            <option value="Q34038">Waterfall</option>
-            <option value="Q16521">Taxon / Species</option>
-            <option value="Q756">Plant</option>
-          </select>
-        </div>
-      </div>
+  <label for="category">Article Category (Wikidata P31 type)</label>
+  <div class="select-wrap">
+    <select id="category">
+      <!-- People -->
+      <optgroup label="👤 People">
+        <option value="Q5">Human / Person</option>
+        <option value="Q482980">Author / Writer</option>
+        <option value="Q901">Scientist</option>
+        <option value="Q2562308">Woman Scientist</option>
+        <option value="Q36180">Poet</option>
+        <option value="Q33999">Actor</option>
+        <option value="Q639669">Musician</option>
+        <option value="Q40348">Lawyer</option>
+        <option value="Q82955">Politician</option>
+        <option value="Q193391">Diplomat</option>
+        <option value="Q11631">Astronaut</option>
+        <option value="Q189290">Military Officer</option>
+        <option value="Q1930187">Journalist</option>
+        <option value="Q2374149">Activist / Social Reformer</option>
+        <option value="Q15976105">Freedom Fighter</option>
+        <option value="Q12362622">Female Politician</option>
+        <option value="Q2066131">Athlete / Sportsperson</option>
+        <option value="Q4964182">Philosopher</option>
+        <option value="Q2526255">Film Director</option>
+        <option value="Q177220">Singer</option>
+        <option value="Q1028181">Painter / Artist</option>
+        <option value="Q3665646">Dancer</option>
+        <option value="Q14089670">Fashion Designer</option>
+        <option value="Q712378">Religious Leader</option>
+        <option value="Q372436">Feminist / Women's Rights Activist</option>
+      </optgroup>
 
+      <!-- Places -->
+      <optgroup label="🌍 Places">
+        <option value="Q3624078">Sovereign State / Country</option>
+        <option value="Q515">City</option>
+        <option value="Q34763">Village</option>
+        <option value="Q532">Village (alternate)</option>
+        <option value="Q484170">Municipality</option>
+        <option value="Q1549591">Big City / Metropolis</option>
+        <option value="Q5119">Capital City</option>
+        <option value="Q133215">State / Province</option>
+        <option value="Q185145">District</option>
+        <option value="Q1967419">Tehsil / Subdivision</option>
+        <option value="Q28575">County</option>
+      </optgroup>
+
+      <!-- Nature & Geography -->
+      <optgroup label="🏔️ Nature & Geography">
+        <option value="Q8502">Mountain</option>
+        <option value="Q4022">River</option>
+        <option value="Q23397">Lake</option>
+        <option value="Q34038">Waterfall</option>
+        <option value="Q46">National Park</option>
+        <option value="Q179049">Wildlife Sanctuary</option>
+        <option value="Q1967038">Biosphere Reserve</option>
+        <option value="Q35509">Cave</option>
+        <option value="Q23442">Island</option>
+        <option value="Q1322809">Gulf / Bay</option>
+        <option value="Q39816">Valley</option>
+        <option value="Q93352">Coast / Beach</option>
+        <option value="Q5107">Continent</option>
+        <option value="Q16521">Taxon / Species</option>
+        <option value="Q756">Plant</option>
+        <option value="Q7377">Mammal</option>
+        <option value="Q5113">Bird</option>
+      </optgroup>
+
+      <!-- Culture & Community -->
+      <optgroup label="🎭 Culture & Community">
+        <option value="Q41710">Ethnic Group</option>
+        <option value="Q33506">Tribe / Tribal Community</option>
+        <option value="Q17633526">Indigenous Community</option>
+        <option value="Q1549591">Cultural Group</option>
+        <option value="Q132241">Festival</option>
+        <option value="Q179380">Religious Festival</option>
+        <option value="Q27968055">Tribal Festival</option>
+        <option value="Q4504495">Folk Festival</option>
+        <option value="Q2736527">Music Festival</option>
+        <option value="Q1344">Opera</option>
+        <option value="Q483394">Genre (Music / Art)</option>
+        <option value="Q9842">Primary School</option>
+        <option value="Q9826">High School</option>
+        <option value="Q3918">University</option>
+        <option value="Q166118">Caste / Social Group</option>
+        <option value="Q8261">Novel</option>
+        <option value="Q571">Book</option>
+        <option value="Q7725634">Literary Work</option>
+        <option value="Q15632617">Fictional Character</option>
+      </optgroup>
+
+      <!-- Religion & Heritage -->
+      <optgroup label="🛕 Religion & Heritage">
+        <option value="Q16970">Church Building</option>
+        <option value="Q44539">Temple</option>
+        <option value="Q32815">Mosque</option>
+        <option value="Q697295">Gurudwara</option>
+        <option value="Q179700">Monastery</option>
+        <option value="Q839954">Archaeological Site</option>
+        <option value="Q570116">Tourist Attraction</option>
+        <option value="Q9259">World Heritage Site (UNESCO)</option>
+        <option value="Q1185117">Heritage Site</option>
+        <option value="Q4989906">Monument</option>
+        <option value="Q12280">Bridge</option>
+        <option value="Q41176">Building</option>
+        <option value="Q33506">Shrine</option>
+      </optgroup>
+
+      <!-- Science & Knowledge -->
+      <optgroup label="🔬 Science & Knowledge">
+        <option value="Q5633421">Scientific Journal</option>
+        <option value="Q191067">Wikipedia Article</option>
+        <option value="Q7191">Nobel Prize</option>
+        <option value="Q4830453">Business / Enterprise</option>
+        <option value="Q7187">Gene</option>
+        <option value="Q11173">Chemical Compound</option>
+        <option value="Q3966">Computer Hardware</option>
+        <option value="Q7397">Software</option>
+        <option value="Q2996394">Biological Process</option>
+        <option value="Q431">Astronomical Object</option>
+        <option value="Q523">Star</option>
+        <option value="Q634">Planet</option>
+      </optgroup>
+
+      <!-- Events -->
+      <optgroup label="📅 Events">
+        <option value="Q1656682">Event</option>
+        <option value="Q18608583">Recurring Sporting Event</option>
+        <option value="Q27020041">Sports Season</option>
+        <option value="Q49773">Sports Competition</option>
+        <option value="Q235557">Battle</option>
+        <option value="Q198">War / Conflict</option>
+        <option value="Q40231">Election</option>
+        <option value="Q15275719">Revolt / Uprising</option>
+        <option value="Q3839081">Social Movement</option>
+      </optgroup>
+
+      <!-- Infrastructure & Transport -->
+      <optgroup label="🏗️ Infrastructure & Transport">
+        <option value="Q55488">Railway Station</option>
+        <option value="Q1248784">Airport</option>
+        <option value="Q16917">Hospital</option>
+        <option value="Q43229">Organization</option>
+        <option value="Q891723">Public Company</option>
+        <option value="Q786014">Administrative Unit</option>
+        <option value="Q27686">Hotel</option>
+        <option value="Q571481">Stadium</option>
+        <option value="Q207694">Art Museum</option>
+        <option value="Q33506">Memorial</option>
+        <option value="Q1785071">Lighthouse</option>
+        <option value="Q44782">Port / Harbour</option>
+        <option value="Q79007">Street / Road</option>
+        <option value="Q1078765">Metro Station</option>
+      </optgroup>
+
+      <!-- Arts & Entertainment -->
+      <optgroup label="🎬 Arts & Entertainment">
+        <option value="Q11424">Film / Movie</option>
+        <option value="Q5398426">Television Series</option>
+        <option value="Q7889">Video Game</option>
+        <option value="Q105420">Artwork</option>
+        <option value="Q838948">Work of Art</option>
+        <option value="Q134556">Single (Music)</option>
+        <option value="Q482994">Album</option>
+        <option value="Q11707">Restaurant</option>
+        <option value="Q1914636">Activity / Tradition</option>
+      </optgroup>
+    </select>
+  </div>
+</div>
       <div>
         <label for="batchSize">Batch Size (results per load)</label>
         <div class="select-wrap">
@@ -437,7 +572,7 @@
 </div>
 
 <div class="footer">
-  Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 18 April 2026
+  Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 20 April 2026
 </div>
 
 <button id="go-to-top"    class="scroll-button" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Go to top">↑</button>
