@@ -500,7 +500,7 @@
         <div class="assessment-logos">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Quality_images_logo.svg/330px-Quality_images_logo.svg.png" alt="Quality Image" title="Quality Image">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Cscr-featured.svg/120px-Cscr-featured.svg.png" alt="Featured Picture" title="Featured Picture">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Valued_image_seal.svg/400px-Valued_image_seal.svg.png" alt="Valued Image" title="Valued Image">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Valued_image_seal.svg/250px-Valued_image_seal.svg.png" alt="Valued Image" title="Valued Image">
         </div>
         <button id="night-mode-btn" onclick="toggleNightMode()">🌙 Dark Mode</button>
     </div>
@@ -543,7 +543,7 @@
 <script>
     const ICON_QI = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Quality_images_logo.svg/330px-Quality_images_logo.svg.png";
     const ICON_FP = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Cscr-featured.svg/120px-Cscr-featured.svg.png";
-    const ICON_VI = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Valued_image_seal.svg/400px-Valued_image_seal.svg.png";
+    const ICON_VI = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Valued_image_seal.svg/250px-Valued_image_seal.svg.png";
 
     let totalFiles = 0;
     let processedFiles = 0;
@@ -702,7 +702,7 @@
         const subcategories = (data && data.query && data.query.categorymembers) || [];
 
         // Process subcategories in batches to balance speed vs rate limiting
-        const batchSize = 10;
+        const batchSize = 50;
         for (let i = 0; i < subcategories.length; i += batchSize) {
             const batch = subcategories.slice(i, i + batchSize);
             const results = await Promise.allSettled(
@@ -717,7 +717,7 @@
             });
             // Small delay between batches to respect API rate limits
             if (i + batchSize < subcategories.length) {
-                await new Promise(r => setTimeout(r, 80));
+                await new Promise(r => setTimeout(r, 50));
             }
         }
 
