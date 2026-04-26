@@ -259,47 +259,135 @@
       <div>
         <label for="lang">Wikipedia Language Project</label>
         <div class="select-wrap">
-          <select id="lang">
-            <option value="hi">Hindi (hi)</option>
-            <option value="ar">Arabic (ar)</option>
-            <option value="awa">Awadhi (awa)</option>
-            <option value="en">English (en)</option>
-            <option value="fr">French (fr)</option>
-            <option value="de">German (de)</option>
-            <option value="es">Spanish (es)</option>
-            <option value="pt">Portuguese (pt)</option>
-            <option value="ru">Russian (ru)</option>
-            <option value="zh">Chinese (zh)</option>
-            <option value="ja">Japanese (ja)</option>
-            <option value="it">Italian (it)</option>
-            <option value="pl">Polish (pl)</option>
-            <option value="nl">Dutch (nl)</option>
-            <option value="fa">Persian (fa)</option>
-            <option value="ur">Urdu (ur)</option>
-            <option value="bn">Bengali (bn)</option>
-            <option value="pa">Punjabi (pa)</option>
-            <option value="ta">Tamil (ta)</option>
-            <option value="te">Telugu (te)</option>
-            <option value="ml">Malayalam (ml)</option>
-            <option value="mr">Marathi (mr)</option>
-            <option value="gu">Gujarati (gu)</option>
-            <option value="kn">Kannada (kn)</option>
-            <option value="bho">Bhojpuri (bho)</option>
-            <option value="mai">Maithili (mai)</option>
-            <option value="new">Newari (new)</option>
-            <option value="ne">Nepali (ne)</option>
-            <option value="ko">Korean (ko)</option>
-            <option value="vi">Vietnamese (vi)</option>
-            <option value="tr">Turkish (tr)</option>
-            <option value="sv">Swedish (sv)</option>
-            <option value="uk">Ukrainian (uk)</option>
-            <option value="he">Hebrew (he)</option>
-            <option value="id">Indonesian (id)</option>
-            <option value="ms">Malay (ms)</option>
-            <option value="th">Thai (th)</option>
-            <option value="ca">Catalan (ca)</option>
-            <option value="simple">Simple English (simple)</option>
-          </select>
+         <select id="lang">
+
+  <!-- Major World Languages -->
+  <optgroup label="🌐 Major Languages">
+    <option value="en">English (en)</option>
+    <option value="simple">Simple English (simple)</option>
+    <option value="fr">French/Français (fr)</option>
+    <option value="de">German/Deutsch (de)</option>
+    <option value="es">Spanish/Español (es)</option>
+    <option value="pt">Portuguese/Português (pt)</option>
+    <option value="ru">Russian/Русский (ru)</option>
+    <option value="zh">Chinese/中文 (zh)</option>
+    <option value="ja">Japanese/日本語 (ja)</option>
+    <option value="it">Italian/Italiano (it)</option>
+    <option value="pl">Polish/Polski (pl)</option>
+    <option value="nl">Dutch/Nederlands (nl)</option>
+    <option value="ar">Arabic/العربية (ar)</option>
+    <option value="fa">Persian/فارسی (fa)</option>
+    <option value="tr">Turkish/Türkçe (tr)</option>
+    <option value="sv">Swedish/Svenska (sv)</option>
+    <option value="uk">Ukrainian/Українська (uk)</option>
+    <option value="he">Hebrew/עברית (he)</option>
+    <option value="ca">Catalan/Català (ca)</option>
+    <option value="ko">Korean/한국어 (ko)</option>
+  </optgroup>
+
+  <!-- South Asia -->
+  <optgroup label="🪔 South Asia">
+    <option value="hi">Hindi/हिन्दी (hi)</option>
+    <option value="ur">Urdu/اردو (ur)</option>
+    <option value="bn">Bengali/বাংলা (bn)</option>
+    <option value="pa">Punjabi/ਪੰਜਾਬੀ (pa)</option>
+    <option value="ta">Tamil/தமிழ் (ta)</option>
+    <option value="te">Telugu/తెలుగు (te)</option>
+    <option value="ml">Malayalam/മലയാളം (ml)</option>
+    <option value="mr">Marathi/मराठी (mr)</option>
+    <option value="gu">Gujarati/ગુજરાતી (gu)</option>
+    <option value="kn">Kannada/ಕನ್ನಡ (kn)</option>
+    <option value="bho">Bhojpuri/भोजपुरी (bho)</option>
+    <option value="mai">Maithili/मैथिली (mai)</option>
+    <option value="awa">Awadhi/अवधी (awa)</option>
+    <option value="new">Newari/नेपाल भाषा (new)</option>
+    <option value="ne">Nepali/नेपाली (ne)</option>
+    <option value="sa">Sanskrit/संस्कृतम् (sa)</option>
+    <option value="si">Sinhala/සිංහල (si)</option>
+    <option value="sd">Sindhi/سنڌي (sd)</option>
+    <option value="as">Assamese/অসমীয়া (as)</option>
+    <option value="or">Odia/ଓଡ଼ିଆ (or)</option>
+    <option value="dz">Dzongkha/རྫོང་ཁ (dz)</option>
+    <option value="ps">Pashto/پښتو (ps)</option>
+  </optgroup>
+
+  <!-- Southeast Asia -->
+  <optgroup label="🌴 Southeast Asia">
+    <option value="id">Indonesian/Bahasa Indonesia (id)</option>
+    <option value="ms">Malay/Bahasa Melayu (ms)</option>
+    <option value="th">Thai/ภาษาไทย (th)</option>
+    <option value="vi">Vietnamese/Tiếng Việt (vi)</option>
+    <option value="my">Burmese/မြန်မာဘာသာ (my)</option>
+    <option value="km">Khmer/ភាសាខ្មែរ (km)</option>
+    <option value="lo">Lao/ລາວ (lo)</option>
+    <option value="tl">Tagalog/Tagalog (tl)</option>
+    <option value="ceb">Cebuano/Sinugboanon (ceb)</option>
+    <option value="ilo">Ilocano/Ilokano (ilo)</option>
+    <option value="war">Waray/Winaray (war)</option>
+    <option value="jv">Javanese/Basa Jawa (jv)</option>
+    <option value="su">Sundanese/Basa Sunda (su)</option>
+    <option value="min">Minangkabau/Baso Minangkabau (min)</option>
+    <option value="ace">Acehnese/Bahsa Acèh (ace)</option>
+    <option value="ban">Balinese/Basa Bali (ban)</option>
+    <option value="bjn">Banjar/Bahasa Banjar (bjn)</option>
+  </optgroup>
+
+  <!-- Africa -->
+  <optgroup label="🌍 Africa — East & Horn">
+    <option value="sw">Swahili/Kiswahili (sw)</option>
+    <option value="am">Amharic/አማርኛ (am)</option>
+    <option value="so">Somali/Soomaali (so)</option>
+    <option value="ti">Tigrinya/ትግርኛ (ti)</option>
+    <option value="om">Oromo/Oromoo (om)</option>
+    <option value="rw">Kinyarwanda/Kinyarwanda (rw)</option>
+    <option value="lg">Luganda/Luganda (lg)</option>
+    <option value="sn">Shona/chiShona (sn)</option>
+  </optgroup>
+
+  <optgroup label="🌍 Africa — West">
+    <option value="yo">Yoruba/Yorùbá (yo)</option>
+    <option value="ha">Hausa/Hausa (ha)</option>
+    <option value="ig">Igbo/Igbo (ig)</option>
+    <option value="wo">Wolof/Wolof (wo)</option>
+    <option value="ee">Ewe/Eʋegbe (ee)</option>
+    <option value="bm">Bambara/Bamanankan (bm)</option>
+    <option value="ff">Fula/Fulfulde (ff)</option>
+    <option value="tw">Twi/Twi (tw)</option>
+    <option value="kab">Kabyle/Taqbaylit (kab)</option>
+  </optgroup>
+
+  <optgroup label="🌍 Africa — South & Central">
+    <option value="af">Afrikaans/Afrikaans (af)</option>
+    <option value="zu">Zulu/isiZulu (zu)</option>
+    <option value="xh">Xhosa/isiXhosa (xh)</option>
+    <option value="st">Sesotho/Sesotho (st)</option>
+    <option value="tn">Setswana/Setswana (tn)</option>
+    <option value="ny">Chichewa/Chichewa (ny)</option>
+    <option value="ln">Lingala/Lingála (ln)</option>
+    <option value="mg">Malagasy/Malagasy (mg)</option>
+    <option value="kg">Kongo/Kikongo (kg)</option>
+  </optgroup>
+
+  <!-- Russia & Eurasia — Regional Languages -->
+  <optgroup label="🇷🇺 Russia & Eurasia — Regional">
+    <option value="tt">Tatar/Татарча (tt)</option>
+    <option value="ba">Bashkir/Башҡортса (ba)</option>
+    <option value="cv">Chuvash/Чӑвашла (cv)</option>
+    <option value="ce">Chechen/Нохчийн (ce)</option>
+    <option value="os">Ossetian/Ирон (os)</option>
+    <option value="sah">Sakha/Саха тыла (sah)</option>
+    <option value="mhr">Meadow Mari/Олык марий (mhr)</option>
+    <option value="kv">Komi/Коми кыв (kv)</option>
+    <option value="udm">Udmurt/Удмурт кыл (udm)</option>
+    <option value="av">Avar/Авар мацӏ (av)</option>
+    <option value="lez">Lezgian/Лезги чӏал (lez)</option>
+    <option value="inh">Ingush/ГӀалгӀай мотт (inh)</option>
+    <option value="myv">Erzya/Эрзянь кель (myv)</option>
+    <option value="bxr">Buryat/Буряад хэлэн (bxr)</option>
+    <option value="xmf">Mingrelian/მარგალური (xmf)</option>
+  </optgroup>
+
+</select>
         </div>
       </div>
 
@@ -307,171 +395,180 @@
   <label for="category">Article Category (Wikidata P31 type)</label>
   <div class="select-wrap">
     <select id="category">
-      <!-- People -->
-      <optgroup label="👤 People">
-        <option value="Q5">Human / Person</option>
-        <option value="Q482980">Author / Writer</option>
-        <option value="Q901">Scientist</option>
-        <option value="Q2562308">Woman Scientist</option>
-        <option value="Q36180">Poet</option>
-        <option value="Q33999">Actor</option>
-        <option value="Q639669">Musician</option>
-        <option value="Q40348">Lawyer</option>
-        <option value="Q82955">Politician</option>
-        <option value="Q193391">Diplomat</option>
-        <option value="Q11631">Astronaut</option>
-        <option value="Q189290">Military Officer</option>
-        <option value="Q1930187">Journalist</option>
-        <option value="Q2374149">Activist / Social Reformer</option>
-        <option value="Q15976105">Freedom Fighter</option>
-        <option value="Q12362622">Female Politician</option>
-        <option value="Q2066131">Athlete / Sportsperson</option>
-        <option value="Q4964182">Philosopher</option>
-        <option value="Q2526255">Film Director</option>
-        <option value="Q177220">Singer</option>
-        <option value="Q1028181">Painter / Artist</option>
-        <option value="Q3665646">Dancer</option>
-        <option value="Q14089670">Fashion Designer</option>
-        <option value="Q712378">Religious Leader</option>
-        <option value="Q372436">Feminist / Women's Rights Activist</option>
-      </optgroup>
+  <!-- People -->
+  <optgroup label="👤 People">
+    <option value="Q5">Human / Person</option>
+    <option value="Q482980">Author / Writer</option>
+    <option value="Q901">Scientist</option>
+    <option value="Q2562308">Woman Scientist</option>
+    <option value="Q36180">Poet</option>
+    <option value="Q33999">Actor</option>
+    <option value="Q639669">Musician</option>
+    <option value="Q40348">Lawyer</option>
+    <option value="Q82955">Politician</option>
+    <option value="Q193391">Diplomat</option>
+    <option value="Q11631">Astronaut</option>
+    <option value="Q189290">Military Officer</option>
+    <option value="Q1930187">Journalist</option>
+    <option value="Q2374149">Activist / Social Reformer</option>
+    <option value="Q15976105">Freedom Fighter</option>
+    <option value="Q12362622">Female Politician</option>
+    <option value="Q2066131">Athlete / Sportsperson</option>
+    <option value="Q4964182">Philosopher</option>
+    <option value="Q2526255">Film Director</option>
+    <option value="Q177220">Singer</option>
+    <option value="Q1028181">Painter / Artist</option>
+    <option value="Q3665646">Dancer</option>
+    <option value="Q14089670">Fashion Designer</option>
+    <option value="Q712378">Religious Leader</option>
+    <option value="Q372436">Feminist / Women's Rights Activist</option>
+  </optgroup>
 
-      <!-- Places -->
-      <optgroup label="🌍 Places">
-        <option value="Q3624078">Sovereign State / Country</option>
-        <option value="Q515">City</option>
-        <option value="Q34763">Village</option>
-        <option value="Q532">Village (alternate)</option>
-        <option value="Q484170">Municipality</option>
-        <option value="Q1549591">Big City / Metropolis</option>
-        <option value="Q5119">Capital City</option>
-        <option value="Q133215">State / Province</option>
-        <option value="Q185145">District</option>
-        <option value="Q1967419">Tehsil / Subdivision</option>
-        <option value="Q28575">County</option>
-      </optgroup>
+  <!-- Places -->
+  <optgroup label="🌍 Places">
+    <option value="Q3624078">Sovereign State / Country</option>
+    <option value="Q515">City</option>
+    <option value="Q34763">Village</option>
+    <option value="Q532">Village (alternate)</option>
+    <option value="Q484170">Municipality</option>
+    <option value="Q1549591">Big City / Metropolis</option>
+    <option value="Q5119">Capital City</option>
+    <option value="Q133215">State / Province</option>
+    <option value="Q185145">District</option>
+    <option value="Q1967419">Tehsil / Subdivision</option>
+    <option value="Q28575">County</option>
+  </optgroup>
 
-      <!-- Nature & Geography -->
-      <optgroup label="🏔️ Nature & Geography">
-        <option value="Q8502">Mountain</option>
-        <option value="Q4022">River</option>
-        <option value="Q23397">Lake</option>
-        <option value="Q34038">Waterfall</option>
-        <option value="Q46">National Park</option>
-        <option value="Q179049">Wildlife Sanctuary</option>
-        <option value="Q1967038">Biosphere Reserve</option>
-        <option value="Q35509">Cave</option>
-        <option value="Q23442">Island</option>
-        <option value="Q1322809">Gulf / Bay</option>
-        <option value="Q39816">Valley</option>
-        <option value="Q93352">Coast / Beach</option>
-        <option value="Q5107">Continent</option>
-        <option value="Q16521">Taxon / Species</option>
-        <option value="Q756">Plant</option>
-        <option value="Q7377">Mammal</option>
-        <option value="Q5113">Bird</option>
-      </optgroup>
+  <!-- Nature & Geography -->
+  <optgroup label="🏔️ Nature & Geography">
+    <option value="Q8502">Mountain</option>
+    <option value="Q4022">River</option>
+    <option value="Q23397">Lake</option>
+    <option value="Q34038">Waterfall</option>
+    <option value="Q46">National Park</option>
+    <option value="Q179049">Wildlife Sanctuary</option>
+    <option value="Q1967038">Biosphere Reserve</option>
+    <option value="Q35509">Cave</option>
+    <option value="Q23442">Island</option>
+    <option value="Q1322809">Gulf / Bay</option>
+    <option value="Q39816">Valley</option>
+    <option value="Q93352">Coast / Beach</option>
+    <option value="Q5107">Continent</option>
+    <option value="Q16521">Taxon / Species</option>
+    <option value="Q756">Plant</option>
+    <option value="Q7377">Mammal</option>
+    <option value="Q5113">Bird</option>
+    <option value="Q131681">Reservoir / Dam Lake</option>
+    <option value="Q12323">Dam</option>
+    <option value="Q39614">Cemetery / Graveyard</option>
+  </optgroup>
 
-      <!-- Culture & Community -->
-      <optgroup label="🎭 Culture & Community">
-        <option value="Q41710">Ethnic Group</option>
-        <option value="Q33506">Tribe / Tribal Community</option>
-        <option value="Q17633526">Indigenous Community</option>
-        <option value="Q1549591">Cultural Group</option>
-        <option value="Q132241">Festival</option>
-        <option value="Q179380">Religious Festival</option>
-        <option value="Q27968055">Tribal Festival</option>
-        <option value="Q4504495">Folk Festival</option>
-        <option value="Q2736527">Music Festival</option>
-        <option value="Q1344">Opera</option>
-        <option value="Q483394">Genre (Music / Art)</option>
-        <option value="Q9842">Primary School</option>
-        <option value="Q9826">High School</option>
-        <option value="Q3918">University</option>
-        <option value="Q166118">Caste / Social Group</option>
-        <option value="Q8261">Novel</option>
-        <option value="Q571">Book</option>
-        <option value="Q7725634">Literary Work</option>
-        <option value="Q15632617">Fictional Character</option>
-      </optgroup>
+  <!-- Culture & Community -->
+  <optgroup label="🎭 Culture & Community">
+    <option value="Q41710">Ethnic Group</option>
+    <option value="Q33829">Tribe / Tribal Community</option>   <!-- ✅ fixed: was Q33506 -->
+    <option value="Q17633526">Indigenous Community</option>
+    <option value="Q132241">Festival</option>
+    <option value="Q179380">Religious Festival</option>
+    <option value="Q27968055">Tribal Festival</option>
+    <option value="Q4504495">Folk Festival</option>
+    <option value="Q2736527">Music Festival</option>
+    <option value="Q1344">Opera</option>
+    <option value="Q483394">Genre (Music / Art)</option>
+    <option value="Q9842">Primary School</option>
+    <option value="Q9826">High School</option>
+    <option value="Q3918">University</option>
+    <option value="Q166118">Caste / Social Group</option>
+    <option value="Q8261">Novel</option>
+    <option value="Q571">Book</option>
+    <option value="Q7725634">Literary Work</option>
+    <option value="Q15632617">Fictional Character</option>
+    <option value="Q7075">Library</option>                    <!-- ✅ new -->
+  </optgroup>
 
-      <!-- Religion & Heritage -->
-      <optgroup label="🛕 Religion & Heritage">
-        <option value="Q16970">Church Building</option>
-        <option value="Q44539">Temple</option>
-        <option value="Q32815">Mosque</option>
-        <option value="Q697295">Gurudwara</option>
-        <option value="Q179700">Monastery</option>
-        <option value="Q839954">Archaeological Site</option>
-        <option value="Q570116">Tourist Attraction</option>
-        <option value="Q9259">World Heritage Site (UNESCO)</option>
-        <option value="Q1185117">Heritage Site</option>
-        <option value="Q4989906">Monument</option>
-        <option value="Q12280">Bridge</option>
-        <option value="Q41176">Building</option>
-        <option value="Q33506">Shrine</option>
-      </optgroup>
+  <!-- Religion & Heritage -->
+  <optgroup label="🛕 Religion & Heritage">
+    <option value="Q16970">Church Building</option>
+    <option value="Q44539">Temple</option>
+    <option value="Q32815">Mosque</option>
+    <option value="Q697295">Gurudwara</option>
+    <option value="Q179700">Monastery</option>
+    <option value="Q697637">Shrine</option>                   <!-- ✅ fixed: was Q33506 -->
+    <option value="Q5003624">Memorial</option>                <!-- ✅ fixed: was Q33506 -->
+    <option value="Q839954">Archaeological Site</option>
+    <option value="Q570116">Tourist Attraction</option>
+    <option value="Q9259">World Heritage Site (UNESCO)</option>
+    <option value="Q1185117">Heritage Site</option>
+    <option value="Q4989906">Monument</option>
+    <option value="Q12280">Bridge</option>
+    <option value="Q41176">Building</option>
+    <option value="Q16560">Palace</option>                    <!-- ✅ new -->
+    <option value="Q57821">Fort / Fortress</option>          <!-- ✅ new -->
+    <option value="Q860861">Sculpture</option>               <!-- ✅ new -->
+  </optgroup>
 
-      <!-- Science & Knowledge -->
-      <optgroup label="🔬 Science & Knowledge">
-        <option value="Q5633421">Scientific Journal</option>
-        <option value="Q191067">Wikipedia Article</option>
-        <option value="Q7191">Nobel Prize</option>
-        <option value="Q4830453">Business / Enterprise</option>
-        <option value="Q7187">Gene</option>
-        <option value="Q11173">Chemical Compound</option>
-        <option value="Q3966">Computer Hardware</option>
-        <option value="Q7397">Software</option>
-        <option value="Q2996394">Biological Process</option>
-        <option value="Q431">Astronomical Object</option>
-        <option value="Q523">Star</option>
-        <option value="Q634">Planet</option>
-      </optgroup>
+  <!-- Science & Knowledge -->
+  <optgroup label="🔬 Science & Knowledge">
+    <option value="Q5633421">Scientific Journal</option>
+    <option value="Q191067">Wikipedia Article</option>
+    <option value="Q7191">Nobel Prize</option>
+    <option value="Q4830453">Business / Enterprise</option>
+    <option value="Q7187">Gene</option>
+    <option value="Q11173">Chemical Compound</option>
+    <option value="Q3966">Computer Hardware</option>
+    <option value="Q7397">Software</option>
+    <option value="Q2996394">Biological Process</option>
+    <option value="Q431">Astronomical Object</option>
+    <option value="Q523">Star</option>
+    <option value="Q634">Planet</option>
+  </optgroup>
 
-      <!-- Events -->
-      <optgroup label="📅 Events">
-        <option value="Q1656682">Event</option>
-        <option value="Q18608583">Recurring Sporting Event</option>
-        <option value="Q27020041">Sports Season</option>
-        <option value="Q49773">Sports Competition</option>
-        <option value="Q235557">Battle</option>
-        <option value="Q198">War / Conflict</option>
-        <option value="Q40231">Election</option>
-        <option value="Q15275719">Revolt / Uprising</option>
-        <option value="Q3839081">Social Movement</option>
-      </optgroup>
+  <!-- Events -->
+  <optgroup label="📅 Events">
+    <option value="Q1656682">Event</option>
+    <option value="Q18608583">Recurring Sporting Event</option>
+    <option value="Q27020041">Sports Season</option>
+    <option value="Q49773">Sports Competition</option>
+    <option value="Q235557">Battle</option>
+    <option value="Q198">War / Conflict</option>
+    <option value="Q40231">Election</option>
+    <option value="Q15275719">Revolt / Uprising</option>
+    <option value="Q3839081">Social Movement</option>
+  </optgroup>
 
-      <!-- Infrastructure & Transport -->
-      <optgroup label="🏗️ Infrastructure & Transport">
-        <option value="Q55488">Railway Station</option>
-        <option value="Q1248784">Airport</option>
-        <option value="Q16917">Hospital</option>
-        <option value="Q43229">Organization</option>
-        <option value="Q891723">Public Company</option>
-        <option value="Q786014">Administrative Unit</option>
-        <option value="Q27686">Hotel</option>
-        <option value="Q571481">Stadium</option>
-        <option value="Q207694">Art Museum</option>
-        <option value="Q33506">Memorial</option>
-        <option value="Q1785071">Lighthouse</option>
-        <option value="Q44782">Port / Harbour</option>
-        <option value="Q79007">Street / Road</option>
-        <option value="Q1078765">Metro Station</option>
-      </optgroup>
+  <!-- Infrastructure & Transport -->
+  <optgroup label="🏗️ Infrastructure & Transport">
+    <option value="Q55488">Railway Station</option>
+    <option value="Q1248784">Airport</option>
+    <option value="Q16917">Hospital</option>
+    <option value="Q43229">Organization</option>
+    <option value="Q891723">Public Company</option>
+    <option value="Q786014">Administrative Unit</option>
+    <option value="Q27686">Hotel</option>
+    <option value="Q571481">Stadium</option>
+    <option value="Q33506">Museum</option>                    <!-- ✅ fixed: correct label for Q33506 -->
+    <option value="Q207694">Art Museum</option>
+    <option value="Q1785071">Lighthouse</option>
+    <option value="Q44782">Port / Harbour</option>
+    <option value="Q79007">Street / Road</option>
+    <option value="Q1078765">Metro Station</option>
+    <option value="Q1107656">Botanical Garden</option>        <!-- ✅ new -->
+    <option value="Q22698">Park</option>                     <!-- ✅ new -->
+  </optgroup>
 
-      <!-- Arts & Entertainment -->
-      <optgroup label="🎬 Arts & Entertainment">
-        <option value="Q11424">Film / Movie</option>
-        <option value="Q5398426">Television Series</option>
-        <option value="Q7889">Video Game</option>
-        <option value="Q105420">Artwork</option>
-        <option value="Q838948">Work of Art</option>
-        <option value="Q134556">Single (Music)</option>
-        <option value="Q482994">Album</option>
-        <option value="Q11707">Restaurant</option>
-        <option value="Q1914636">Activity / Tradition</option>
-      </optgroup>
-    </select>
+  <!-- Arts & Entertainment -->
+  <optgroup label="🎬 Arts & Entertainment">
+    <option value="Q11424">Film / Movie</option>
+    <option value="Q5398426">Television Series</option>
+    <option value="Q7889">Video Game</option>
+    <option value="Q105420">Artwork</option>
+    <option value="Q838948">Work of Art</option>
+    <option value="Q134556">Single (Music)</option>
+    <option value="Q482994">Album</option>
+    <option value="Q11707">Restaurant</option>
+    <option value="Q1914636">Activity / Tradition</option>
+  </optgroup>
+</select>
   </div>
 </div>
       <div>
