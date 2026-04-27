@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Track participant contributions for the Tillararo rishtalar editathon — uzwiki sitelinks, Uzbek Wikidata descriptions, and no-iwiki template removals. Wikimedia CEE Hub Microgrant 2026." />
+  <meta name="keywords" content="Tillararo rishtalar, editathon, uz.wikipedia, uzwiki, Wikidata, Wikimedia CEE Hub, interwiki, sitelinks, Uzbek Wikipedia, microgrant 2026" />
+  <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/tillararo-rishtalar-tracker.html" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/tillararo-rishtalar-tracker.html" />
+  <meta property="og:title" content="Tillararo rishtalar — Editathon Dashboard 2026" />
+  <meta property="og:description" content="Track participant contributions for the Tillararo rishtalar editathon — uzwiki sitelinks, Uzbek Wikidata descriptions, and no-iwiki template removals." />
+  <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
+
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://suyashdwivedi.github.io/Wiki_Tools/tillararo-rishtalar-tracker.html" />
+  <meta property="twitter:title" content="Tillararo rishtalar — Editathon Dashboard 2026" />
+  <meta property="twitter:description" content="Track participant contributions for the Tillararo rishtalar editathon — sitelinks, descriptions, and no-iwiki removals." />
+  <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
+
+  <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
+
+  <title>Tillararo rishtalar — Editathon Dashboard 2026</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:    #3366cc;
+  --blue-lt: #eaf3ff;
+  --green:   #1a9e6b;
+  --green-lt:#e6f7f1;
+  --amber:   #ba7517;
+  --amber-lt:#fdf3e3;
+  --gold:    #d4a017;
+  --silver:  #8a9ba8;
+  --bronze:  #a0522d;
+  --ink:     #202122;
+  --muted:   #54595d;
+  --faint:   #72777d;
+  --border:  #c8ccd1;
+  --bg:      #f8f9fa;
+  --white:   #ffffff;
+  --radius:  8px;
+  --shadow:  0 2px 12px rgba(0,0,0,0.07);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── HERO BANNER ────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, #1a2f5a 0%, #2a4a8a 50%, #1e3d6e 100%);
+  color: #fff;
+  padding: 3rem 1.5rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+  opacity: 1;
+}
+.hero-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  position: relative;
+}
+.hero-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 1.5rem;
+}
+.hero-logo img {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.1);
+}
+.hero-text { flex: 1; }
+.hero-eyebrow {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 4px;
+}
+.hero-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(22px, 4vw, 34px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: #fff;
+}
+.hero-title span { color: #7eb3ff; }
+.hero-subtitle {
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+.hero-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+}
+.hero-link {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 4px;
+  padding: 5px 12px;
+  background: rgba(255,255,255,0.08);
+  transition: background 0.15s, border-color 0.15s;
+}
+.hero-link:hover { background: rgba(255,255,255,0.18); text-decoration: none; border-color: rgba(255,255,255,0.5); color: #fff; }
+
+/* ── MAIN WRAP ──────────────────────────────────────── */
+.wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 5rem;
+}
+
+/* ── SECTION TITLES ─────────────────────────────────── */
+.section-label {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── PANEL ──────────────────────────────────────────── */
+.panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+
+/* ── SUMMARY CARDS ──────────────────────────────────── */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+.summary-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.summary-card.c-blue::before  { background: var(--blue); }
+.summary-card.c-green::before { background: var(--green); }
+.summary-card.c-amber::before { background: var(--amber); }
+.summary-card .sc-label { font-size: 12px; color: var(--faint); margin-bottom: 6px; font-weight: 500; }
+.summary-card .sc-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1;
+}
+.summary-card.c-blue  .sc-value { color: var(--blue); }
+.summary-card.c-green .sc-value { color: var(--green); }
+.summary-card.c-amber .sc-value { color: var(--amber); }
+.summary-card .sc-sub { font-size: 11px; color: var(--faint); margin-top: 6px; }
+
+/* ── WINNERS PODIUM ─────────────────────────────────── */
+.podium-section { margin-bottom: 1.5rem; display: none; }
+.podium-section.visible { display: block; }
+.podium-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr 1fr;
+  gap: 10px;
+  align-items: end;
+}
+.podium-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+  position: relative;
+  transition: transform 0.2s;
+}
+.podium-card:hover { transform: translateY(-2px); }
+.podium-card.p1 { border-top: 3px solid var(--gold); }
+.podium-card.p2 { border-top: 3px solid var(--silver); }
+.podium-card.p3 { border-top: 3px solid var(--bronze); }
+.podium-rank {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.podium-card.p1 .podium-rank { color: var(--gold); font-size: 36px; }
+.podium-card.p2 .podium-rank { color: var(--silver); }
+.podium-card.p3 .podium-rank { color: var(--bronze); }
+.podium-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--blue);
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.podium-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.podium-card.p1 .podium-score { font-size: 28px; }
+.podium-breakdown {
+  font-size: 11px;
+  color: var(--faint);
+  line-height: 1.6;
+}
+.podium-breakdown span { display: inline-block; margin: 0 2px; }
+
+/* ── CHARTS ─────────────────────────────────────────── */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+.chart-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  box-shadow: var(--shadow);
+  display: none;
+}
+.chart-card.visible { display: block; }
+.chart-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+.chart-wrap { position: relative; height: 200px; }
+
+/* ── INPUT PANEL ────────────────────────────────────── */
+label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+textarea, input[type="date"] {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 9px 11px;
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--ink);
+  background: var(--white);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+textarea:focus, input[type="date"]:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(51,102,204,0.12);
+}
+.date-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 10px;
+  margin-top: 12px;
+  align-items: end;
+}
+.date-row > div label { font-family: 'Source Sans 3', sans-serif; }
+.date-row input[type="date"] { font-family: 'Source Sans 3', sans-serif; }
+
+/* ── BUTTONS ────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 18px; height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--white);
+  color: var(--ink);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, border-color 0.12s, color 0.12s, transform 0.1s;
+}
+.btn:hover { background: var(--blue-lt); border-color: var(--blue); color: var(--blue); }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+.btn-primary:hover { background: #2a55aa; border-color: #2a55aa; color: #fff; }
+
+/* ── INFO BOX ───────────────────────────────────────── */
+.info-box {
+  margin-top: 12px;
+  padding: 10px 13px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+
+/* ── PROGRESS ───────────────────────────────────────── */
+#progress {
+  display: none;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+.progress-row { display: flex; align-items: center; gap: 10px; }
+.spinner {
+  width: 16px; height: 16px; min-width: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+#progressText { font-size: 13px; color: var(--muted); }
+.progress-bar-bg { height: 4px; background: #e8e8e8; border-radius: 2px; margin-top: 10px; overflow: hidden; }
+#progressFill { height: 100%; background: var(--blue); border-radius: 2px; width: 0%; transition: width 0.4s ease; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── EXPORT ROW ─────────────────────────────────────── */
+.export-row { display: flex; gap: 8px; margin-bottom: 1rem; align-items: center; flex-wrap: wrap; }
+#exportMsg { font-size: 12px; color: var(--green); font-weight: 600; display: none; }
+
+/* ── TABLE ──────────────────────────────────────────── */
+.table-wrap {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+}
+table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
+thead th {
+  text-align: left;
+  padding: 11px 13px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+thead th.num { text-align: right; }
+tbody tr { border-bottom: 1px solid #eaecf0; cursor: pointer; transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--blue-lt); }
+tbody td { padding: 11px 13px; vertical-align: top; }
+tbody td.num {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 500;
+}
+.col-user { width: auto; }
+.col-sl   { width: 100px; }
+.col-desc { width: 120px; }
+.col-ni   { width: 130px; }
+.col-tot  { width: 70px; }
+.c-blue  { color: var(--blue); }
+.c-green { color: var(--green); }
+.c-amber { color: var(--amber); }
+
+.rank-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  margin-right: 8px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.rank-1 { background: var(--gold); color: #fff; }
+.rank-2 { background: var(--silver); color: #fff; }
+.rank-3 { background: var(--bronze); color: #fff; }
+
+.username-link { color: var(--blue); font-weight: 600; }
+.username-link:hover { text-decoration: underline; }
+.err-badge { font-size: 10px; color: #cc0000; margin-left: 6px; }
+.toggle-hint { font-size: 11px; color: var(--faint); margin-left: 4px; }
+.unchecked-note { font-size: 10px; color: var(--faint); font-weight: 400; }
+
+/* ── DETAIL ROW ─────────────────────────────────────── */
+.detail-row td { padding: 0 13px 13px; }
+.detail-inner {
+  background: var(--bg);
+  border: 1px solid #eaecf0;
+  border-radius: 6px;
+  padding: 12px;
+}
+.detail-section { margin-bottom: 10px; }
+.detail-section:last-child { margin-bottom: 0; }
+.detail-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.detail-list {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  max-height: 130px;
+  overflow-y: auto;
+  line-height: 1.85;
+}
+.detail-list a { text-decoration: none; }
+.detail-list a:hover { text-decoration: underline; }
+.detail-comment { color: var(--faint); font-size: 11px; }
+
+/* ── SCROLL BUTTONS ─────────────────────────────────── */
+.scroll-button {
+  position: fixed;
+  right: 22px;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.18);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, transform 0.15s;
+  z-index: 100;
+  opacity: 0.85;
+}
+.scroll-button:hover { background: #2a55aa; transform: scale(1.08); opacity: 1; }
+#go-to-top    { bottom: 70px; }
+#go-to-bottom { bottom: 22px; }
+
+/* ── FOOTER ─────────────────────────────────────────── */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 0 1rem;
+  font-size: 12px;
+  color: var(--faint);
+  text-align: center;
+  line-height: 2;
+}
+.footer a { color: var(--blue); }
+.footer strong { color: var(--muted); font-weight: 600; }
+
+/* ── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 620px) {
+  .summary-grid { grid-template-columns: 1fr; }
+  .charts-grid  { grid-template-columns: 1fr; }
+  .podium-grid  { grid-template-columns: 1fr; }
+  .date-row     { grid-template-columns: 1fr 1fr; }
+  .date-row .btn-primary { grid-column: 1 / -1; }
+  .hero-top     { flex-wrap: wrap; }
+  .hero-links   { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── HERO ─────────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div class="hero-logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Logo">
+      </div>
+      <div class="hero-text">
+        <div class="hero-eyebrow">Wikimedia CEE Hub · Microgrant 2026</div>
+        <h1 class="hero-title">Tillararo <span>rishtalar</span><br>editathon dashboard</h1>
+        <p class="hero-subtitle">June 1–30, 2026 · uz.wikipedia.org · Tracking interwiki links, Uzbek descriptions & template cleanups</p>
+      </div>
+    </div>
+    <div class="hero-links">
+      <a class="hero-link" href="https://meta.wikimedia.org/wiki/Wikimedia_CEE_Hub/Microgrants/Applications_2026/MG-10" target="_blank">📄 Proposal ↗</a>
+      <a class="hero-link" href="https://uz.wikipedia.org/wiki/Vikipediya:Tillararo_rishtalar" target="_blank">🌐 Event page ↗</a>
+      <a class="hero-link" href="https://www.wikidata.org/" target="_blank">🔗 Wikidata ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN ──────────────────────────────────────────── -->
+<div class="wrap">
+
+  <!-- INPUT PANEL -->
+  <div class="section-label">Tracking setup</div>
+  <div class="panel">
+    <label for="usernames">Participant usernames <span style="font-weight:400;color:var(--faint)">(one per line, no "User:" prefix)</span></label>
+    <textarea id="usernames" rows="5" placeholder="WikiUser1&#10;WikiUser2&#10;WikiUser3"></textarea>
+
+    <div class="date-row">
+      <div>
+        <label for="startDate">Start date</label>
+        <input type="date" id="startDate" value="2026-06-01">
+      </div>
+      <div>
+        <label for="endDate">End date</label>
+        <input type="date" id="endDate" value="2026-06-30">
+      </div>
+      <button class="btn btn-primary" id="fetchBtn">▶ Track edits</button>
+    </div>
+
+    <div class="info-box">
+      <strong>Metrics tracked per participant:</strong><br>
+      <span class="dot" style="background:var(--blue)"></span><strong>Sitelinks</strong> — uzwiki sitelinks added on Wikidata (<code>wbsetsitelink-add|uzwiki</code>) · <em>primary metric</em><br>
+      <span class="dot" style="background:var(--green)"></span><strong>Descriptions</strong> — Uzbek item descriptions added on Wikidata (<code>wbsetdescription-add|uz</code>)<br>
+      <span class="dot" style="background:var(--amber)"></span><strong>No-iwiki removed</strong> — <code>{{no iwiki}}</code> template removals from uzwiki articles (diff-checked, up to 100 edits/user)
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div id="progress">
+    <div class="progress-row">
+      <div class="spinner"></div>
+      <span id="progressText">Starting…</span>
+    </div>
+    <div class="progress-bar-bg"><div id="progressFill"></div></div>
+  </div>
+
+  <!-- RESULTS (hidden until data loads) -->
+  <div id="results" style="display:none;">
+
+    <!-- SUMMARY CARDS -->
+    <div class="section-label">Campaign totals</div>
+    <div class="summary-grid">
+      <div class="summary-card c-blue">
+        <div class="sc-label">Sitelinks added</div>
+        <div class="sc-value" id="totalSitelinks">—</div>
+        <div class="sc-sub">uzwiki ↔ Wikidata</div>
+      </div>
+      <div class="summary-card c-green">
+        <div class="sc-label">uz descriptions added</div>
+        <div class="sc-value" id="totalDesc">—</div>
+        <div class="sc-sub">on Wikidata items</div>
+      </div>
+      <div class="summary-card c-amber">
+        <div class="sc-label">No-iwiki removed</div>
+        <div class="sc-value" id="totalNoIwiki">—</div>
+        <div class="sc-sub">from uzwiki articles</div>
+      </div>
+    </div>
+
+    <!-- WINNERS PODIUM -->
+    <div class="section-label">🏆 Winners</div>
+    <div class="podium-section visible" id="podiumSection">
+      <div class="podium-grid" id="podiumGrid"></div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="section-label">📊 Charts</div>
+    <div class="charts-grid">
+      <div class="chart-card visible" id="chartBar">
+        <div class="chart-title">Contributions by participant</div>
+        <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+      </div>
+      <div class="chart-card visible" id="chartDough">
+        <div class="chart-title">Metric breakdown (totals)</div>
+        <div class="chart-wrap"><canvas id="doughChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="export-row">
+      <button class="btn" id="exportWiki">📋 Copy as wikitext</button>
+      <button class="btn" id="exportCSV">📥 Copy as CSV</button>
+      <span id="exportMsg">✓ Copied!</span>
+    </div>
+
+    <!-- LEADERBOARD TABLE -->
+    <div class="section-label">Leaderboard</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-user">Participant</th>
+            <th class="col-sl num c-blue">Sitelinks</th>
+            <th class="col-desc num c-green">Descriptions</th>
+            <th class="col-ni num c-amber">No-iwiki off</th>
+            <th class="col-tot num">Total</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+  </div><!-- /results -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div>
+      Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank"><strong>Suyash Dwivedi</strong></a> · Updated on: 27 April 2026
+    </div>
+    <div>
+      Queries <a href="https://www.wikidata.org/w/api.php" target="_blank">Wikidata API</a> &amp;
+      <a href="https://uz.wikipedia.org/w/api.php" target="_blank">uz.wikipedia.org API</a> directly — no login required, no data stored.<br>
+      Part of the <a href="https://meta.wikimedia.org/wiki/Wikimedia_CEE_Hub" target="_blank">Wikimedia CEE Hub</a> microgrant programme ·
+      <a href="https://uz.wikipedia.org/wiki/Vikipediya:Tillararo_rishtalar" target="_blank">Tillararo rishtalar editathon</a>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<!-- SCROLL BUTTONS -->
+<button id="go-to-top" class="scroll-button" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Go to top">↑</button>
+<button id="go-to-bottom" class="scroll-button" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})" title="Go to bottom">↓</button>
+
+<!-- GOOGLE ANALYTICS -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GC8PGC89NB');
+</script>
+<script src="https://cdn.counter.dev/script.js" data-id="cc7a036d-a904-4d76-bcac-37ea4196c014" data-utcoffset="6"></script>
+
+<script>
+const WD = 'https://www.wikidata.org/w/api.php';
+const UZ = 'https://uz.wikipedia.org/w/api.php';
+let allResults = [];
+let barChartInst = null;
+let doughChartInst = null;
+
+function setProgress(text, pct) {
+  document.getElementById('progressText').textContent = text;
+  document.getElementById('progressFill').style.width = Math.round(pct) + '%';
+}
+
+async function apiGet(base, params) {
+  const url = base + '?' + new URLSearchParams({ ...params, format: 'json', origin: '*' });
+  const r = await fetch(url);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
+async function fetchContribs(base, username, startDate, endDate, ns) {
+  const items = [];
+  let cont = null;
+  const ps = {
+    action: 'query', list: 'usercontribs',
+    ucuser: username,
+    ucstart: endDate + 'T23:59:59Z',
+    ucend:   startDate + 'T00:00:00Z',
+    uclimit: 500,
+    ucprop:  'ids|title|comment|timestamp'
+  };
+  if (ns !== undefined) ps.ucnamespace = ns;
+  do {
+    if (cont) ps.uccontinue = cont;
+    const d = await apiGet(base, ps);
+    items.push(...(d.query?.usercontribs || []));
+    cont = d.continue?.uccontinue || null;
+  } while (cont && items.length < 5000);
+  return items;
+}
+
+async function getSitelinks(username, startDate, endDate) {
+  const contribs = await fetchContribs(WD, username, startDate, endDate, 0);
+  const items = contribs.filter(c => /wbsetsitelink-add[^|]*\|uzwiki/i.test(c.comment || ''));
+  return { count: items.length, items: items.map(c => ({ title: c.title, comment: c.comment, revid: c.revid })) };
+}
+
+async function getDescriptions(username, startDate, endDate) {
+  const contribs = await fetchContribs(WD, username, startDate, endDate, 0);
+  const items = contribs.filter(c => /wbsetdescription-(?:add|set)[^|]*\|uz\b/i.test(c.comment || ''));
+  return { count: items.length, items: items.map(c => ({ title: c.title, comment: c.comment, revid: c.revid })) };
+}
+
+function noIwikiInDiff(html) {
+  const delParts = [];
+  const re = /<td[^>]*diff-deletedline[^>]*>([\s\S]*?)<\/td>/gi;
+  let m;
+  while ((m = re.exec(html)) !== null) delParts.push(m[1]);
+  const t = delParts.join(' ');
+  return /\{\{[Nn]o\s*[Ii]wiki\}\}/.test(t) || /\{\{[Нн]ет\s*[Ii]wiki\}\}/.test(t) ||
+         /\{\{[Ii]wiki\}\}/.test(t) || /\{\{[Nn]oiwiki\}\}/.test(t) || /no.?iwiki/i.test(t);
+}
+
+async function checkDiff(revid, parentid) {
+  try {
+    const d = await apiGet(UZ, { action: 'compare', fromrev: parentid, torev: revid, prop: 'diff' });
+    const html = d.compare?.body || d.compare?.['*'] || '';
+    return noIwikiInDiff(html);
+  } catch { return false; }
+}
+
+async function getNoIwiki(username, startDate, endDate, onProg) {
+  const contribs = await fetchContribs(UZ, username, startDate, endDate, 0);
+  const cands = contribs.filter(c => c.parentid > 0);
+  const MAX = 100, toCheck = cands.slice(0, MAX), unchecked = Math.max(0, cands.length - MAX);
+  const foundItems = [];
+  for (let i = 0; i < toCheck.length; i += 5) {
+    onProg && onProg(i, toCheck.length);
+    const batch = toCheck.slice(i, i + 5);
+    const res = await Promise.all(batch.map(c => checkDiff(c.revid, c.parentid).then(f => ({ ...c, found: f }))));
+    for (const r of res) if (r.found) foundItems.push({ title: r.title, revid: r.revid });
+    if (i + 5 < toCheck.length) await new Promise(r => setTimeout(r, 150));
+  }
+  return { count: foundItems.length, unchecked, items: foundItems };
+}
+
+async function processUser(username, startDate, endDate, onProg) {
+  try {
+    onProg('Fetching Wikidata sitelinks…', 10);
+    const sitelinks = await getSitelinks(username, startDate, endDate);
+    onProg('Fetching uz descriptions…', 40);
+    const descriptions = await getDescriptions(username, startDate, endDate);
+    onProg('Checking no-iwiki diffs…', 60);
+    const noIwiki = await getNoIwiki(username, startDate, endDate, (i, total) => {
+      onProg('Checking diffs ' + i + '/' + total + '…', 60 + Math.round((i / total) * 35));
+    });
+    return { username, sitelinks, descriptions, noIwiki, error: null };
+  } catch(e) {
+    return { username, sitelinks:{count:0,items:[]}, descriptions:{count:0,items:[]}, noIwiki:{count:0,unchecked:0,items:[]}, error: e.message };
+  }
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function commentLabel(c) {
+  if (!c) return '';
+  return esc(c.replace(/\/\*\s*.+?\s*\*\/\s*/, '').slice(0, 80));
+}
+
+function buildDetailHTML(r) {
+  const parts = [];
+  if (r.sitelinks.items.length) {
+    parts.push(`<div class="detail-section">
+      <div class="detail-label c-blue">Sitelinks added (${r.sitelinks.count})</div>
+      <div class="detail-list">
+        ${r.sitelinks.items.map(it => `<div><a href="https://www.wikidata.org/wiki/${esc(it.title)}?diff=${it.revid}" target="_blank" style="color:var(--blue)">${esc(it.title)}</a>${it.comment ? `<span class="detail-comment"> — ${commentLabel(it.comment)}</span>` : ''}</div>`).join('')}
+      </div></div>`);
+  }
+  if (r.descriptions.items.length) {
+    parts.push(`<div class="detail-section">
+      <div class="detail-label c-green">Descriptions added (${r.descriptions.count})</div>
+      <div class="detail-list">
+        ${r.descriptions.items.map(it => `<div><a href="https://www.wikidata.org/wiki/${esc(it.title)}?diff=${it.revid}" target="_blank" style="color:var(--green)">${esc(it.title)}</a>${it.comment ? `<span class="detail-comment"> — ${commentLabel(it.comment)}</span>` : ''}</div>`).join('')}
+      </div></div>`);
+  }
+  if (r.noIwiki.items.length) {
+    parts.push(`<div class="detail-section">
+      <div class="detail-label c-amber">{{no iwiki}} removed (${r.noIwiki.count}${r.noIwiki.unchecked ? ' + up to ' + r.noIwiki.unchecked + ' unchecked' : ''})</div>
+      <div class="detail-list">
+        ${r.noIwiki.items.map(it => `<div><a href="https://uz.wikipedia.org/wiki/${encodeURIComponent(it.title)}?diff=${it.revid}" target="_blank" style="color:var(--amber)">${esc(it.title)}</a></div>`).join('')}
+      </div></div>`);
+  }
+  if (!parts.length) parts.push('<div style="font-size:13px;color:var(--faint)">No qualifying contributions found in this period.</div>');
+  return '<div class="detail-inner">' + parts.join('') + '</div>';
+}
+
+function renderPodium(sorted) {
+  const top3 = sorted.slice(0, 3);
+  const classes = ['p1','p2','p3'];
+  const medals  = ['🥇','🥈','🥉'];
+  const order   = top3.length >= 3 ? [1, 0, 2] : (top3.length === 2 ? [1, 0] : [0]); // 2nd, 1st, 3rd visual order
+
+  // Build in podium order (silver left, gold center, bronze right)
+  const reordered = order.map(i => top3[i]).filter(Boolean);
+
+  document.getElementById('podiumGrid').innerHTML = reordered.map((r, vi) => {
+    const origIdx = order[vi];
+    if (!r) return '';
+    const tot = r.sitelinks.count + r.descriptions.count + r.noIwiki.count;
+    return `<div class="podium-card ${classes[origIdx]}">
+      <div class="podium-rank">${medals[origIdx]}</div>
+      <div class="podium-name"><a href="https://uz.wikipedia.org/wiki/User:${encodeURIComponent(r.username)}" target="_blank" style="color:inherit">${esc(r.username)}</a></div>
+      <div class="podium-score">${tot}</div>
+      <div class="podium-breakdown">
+        <span style="color:var(--blue)">🔗 ${r.sitelinks.count}</span>
+        <span style="color:var(--green)">📝 ${r.descriptions.count}</span>
+        <span style="color:var(--amber)">🧹 ${r.noIwiki.count}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderCharts(sorted) {
+  const labels = sorted.map(r => r.username);
+  const slData = sorted.map(r => r.sitelinks.count);
+  const descData = sorted.map(r => r.descriptions.count);
+  const niData = sorted.map(r => r.noIwiki.count);
+
+  // Bar chart
+  if (barChartInst) barChartInst.destroy();
+  barChartInst = new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Sitelinks', data: slData, backgroundColor: 'rgba(51,102,204,0.8)', borderRadius: 4 },
+        { label: 'Descriptions', data: descData, backgroundColor: 'rgba(26,158,107,0.8)', borderRadius: 4 },
+        { label: 'No-iwiki off', data: niData, backgroundColor: 'rgba(186,117,23,0.8)', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { font: { family: "'Source Sans 3', sans-serif", size: 11 }, boxWidth: 12 } } },
+      scales: {
+        x: { stacked: true, ticks: { font: { family: "'JetBrains Mono', monospace", size: 10 }, maxRotation: 30 }, grid: { display: false } },
+        y: { stacked: true, ticks: { font: { family: "'JetBrains Mono', monospace", size: 10 } }, grid: { color: '#f0f0f0' } }
+      }
+    }
+  });
+
+  // Doughnut chart
+  const totSL  = allResults.reduce((s,r) => s+r.sitelinks.count, 0);
+  const totD   = allResults.reduce((s,r) => s+r.descriptions.count, 0);
+  const totNI  = allResults.reduce((s,r) => s+r.noIwiki.count, 0);
+
+  if (doughChartInst) doughChartInst.destroy();
+  doughChartInst = new Chart(document.getElementById('doughChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Sitelinks', 'Descriptions', 'No-iwiki off'],
+      datasets: [{
+        data: [totSL, totD, totNI],
+        backgroundColor: ['rgba(51,102,204,0.85)','rgba(26,158,107,0.85)','rgba(186,117,23,0.85)'],
+        borderWidth: 2, borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: "'Source Sans 3', sans-serif", size: 11 }, padding: 12, boxWidth: 14 } }
+      }
+    }
+  });
+}
+
+function renderResults() {
+  const totSL  = allResults.reduce((s,r) => s+r.sitelinks.count, 0);
+  const totD   = allResults.reduce((s,r) => s+r.descriptions.count, 0);
+  const totNI  = allResults.reduce((s,r) => s+r.noIwiki.count, 0);
+
+  document.getElementById('totalSitelinks').textContent = totSL;
+  document.getElementById('totalDesc').textContent      = totD;
+  document.getElementById('totalNoIwiki').textContent   = totNI;
+
+  const sorted = [...allResults].sort((a,b) =>
+    (b.sitelinks.count+b.descriptions.count+b.noIwiki.count) -
+    (a.sitelinks.count+a.descriptions.count+a.noIwiki.count)
+  );
+
+  renderPodium(sorted);
+  renderCharts(sorted);
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = sorted.map((r, i) => {
+    const tot = r.sitelinks.count + r.descriptions.count + r.noIwiki.count;
+    const rank = i < 3 ? `<span class="rank-badge rank-${i+1}">${i+1}</span>` : `<span style="display:inline-block;width:22px;height:22px;text-align:center;line-height:22px;font-size:12px;color:var(--faint);margin-right:8px;">${i+1}</span>`;
+    return `<tr onclick="toggleRow('dtl${i}')">
+      <td>${rank}<a class="username-link" href="https://uz.wikipedia.org/wiki/User:${encodeURIComponent(r.username)}" target="_blank" onclick="event.stopPropagation()">${esc(r.username)}</a>
+        ${r.error ? `<span class="err-badge" title="${esc(r.error)}">⚠</span>` : ''}
+        <span class="toggle-hint">▾</span>
+      </td>
+      <td class="num c-blue">${r.sitelinks.count}</td>
+      <td class="num c-green">${r.descriptions.count}</td>
+      <td class="num c-amber">${r.noIwiki.count}${r.noIwiki.unchecked > 0 ? `<span class="unchecked-note"> +${r.noIwiki.unchecked}?</span>` : ''}</td>
+      <td class="num">${tot}</td>
+    </tr>
+    <tr class="detail-row" id="dtl${i}" style="display:none;">
+      <td colspan="5">${buildDetailHTML(r)}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function toggleRow(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
+}
+
+function showCopied() {
+  const m = document.getElementById('exportMsg');
+  m.style.display = 'inline';
+  setTimeout(() => m.style.display = 'none', 2000);
+}
+
+document.getElementById('exportWiki').addEventListener('click', () => {
+  if (!allResults.length) return;
+  const sorted = [...allResults].sort((a,b)=>(b.sitelinks.count+b.descriptions.count+b.noIwiki.count)-(a.sitelinks.count+a.descriptions.count+a.noIwiki.count));
+  let t = '{| class="wikitable sortable"\n|-\n! # !! Participant !! Sitelinks added !! uz Descriptions !! {{no iwiki}} removed !! Total\n';
+  sorted.forEach((r,i)=>{
+    const tot=r.sitelinks.count+r.descriptions.count+r.noIwiki.count;
+    t+=`|-\n| ${i+1} || [[User:${r.username}|${r.username}]] || ${r.sitelinks.count} || ${r.descriptions.count} || ${r.noIwiki.count} || '''${tot}'''\n`;
+  });
+  t += '|}';
+  navigator.clipboard.writeText(t).then(showCopied);
+});
+
+document.getElementById('exportCSV').addEventListener('click', () => {
+  if (!allResults.length) return;
+  const sorted = [...allResults].sort((a,b)=>(b.sitelinks.count+b.descriptions.count+b.noIwiki.count)-(a.sitelinks.count+a.descriptions.count+a.noIwiki.count));
+  let csv = 'Rank,Username,Sitelinks,Descriptions,No-iwiki removed,Total\n';
+  sorted.forEach((r,i)=>{
+    csv+=`${i+1},${r.username},${r.sitelinks.count},${r.descriptions.count},${r.noIwiki.count},${r.sitelinks.count+r.descriptions.count+r.noIwiki.count}\n`;
+  });
+  navigator.clipboard.writeText(csv).then(showCopied);
+});
+
+document.getElementById('fetchBtn').addEventListener('click', async () => {
+  const raw = document.getElementById('usernames').value;
+  const usernames = raw.split('\n').map(s=>s.trim()).filter(Boolean);
+  if (!usernames.length) { alert('Please enter at least one username.'); return; }
+  const startDate = document.getElementById('startDate').value;
+  const endDate   = document.getElementById('endDate').value;
+  if (!startDate || !endDate) { alert('Please fill in both dates.'); return; }
+
+  document.getElementById('progress').style.display = 'block';
+  document.getElementById('results').style.display  = 'none';
+  document.getElementById('fetchBtn').disabled = true;
+  allResults = [];
+
+  for (let i = 0; i < usernames.length; i++) {
+    const u = usernames[i];
+    const base = (i / usernames.length) * 100;
+    const result = await processUser(u, startDate, endDate, (msg, localPct) => {
+      setProgress(u + ': ' + msg, base + (localPct / usernames.length));
+    });
+    allResults.push(result);
+    setProgress('Finished ' + u + ' (' + (i+1) + '/' + usernames.length + ')', ((i+1) / usernames.length) * 100);
+  }
+
+  document.getElementById('progress').style.display = 'none';
+  document.getElementById('fetchBtn').disabled = false;
+  renderResults();
+});
+</script>
+</body>
+</html>
