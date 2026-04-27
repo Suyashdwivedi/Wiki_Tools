@@ -1,45 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wikidata Connect — Discover Hidden Connections</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Wikidata Connect — Discover how people, places and ideas are connected using Wikidata's knowledge graph. Enter any entities and explore their hidden links interactively." />
+<meta name="keywords" content="Wikidata, WikiConnect, knowledge graph, SPARQL, entity connections, Wikimedia, linked data, interactive visualization" />
+<link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/wikidata-connect.html" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/wikidata-connect.html" />
+<meta property="og:title" content="Wikidata Connect — Discover Hidden Connections" />
+<meta property="og:description" content="Discover how people, places and ideas are connected using Wikidata's knowledge graph. Interactive force-directed visualization powered by SPARQL." />
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content="https://suyashdwivedi.github.io/Wiki_Tools/wikidata-connect.html" />
+<meta property="twitter:title" content="Wikidata Connect — Discover Hidden Connections" />
+<meta property="twitter:description" content="Discover how people, places and ideas are connected using Wikidata's knowledge graph." />
+<meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
 <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<title>Wikidata Connect — Discover Hidden Connections</title>
+
+<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
 <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-GC8PGC89NB');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GC8PGC89NB');
 </script>
-<script src="https://cdn.counter.dev/script.js" data-id="cc7a036d-a904-4d76-bcac-37ea4196c014" data-utcoffset="6"></script>  
+<script src="https://cdn.counter.dev/script.js" data-id="cc7a036d-a904-4d76-bcac-37ea4196c014" data-utcoffset="6"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+
 <style>
+/* ═══ VARIABLES ═══ */
 :root {
-  --bg: #06080f;
+  --bg:      #06080f;
   --surface: #0b0f1c;
-  --card: #0f1624;
-  --card2: #141c2e;
-  --border: #1e2d4a;
+  --card:    #0f1624;
+  --card2:   #141c2e;
+  --border:  #1e2d4a;
   --border2: #253350;
   --a0: #3b82f6;
   --a1: #8b5cf6;
   --a2: #10b981;
   --a3: #f59e0b;
   --a4: #ef4444;
-  --text: #dce6f8;
-  --dim: #6b87b8;
+  --text:  #dce6f8;
+  --dim:   #6b87b8;
   --muted: #3a5070;
   --glow0: rgba(59,130,246,0.25);
   --glow1: rgba(139,92,246,0.25);
   --font-display: 'Syne', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
+  --font-body:    'DM Sans', sans-serif;
+  --font-mono:    'IBM Plex Mono', monospace;
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+/* ═══ LIGHT MODE ═══ */
+body.light {
+  --bg:      #f0f4ff;
+  --surface: #ffffff;
+  --card:    #f8faff;
+  --card2:   #eef2fb;
+  --border:  #c8d5ee;
+  --border2: #b0c2e0;
+  --a0: #1d6fd6;
+  --a1: #7c3aed;
+  --a2: #059669;
+  --a3: #d97706;
+  --a4: #dc2626;
+  --text:  #0f1f3d;
+  --dim:   #3a5a8a;
+  --muted: #7a92b8;
+  --glow0: rgba(29,111,214,0.18);
+  --glow1: rgba(124,58,237,0.15);
+}
+body.light::before { display: none; }
+body.light header {
+  background: linear-gradient(180deg,rgba(240,244,255,.98) 0%,rgba(240,244,255,.92) 100%);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--font-body);
@@ -47,87 +89,134 @@ body {
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background .35s, color .35s;
 }
 
-/* ── Star field ── */
-body::before {
-  content:'';
-  position:fixed;
-  inset:0;
-  background-image:
-    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.18) 0%, transparent 100%),
-    radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.12) 0%, transparent 100%),
-    radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.15) 0%, transparent 100%),
-    radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,0.1) 0%, transparent 100%),
-    radial-gradient(1px 1px at 85% 75%, rgba(255,255,255,0.14) 0%, transparent 100%),
-    radial-gradient(1px 1px at 20% 85%, rgba(255,255,255,0.09) 0%, transparent 100%),
-    radial-gradient(1px 1px at 60% 90%, rgba(255,255,255,0.11) 0%, transparent 100%),
-    radial-gradient(1px 1px at 90% 15%, rgba(255,255,255,0.13) 0%, transparent 100%),
-    radial-gradient(1px 1px at 45% 50%, rgba(255,255,255,0.08) 0%, transparent 100%),
-    radial-gradient(1px 1px at 75% 30%, rgba(255,255,255,0.16) 0%, transparent 100%);
-  pointer-events:none;
-  z-index:0;
+/* ── Theme toggle button ── */
+.theme-toggle {
+  position: relative;
+  width: 52px; height: 28px; flex-shrink: 0;
+  cursor: pointer;
+  background: none; border: none; padding: 0;
 }
-
-/* ── Header ── */
-header {
-  text-align:center;
-  padding: 52px 20px 28px;
-  position:relative;
-  z-index:1;
+.theme-toggle-track {
+  width: 52px; height: 28px; border-radius: 14px;
+  background: linear-gradient(135deg, #1e2d4a, #253350);
+  border: 1.5px solid var(--border2);
+  transition: background .35s, border-color .35s;
+  display: flex; align-items: center;
+  padding: 3px;
+  position: relative;
 }
-.logo-wrap {
-  display:inline-flex;
-  align-items:center;
-  gap:12px;
-  margin-bottom:10px;
+body.light .theme-toggle-track {
+  background: linear-gradient(135deg, #c8d5ee, #dce6f8);
 }
-.logo-icon {
-  width:48px; height:48px;
+.theme-toggle-thumb {
+  width: 20px; height: 20px; border-radius: 50%;
   background: linear-gradient(135deg, var(--a0), var(--a1));
-  border-radius:14px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:22px;
-  box-shadow: 0 0 24px var(--glow0);
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), background .35s;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; line-height: 1;
+}
+body.light .theme-toggle-thumb { transform: translateX(24px); }
+.theme-toggle:hover .theme-toggle-thumb { box-shadow: 0 3px 12px rgba(59,130,246,.5); }
+
+/* ── Starfield ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,.18) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,.12) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,.10) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 75%, rgba(255,255,255,.14) 0%, transparent 100%),
+    radial-gradient(1px 1px at 20% 85%, rgba(255,255,255,.09) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 90%, rgba(255,255,255,.11) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 15%, rgba(255,255,255,.13) 0%, transparent 100%),
+    radial-gradient(1px 1px at 45% 50%, rgba(255,255,255,.08) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 30%, rgba(255,255,255,.16) 0%, transparent 100%);
+}
+
+/* ── Scroll progress bar ── */
+.scroll-progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--a0), var(--a1));
+  transform-origin: left; transform: scaleX(0);
+  z-index: 1000; transition: transform .1s linear;
+  border-radius: 0 2px 2px 0;
+}
+
+/* ── HEADER ── */
+header {
+  position: relative; z-index: 1;
+  padding: 32px 24px 26px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(11,15,28,.97) 0%, rgba(6,8,15,.85) 100%);
+  backdrop-filter: blur(14px);
+}
+.header-inner {
+  max-width: 920px; margin: 0 auto;
+  display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+}
+.header-logo-img {
+  width: 72px; height: 72px; border-radius: 16px;
+  object-fit: contain;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border2);
+  padding: 4px; flex-shrink: 0;
+  box-shadow: 0 0 32px rgba(59,130,246,.22);
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s;
+}
+.header-logo-img:hover {
+  transform: scale(1.08) rotate(-3deg);
+  box-shadow: 0 0 44px rgba(139,92,246,.4);
+}
+.header-text { flex: 1; min-width: 220px; }
+.header-title-row {
+  display: flex; align-items: center; gap: 12px;
+  flex-wrap: wrap; margin-bottom: 7px;
+}
+.logo-icon-pill {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--a0), var(--a1));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+  box-shadow: 0 0 20px var(--glow0);
 }
 .logo-text {
   font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
+  font-size: 1.9rem; font-weight: 800; letter-spacing: -.5px;
   background: linear-gradient(135deg, #7eb8ff, #c084fc);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  background-clip:text;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .tagline {
-  color: var(--dim);
-  font-size: 0.9rem;
-  font-weight: 300;
-  letter-spacing: 0.01em;
+  color: var(--dim); font-size: .88rem; font-weight: 300;
+  letter-spacing: .01em; margin-bottom: 10px; line-height: 1.5;
 }
-.wikidata-badge {
-  display:inline-flex; align-items:center; gap:5px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
-  border-radius:20px;
-  padding: 4px 12px;
-  font-size:0.73rem;
-  color: var(--dim);
-  margin-top:10px;
-  font-family: var(--font-mono);
+.header-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border);
+  border-radius: 20px; padding: 3px 11px;
+  font-size: .7rem; color: var(--dim); font-family: var(--font-mono);
+  transition: border-color .15s, color .15s;
+  text-decoration: none;
 }
+.badge:hover { border-color: var(--a0); color: var(--a0); }
+.badge a { color: inherit; text-decoration: none; }
 
 /* ── Container ── */
 .container {
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 0 20px 60px;
-  position:relative;
-  z-index:1;
+  max-width: 920px; margin: 0 auto;
+  padding: 24px 20px 80px;
+  position: relative; z-index: 1;
 }
 
-/* ── Panel base ── */
+/* ── Panel ── */
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -136,331 +225,391 @@ header {
   margin-bottom: 16px;
 }
 .panel-header {
-  padding: 14px 20px;
+  padding: 13px 20px;
   border-bottom: 1px solid var(--border);
-  display:flex; align-items:center; gap:10px;
+  display: flex; align-items: center; gap: 10px;
 }
 .panel-label {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--muted);
+  font-family: var(--font-mono); font-size: .7rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: .12em; color: var(--muted);
 }
 .panel-body { padding: 22px; }
 
-/* ── Entity input fields ── */
-.entity-fields { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
-
+/* ── Entity rows ── */
+.entity-fields { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
 .entity-row {
-  display:flex; gap:10px; align-items:center;
-  animation: slideIn 0.2s ease;
+  display: flex; gap: 10px; align-items: center;
+  animation: slideIn .2s ease;
 }
 @keyframes slideIn {
-  from{opacity:0; transform:translateY(-6px)}
-  to{opacity:1; transform:translateY(0)}
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
 }
 .entity-badge {
-  width:30px; height:30px; border-radius:8px;
-  display:flex; align-items:center; justify-content:center;
-  font-family: var(--font-display);
-  font-size:0.78rem; font-weight:700;
-  flex-shrink:0;
-  transition:all 0.3s;
+  width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: .78rem; font-weight: 700;
+  flex-shrink: 0; transition: all .3s;
 }
-
-.ac-wrap { position:relative; flex:1; }
+.ac-wrap { position: relative; flex: 1; }
 
 .entity-input {
-  width:100%;
-  background: var(--card);
-  border: 1.5px solid var(--border);
-  color: var(--text);
-  padding: 10px 14px;
-  border-radius:10px;
-  font-size:0.9rem;
-  font-family: var(--font-body);
-  outline:none;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  width: 100%;
+  background: var(--card); border: 1.5px solid var(--border);
+  color: var(--text); padding: 10px 14px;
+  border-radius: 10px; font-size: .9rem; font-family: var(--font-body);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s, background .2s;
 }
-.entity-input:focus { border-color: var(--a0); box-shadow: 0 0 0 3px var(--glow0); }
-.entity-input.is-selected { border-color: var(--a2); background: rgba(16,185,129,0.06); }
-.entity-input::placeholder { color: var(--muted); font-style:italic; }
+.entity-input:focus       { border-color: var(--a0); box-shadow: 0 0 0 3px var(--glow0); }
+.entity-input.is-selected { border-color: var(--a2); background: rgba(16,185,129,.06); }
+.entity-input::placeholder { color: var(--muted); font-style: italic; }
 
+/* ── Autocomplete (position:fixed — never clipped by panel overflow) ── */
 .ac-dropdown {
-  position:absolute;
-  top:calc(100% + 5px); left:0; right:0;
+  position: fixed;
   background: var(--card2);
   border: 1px solid var(--border2);
-  border-radius:12px;
-  z-index:200;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
-  overflow:hidden;
-  display:none;
+  border-radius: 12px;
+  z-index: 9999;
+  box-shadow: 0 16px 48px rgba(0,0,0,.8);
+  overflow: hidden;
+  display: none;
+  min-width: 260px;
 }
-.ac-dropdown.open { display:block; }
+.ac-dropdown.open { display: block; }
 
 .ac-item {
-  padding:9px 14px;
-  cursor:pointer;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-  transition: background 0.12s;
-  display:flex; align-items:center; gap:10px;
+  padding: 9px 14px; cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,.03);
+  transition: background .12s;
+  display: flex; align-items: center; gap: 10px;
 }
-.ac-item:last-child { border-bottom:none; }
-.ac-item:hover, .ac-item.hi { background: rgba(59,130,246,0.1); }
-.ac-info { flex:1; min-width:0; }
-.ac-label { font-size:0.88rem; font-weight:500; color:var(--text); }
-.ac-desc { font-size:0.74rem; color:var(--dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
-.ac-qid { font-family:var(--font-mono); font-size:0.68rem; color:var(--a0); flex-shrink:0; }
-.ac-msg { padding:12px 14px; font-size:0.83rem; color:var(--dim); text-align:center; font-style:italic; }
+.ac-item:last-child { border-bottom: none; }
+.ac-item:hover, .ac-item.hi { background: rgba(59,130,246,.1); }
+.ac-info { flex: 1; min-width: 0; }
+.ac-label { font-size: .88rem; font-weight: 500; color: var(--text); }
+.ac-desc  { font-size: .74rem; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.ac-qid   { font-family: var(--font-mono); font-size: .68rem; color: var(--a0); flex-shrink: 0; }
+.ac-msg   { padding: 12px 14px; font-size: .83rem; color: var(--dim); text-align: center; font-style: italic; }
 
+/* ── Buttons ── */
 .btn-rm {
-  background:none; border:1.5px solid var(--border);
-  color:var(--muted); width:30px; height:30px; border-radius:8px;
-  cursor:pointer; display:flex; align-items:center; justify-content:center;
-  font-size:1rem; flex-shrink:0;
-  transition: all 0.15s;
+  background: none; border: 1.5px solid var(--border);
+  color: var(--muted); width: 30px; height: 30px; border-radius: 8px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0; transition: all .15s;
 }
-.btn-rm:hover { border-color:var(--a4); color:var(--a4); background:rgba(239,68,68,0.08); }
+.btn-rm:hover { border-color: var(--a4); color: var(--a4); background: rgba(239,68,68,.08); }
 
-/* ── Row actions ── */
-.row-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.row-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
 .btn-add {
-  background:none;
-  border:1.5px dashed var(--border2);
-  color:var(--dim);
-  padding: 8px 16px;
-  border-radius:9px;
-  font-size:0.82rem;
-  font-family: var(--font-body);
-  cursor:pointer;
-  transition: all 0.15s;
-  display:flex; align-items:center; gap:6px;
+  background: none; border: 1.5px dashed var(--border2); color: var(--dim);
+  padding: 8px 16px; border-radius: 9px; font-size: .82rem;
+  font-family: var(--font-body); cursor: pointer;
+  transition: all .15s; display: flex; align-items: center; gap: 6px;
 }
-.btn-add:hover { border-color:var(--a0); color:var(--a0); background:var(--glow0); }
-.btn-add:disabled { opacity:0.35; cursor:not-allowed; pointer-events:none; }
+.btn-add:hover    { border-color: var(--a0); color: var(--a0); background: var(--glow0); }
+.btn-add:disabled { opacity: .35; cursor: not-allowed; pointer-events: none; }
 
 .btn-go {
-  margin-left:auto;
+  margin-left: auto;
   background: linear-gradient(135deg, var(--a0) 0%, var(--a1) 100%);
-  color:#fff;
-  border:none;
-  padding: 10px 26px;
-  border-radius:10px;
-  font-size:0.92rem;
-  font-family: var(--font-display);
-  font-weight:700;
-  cursor:pointer;
-  letter-spacing:0.02em;
-  transition: all 0.2s;
-  box-shadow: 0 4px 20px rgba(59,130,246,0.35);
-  display:flex; align-items:center; gap:8px;
+  color: #fff; border: none;
+  padding: 10px 26px; border-radius: 10px;
+  font-size: .92rem; font-family: var(--font-display); font-weight: 700;
+  cursor: pointer; letter-spacing: .02em;
+  transition: all .2s;
+  box-shadow: 0 4px 20px rgba(59,130,246,.35);
+  display: flex; align-items: center; gap: 8px;
 }
-.btn-go:hover { transform:translateY(-1px); box-shadow:0 6px 28px rgba(59,130,246,0.5); }
-.btn-go:disabled { opacity:0.45; cursor:not-allowed; transform:none; }
-.btn-go .arrow { transition: transform 0.2s; }
+.btn-go:hover    { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(59,130,246,.5); }
+.btn-go:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn-go .arrow   { transition: transform .2s; }
 .btn-go:hover .arrow { transform: translateX(3px); }
 
 .err-msg {
-  background: rgba(239,68,68,0.1);
-  border:1px solid rgba(239,68,68,0.25);
-  border-radius:9px;
-  padding:10px 14px;
-  font-size:0.83rem;
-  color:#fca5a5;
-  display:none;
-  margin-top:10px;
+  background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25);
+  border-radius: 9px; padding: 10px 14px; font-size: .83rem;
+  color: #fca5a5; display: none; margin-top: 10px;
 }
-.err-msg.show { display:block; }
+.err-msg.show { display: block; }
 
 /* ── Loading ── */
-.loading-wrap {
-  display:none;
-  padding:50px 20px;
-  text-align:center;
-}
-.loading-wrap.show { display:block; }
+.loading-wrap { display: none; padding: 50px 20px; text-align: center; }
+.loading-wrap.show { display: block; }
 
 .spinner-ring {
-  width:44px; height:44px;
-  border:3px solid var(--border2);
-  border-top-color:var(--a0);
-  border-radius:50%;
-  animation:spin 0.75s linear infinite;
-  margin:0 auto 16px;
+  width: 44px; height: 44px;
+  border: 3px solid var(--border2); border-top-color: var(--a0);
+  border-radius: 50%; animation: spin .75s linear infinite; margin: 0 auto 16px;
 }
-@keyframes spin{ to{transform:rotate(360deg)} }
-.loading-msg { color:var(--dim); font-size:0.88rem; margin-bottom:12px; }
-.loading-log { display:inline-flex; flex-direction:column; align-items:flex-start; gap:3px; text-align:left; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-msg { color: var(--dim); font-size: .88rem; margin-bottom: 12px; }
+.loading-log { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; }
 .log-line {
-  font-family: var(--font-mono);
-  font-size:0.73rem;
-  color:var(--muted);
-  transition:color 0.25s;
-  display:flex; align-items:center; gap:6px;
+  font-family: var(--font-mono); font-size: .73rem; color: var(--muted);
+  transition: color .25s; display: flex; align-items: center; gap: 6px;
 }
-.log-line.running { color:var(--a0); }
-.log-line.done { color:var(--a2); }
-.log-line .dot { width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
-.log-line.running .dot { animation:pulse 0.8s ease-in-out infinite; }
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.log-line.running { color: var(--a0); }
+.log-line.done    { color: var(--a2); }
+.log-line .dot    { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.log-line.running .dot { animation: pulse .8s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 
 /* ── Results ── */
-.results { display:none; }
-.results.show { display:block; }
+.results { display: none; }
+.results.show { display: block; }
 
 /* ── Graph ── */
-#graph-svg {
-  width:100%;
-  height:480px;
-  display:block;
-  cursor:grab;
-}
-#graph-svg:active { cursor:grabbing; }
+#graph-svg { width: 100%; height: 480px; display: block; cursor: grab; }
+#graph-svg:active { cursor: grabbing; }
 
-.graph-meta { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.graph-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .graph-meta-stat {
-  font-family:var(--font-mono); font-size:0.7rem;
-  color:var(--dim);
-  background:var(--card); border:1px solid var(--border);
-  border-radius:5px; padding:3px 8px;
+  font-family: var(--font-mono); font-size: .7rem; color: var(--dim);
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 5px; padding: 3px 8px;
 }
-
 .graph-legend {
-  display:flex; gap:14px; flex-wrap:wrap; padding:10px 20px;
-  border-top:1px solid var(--border);
-  background:rgba(0,0,0,0.15);
+  display: flex; gap: 14px; flex-wrap: wrap;
+  padding: 10px 20px; border-top: 1px solid var(--border);
+  background: rgba(0,0,0,.15);
 }
-.legend-item {
-  display:flex; align-items:center; gap:6px;
-  font-size:0.72rem; color:var(--dim); font-family:var(--font-mono);
-}
-.legend-line {
-  width:22px; height:2px;
-  border-radius:2px;
-}
-.legend-dot { width:10px; height:10px; border-radius:50%; border:2px solid; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: .72rem; color: var(--dim); font-family: var(--font-mono); }
+.legend-line { width: 22px; height: 2px; border-radius: 2px; }
+.legend-dot  { width: 10px; height: 10px; border-radius: 50%; border: 2px solid; }
 
 /* ── Facts ── */
-.facts-grid {
-  display:grid; gap:10px;
-}
-
-.fact-group { margin-bottom:22px; }
-.fact-group:last-child { margin-bottom:0; }
-
+.fact-group { margin-bottom: 22px; }
+.fact-group:last-child { margin-bottom: 0; }
 .fg-label {
-  font-family:var(--font-mono);
-  font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em;
-  color:var(--muted); margin-bottom:10px;
-  display:flex; align-items:center; gap:8px;
+  font-family: var(--font-mono); font-size: .65rem; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--muted); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
 }
-.fg-label::after { content:''; flex:1; height:1px; background:var(--border); }
+.fg-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 .fg-count {
-  background:var(--card2); border:1px solid var(--border);
-  border-radius:4px; padding:1px 6px;
-  font-size:0.65rem; color:var(--a0);
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 4px; padding: 1px 6px; font-size: .65rem; color: var(--a0);
 }
-
-.fact-cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:8px; }
+.fact-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
 
 .fcard {
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:11px 13px;
-  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
-  cursor:default;
-  position:relative;
-  overflow:hidden;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 11px 13px;
+  transition: border-color .15s, transform .15s, box-shadow .15s;
+  cursor: default; position: relative; overflow: hidden;
 }
 .fcard::before {
-  content:''; position:absolute; left:0; top:0; bottom:0;
-  width:3px; border-radius:3px 0 0 3px;
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; border-radius: 3px 0 0 3px;
 }
-.fcard.direct::before { background:var(--a0); }
-.fcard.shared::before { background:var(--a2); }
-.fcard.common::before { background:var(--a3); }
-.fcard:hover { border-color:var(--border2); transform:translateY(-1px); box-shadow:0 6px 20px rgba(0,0,0,0.4); }
-
+.fcard.direct::before { background: var(--a0); }
+.fcard.shared::before { background: var(--a2); }
+.fcard.common::before { background: var(--a3); }
+.fcard:hover { border-color: var(--border2); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,.4); }
 .fcard-rel {
-  font-family:var(--font-mono);
-  font-size:0.67rem; font-weight:500; text-transform:uppercase; letter-spacing:0.06em;
-  margin-bottom:4px;
+  font-family: var(--font-mono); font-size: .67rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px;
 }
-.fcard.direct .fcard-rel { color:var(--a0); }
-.fcard.shared .fcard-rel { color:var(--a2); }
-.fcard.common .fcard-rel { color:var(--a3); }
-
-.fcard-main { font-size:0.86rem; color:var(--text); line-height:1.45; }
-.fcard-sub { font-size:0.74rem; color:var(--dim); margin-top:4px; line-height:1.4; }
-
-.no-facts {
-  padding:32px 20px; text-align:center;
-  color:var(--muted); font-style:italic; font-size:0.88rem;
-}
+.fcard.direct .fcard-rel { color: var(--a0); }
+.fcard.shared .fcard-rel { color: var(--a2); }
+.fcard.common .fcard-rel { color: var(--a3); }
+.fcard-main { font-size: .86rem; color: var(--text); line-height: 1.45; }
+.fcard-sub  { font-size: .74rem; color: var(--dim); margin-top: 4px; line-height: 1.4; }
+.no-facts   { padding: 32px 20px; text-align: center; color: var(--muted); font-style: italic; font-size: .88rem; }
 
 /* ── Node tooltip ── */
 .graph-tooltip {
-  position:absolute;
-  background:var(--card2);
-  border:1px solid var(--border2);
-  border-radius:9px;
-  padding:9px 13px;
-  font-size:0.8rem;
-  color:var(--text);
-  pointer-events:none;
-  opacity:0;
-  transition:opacity 0.15s;
-  max-width:220px;
-  box-shadow:0 8px 24px rgba(0,0,0,0.5);
-  z-index:500;
-  line-height:1.4;
+  position: absolute; background: var(--card2); border: 1px solid var(--border2);
+  border-radius: 9px; padding: 9px 13px; font-size: .8rem; color: var(--text);
+  pointer-events: none; opacity: 0; transition: opacity .15s;
+  max-width: 220px; box-shadow: 0 8px 24px rgba(0,0,0,.5);
+  z-index: 500; line-height: 1.4;
 }
-.graph-tooltip.visible { opacity:1; }
-.graph-tooltip-name { font-weight:600; margin-bottom:3px; }
-.graph-tooltip-desc { font-size:0.73rem; color:var(--dim); }
-.graph-tooltip-qid { font-family:var(--font-mono); font-size:0.68rem; color:var(--a0); margin-top:4px; }
+.graph-tooltip.visible { opacity: 1; }
+.graph-tooltip-name { font-weight: 600; margin-bottom: 3px; }
+.graph-tooltip-desc { font-size: .73rem; color: var(--dim); }
+.graph-tooltip-qid  { font-family: var(--font-mono); font-size: .68rem; color: var(--a0); margin-top: 4px; }
 
-@media(max-width:600px){
-  .logo-text{font-size:1.5rem}
-  .fact-cards{grid-template-columns:1fr}
-  .row-actions{flex-direction:column;align-items:stretch}
-  .btn-go{margin-left:0;justify-content:center}
-  #graph-svg{height:340px}
+/* ── Scroll nav buttons ── */
+.scroll-nav {
+  position: fixed; right: 22px; bottom: 90px;
+  display: flex; flex-direction: column; gap: 10px; z-index: 800;
+}
+.scroll-btn {
+  width: 46px; height: 46px; border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  background: var(--card2); color: var(--dim);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 18px rgba(0,0,0,.5);
+  transition: all .28s cubic-bezier(.34,1.56,.64,1);
+  backdrop-filter: blur(10px);
+  opacity: 0; pointer-events: none;
+  transform: translateX(18px) scale(.85);
+}
+.scroll-btn.visible {
+  opacity: 1; pointer-events: auto;
+  transform: translateX(0) scale(1);
+}
+.scroll-btn:hover {
+  border-color: var(--a0); color: #fff;
+  background: linear-gradient(135deg, var(--a0), var(--a1));
+  box-shadow: 0 8px 28px rgba(59,130,246,.5);
+  transform: translateY(-3px) scale(1.1);
+}
+.scroll-btn:active { transform: scale(.92); }
+.scroll-btn svg { pointer-events: none; }
+
+/* ── Footer ── */
+.site-footer {
+  text-align: center; padding: 28px 20px 36px;
+  border-top: 1px solid var(--border);
+  color: var(--muted); font-size: .82rem; line-height: 1.75;
+  position: relative; z-index: 1;
+}
+.site-footer a { color: var(--a0); text-decoration: none; transition: color .15s; }
+.site-footer a:hover { color: #93c5fd; text-decoration: underline; }
+.footer-logo {
+  display: inline-block; width: 26px; height: 26px;
+  vertical-align: middle; border-radius: 6px; margin-right: 5px;
+}
+.footer-sep { margin: 0 8px; opacity: .25; }
+
+/* ── Depth selector ── */
+.depth-wrap {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.depth-label {
+  font-family: var(--font-mono); font-size: .68rem;
+  color: var(--muted); text-transform: uppercase; letter-spacing: .08em;
+}
+.depth-btns { display: flex; gap: 4px; }
+.depth-btn {
+  background: var(--card); border: 1.5px solid var(--border);
+  color: var(--dim); padding: 5px 12px; border-radius: 7px;
+  font-size: .78rem; font-family: var(--font-body); cursor: pointer;
+  transition: all .15s;
+}
+.depth-btn:hover { border-color: var(--a0); color: var(--a0); }
+.depth-btn.active {
+  background: rgba(59,130,246,.12);
+  border-color: var(--a0); color: var(--a0); font-weight: 600;
+}
+
+/* ── Light mode overrides for panels ── */
+body.light .panel { box-shadow: 0 2px 16px rgba(0,0,0,.08); }
+body.light .entity-input { background: #fff; }
+body.light .ac-dropdown  { background: #fff; box-shadow: 0 8px 32px rgba(0,0,0,.15); }
+body.light .fcard         { background: #fff; }
+body.light .scroll-btn    { background: #fff; }
+body.light .graph-legend  { background: rgba(0,0,0,.03); }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .header-inner    { gap: 14px; }
+  .header-logo-img { width: 52px; height: 52px; }
+  .logo-text       { font-size: 1.45rem; }
+  .fact-cards      { grid-template-columns: 1fr; }
+  .row-actions     { flex-direction: column; align-items: stretch; }
+  .btn-go          { margin-left: 0; justify-content: center; }
+  #graph-svg       { height: 340px; }
+  .scroll-nav      { right: 12px; bottom: 70px; }
 }
 </style>
 </head>
 <body>
 
+<!-- Scroll progress bar -->
+<div class="scroll-progress" id="scroll-progress"></div>
+
+<!-- ══════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════ -->
 <header>
-  <div class="logo-wrap">
-    <div class="logo-icon">🔗</div>
-    <div class="logo-text">Wikidata Connect</div>
+  <div class="header-inner">
+
+    <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" rel="noopener">
+      <img
+        class="header-logo-img"
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/250px-Wiki%27s_Lazy_Coders.png"
+        alt="Wiki's Lazy Coders Logo"
+        onerror="this.style.display='none'"
+      >
+    </a>
+
+    <div class="header-text">
+      <div class="header-title-row">
+        <div class="logo-icon-pill">🔗</div>
+        <div class="logo-text">Wikidata Connect</div>
+        <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle day / night mode" aria-label="Toggle theme">
+          <div class="theme-toggle-track">
+            <div class="theme-toggle-thumb" id="theme-thumb">🌙</div>
+          </div>
+        </button>
+      </div>
+      <div class="tagline">
+        Discover how people, places &amp; ideas are connected — powered by Wikidata SPARQL
+      </div>
+    </div>
+
   </div>
-  <div class="tagline">Discover how people, places &amp; ideas are connected — powered by Wikidata</div>
-  <div><span class="wikidata-badge">⬡ wikidata.org SPARQL</span></div>
 </header>
 
+<!-- ══════════════════════════════════════════════
+     FLOATING SCROLL NAV
+═══════════════════════════════════════════════ -->
+<div class="scroll-nav">
+  <button class="scroll-btn" id="scroll-top" title="Back to top" onclick="smoothScrollTo(0)">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <polyline points="3,11 8,5 13,11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <button class="scroll-btn" id="scroll-results" title="Jump to results" onclick="scrollToResults()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <polyline points="3,5 8,11 13,5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════════ -->
 <div class="container">
 
   <!-- Input panel -->
   <div class="panel">
     <div class="panel-header">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="4" cy="8" r="2.5" stroke="#6b87b8" stroke-width="1.5"/><circle cx="12" cy="4" r="2.5" stroke="#6b87b8" stroke-width="1.5"/><circle cx="12" cy="12" r="2.5" stroke="#6b87b8" stroke-width="1.5"/><line x1="6" y1="7" x2="10" y2="5" stroke="#6b87b8" stroke-width="1.2"/><line x1="6" y1="9" x2="10" y2="11" stroke="#6b87b8" stroke-width="1.2"/></svg>
-      <span class="panel-label">Entities to connect</span>
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <circle cx="4"  cy="8"  r="2.5" stroke="#6b87b8" stroke-width="1.5"/>
+        <circle cx="12" cy="4"  r="2.5" stroke="#6b87b8" stroke-width="1.5"/>
+        <circle cx="12" cy="12" r="2.5" stroke="#6b87b8" stroke-width="1.5"/>
+        <line x1="6" y1="7" x2="10" y2="5"  stroke="#6b87b8" stroke-width="1.2"/>
+        <line x1="6" y1="9" x2="10" y2="11" stroke="#6b87b8" stroke-width="1.2"/>
+      </svg>
+      <span class="panel-label">Entities to Connect</span>
     </div>
     <div class="panel-body">
       <div class="entity-fields" id="ef"></div>
       <div class="err-msg" id="errmsg"></div>
       <div class="row-actions" style="margin-top:14px;">
         <button class="btn-add" id="btn-add" onclick="addField()">
-          <svg width="12" height="12" viewBox="0 0 12 12"><line x1="6" y1="1" x2="6" y2="11" stroke="currentColor" stroke-width="1.8"/><line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.8"/></svg>
-          Add another entity
+          <svg width="12" height="12" viewBox="0 0 12 12">
+            <line x1="6" y1="1" x2="6" y2="11" stroke="currentColor" stroke-width="1.8"/>
+            <line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+          <span>Add another entity</span>
         </button>
+        <div class="depth-wrap">
+          <span class="depth-label">Search depth</span>
+          <div class="depth-btns">
+            <button class="depth-btn active" data-depth="standard" onclick="setDepth('standard',this)">Standard</button>
+            <button class="depth-btn" data-depth="deep" onclick="setDepth('deep',this)">Deep</button>
+            <button class="depth-btn" data-depth="max" onclick="setDepth('max',this)">Max</button>
+          </div>
+        </div>
         <button class="btn-go" id="btn-go" onclick="runSearch()">
           Find Connections <span class="arrow">→</span>
         </button>
@@ -481,7 +630,15 @@ header {
     <!-- Graph panel -->
     <div class="panel">
       <div class="panel-header">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="3" cy="8" r="2" stroke="#6b87b8" stroke-width="1.4"/><circle cx="13" cy="4" r="2" stroke="#6b87b8" stroke-width="1.4"/><circle cx="13" cy="12" r="2" stroke="#6b87b8" stroke-width="1.4"/><circle cx="8" cy="8" r="2" stroke="#6b87b8" stroke-width="1.4"/><line x1="5" y1="8" x2="6" y2="8" stroke="#6b87b8" stroke-width="1.2"/><line x1="10" y1="8" x2="11" y2="5" stroke="#6b87b8" stroke-width="1.2"/><line x1="10" y1="8" x2="11" y2="11" stroke="#6b87b8" stroke-width="1.2"/></svg>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <circle cx="3"  cy="8"  r="2" stroke="#6b87b8" stroke-width="1.4"/>
+          <circle cx="13" cy="4"  r="2" stroke="#6b87b8" stroke-width="1.4"/>
+          <circle cx="13" cy="12" r="2" stroke="#6b87b8" stroke-width="1.4"/>
+          <circle cx="8"  cy="8"  r="2" stroke="#6b87b8" stroke-width="1.4"/>
+          <line x1="5"  y1="8" x2="6"  y2="8"  stroke="#6b87b8" stroke-width="1.2"/>
+          <line x1="10" y1="8" x2="11" y2="5"  stroke="#6b87b8" stroke-width="1.2"/>
+          <line x1="10" y1="8" x2="11" y2="11" stroke="#6b87b8" stroke-width="1.2"/>
+        </svg>
         <span class="panel-label">Connection Graph</span>
         <div class="graph-meta" style="margin-left:auto;" id="gmeta"></div>
       </div>
@@ -490,60 +647,129 @@ header {
         <div class="graph-tooltip" id="tooltip"></div>
       </div>
       <div class="graph-legend">
-        <div class="legend-item"><div class="legend-dot" style="border-color:var(--a0);background:rgba(59,130,246,0.2)"></div>Entity node</div>
-        <div class="legend-item"><div class="legend-dot" style="border-color:var(--a3);background:rgba(245,158,11,0.15)"></div>Intermediary</div>
+        <div class="legend-item"><div class="legend-dot" style="border-color:var(--a0);background:rgba(59,130,246,.2)"></div>Entity node</div>
+        <div class="legend-item"><div class="legend-dot" style="border-color:var(--a3);background:rgba(245,158,11,.15)"></div>Intermediary</div>
         <div class="legend-item"><div class="legend-line" style="background:var(--a0)"></div>Direct link</div>
         <div class="legend-item"><div class="legend-line" style="background:var(--a2);border-top:2px dashed var(--a2);height:0"></div>Shared trait</div>
-        <div class="legend-item"><div class="legend-line" style="background:var(--a3);opacity:0.6"></div>Via intermediary</div>
-        <div style="margin-left:auto;font-size:0.7rem;color:var(--muted);font-family:var(--font-mono)">scroll to zoom · drag nodes</div>
+        <div class="legend-item"><div class="legend-line" style="background:var(--a3);opacity:.6"></div>Via intermediary</div>
+        <div style="margin-left:auto;font-size:.7rem;color:var(--muted);font-family:var(--font-mono)">scroll to zoom · drag nodes · click to open Wikidata</div>
       </div>
     </div>
 
     <!-- Facts panel -->
     <div class="panel">
       <div class="panel-header">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#6b87b8" stroke-width="1.4"/><line x1="5" y1="6" x2="11" y2="6" stroke="#6b87b8" stroke-width="1.2"/><line x1="5" y1="9" x2="9" y2="9" stroke="#6b87b8" stroke-width="1.2"/></svg>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="2" width="12" height="12" rx="2" stroke="#6b87b8" stroke-width="1.4"/>
+          <line x1="5" y1="6" x2="11" y2="6" stroke="#6b87b8" stroke-width="1.2"/>
+          <line x1="5" y1="9" x2="9"  y2="9" stroke="#6b87b8" stroke-width="1.2"/>
+        </svg>
         <span class="panel-label">Connection Facts</span>
       </div>
       <div class="panel-body" id="facts"></div>
     </div>
 
   </div><!-- /results -->
-</div>
+</div><!-- /container -->
 
+<!-- ══════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div>
+    <img
+      class="footer-logo"
+      src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png"
+      alt="Wiki's Lazy Coders"
+      onerror="this.style.display='none'"
+    >
+    Created by
+    <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" rel="noopener"><strong>Suyash Dwivedi</strong></a>
+    <span class="footer-sep">|</span>
+    Updated: 28 April 2026
+    <span class="footer-sep">|</span>
+    <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank" rel="noopener">More Wiki Tools</a>
+    <span class="footer-sep">|</span>
+    Powered by <a href="https://www.wikidata.org" target="_blank" rel="noopener">Wikidata</a>
+    &amp; <a href="https://query.wikidata.org" target="_blank" rel="noopener">SPARQL</a>
+  </div>
+  <div style="margin-top:5px;font-size:.73rem;color:var(--muted);">
+    Data licensed <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener">CC0</a>
+    · <a href="https://meta.wikimedia.org/wiki/Terms_of_use" target="_blank" rel="noopener">Wikimedia Terms</a>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════ -->
 <script>
-// ═══════════════════════════════════════════════════════════════
-// CONSTANTS
-// ═══════════════════════════════════════════════════════════════
-const WD_API = 'https://www.wikidata.org/w/api.php';
-const SPARQL = 'https://query.wikidata.org/sparql';
-const COLORS = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444'];
+'use strict';
+
+// ── CONSTANTS ─────────────────────────────────────────────────
+const WD_API     = 'https://www.wikidata.org/w/api.php';
+const SPARQL_URL = 'https://query.wikidata.org/sparql';
+const COLORS     = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444'];
 const MAX_FIELDS = 5;
+const PLACEHOLDERS = [
+  'e.g. Amitabh Bachchan or Q37079',
+  'e.g. Bhopal or Q200057',
+  'e.g. Rajiv Gandhi or Q7289098',
+  'e.g. Allahabad or Q1070',
+  'Enter entity name or Wikidata QID…'
+];
 
-// ═══════════════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════════════
-let fields = [];   // [{id, qid, label, desc}]
-let fieldIdx = 0;
-let acResults = {}; // fieldId → results array
-let acHi = {};      // fieldId → highlighted index
+// ── STATE ─────────────────────────────────────────────────────
+let fields    = [];
+let fieldIdx  = 0;
+let acResults = {};
+let acHi      = {};
+let searchDepth = 'standard';   // 'standard' | 'deep' | 'max'
+const debouncers = {};
 
-// ═══════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════
-function init() {
-  addField('e.g. Amitabh Bachchan');
-  addField('e.g. Bhopal');
+// ── THEME TOGGLE ──────────────────────────────────────────────
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  const thumb   = document.getElementById('theme-thumb');
+  if (thumb) thumb.textContent = isLight ? '☀️' : '🌙';
+  try { localStorage.setItem('wdc-theme', isLight ? 'light' : 'dark'); } catch(e) {}
+}
+function loadTheme() {
+  try {
+    const saved = localStorage.getItem('wdc-theme');
+    if (saved === 'light') {
+      document.body.classList.add('light');
+      const thumb = document.getElementById('theme-thumb');
+      if (thumb) thumb.textContent = '☀️';
+    }
+  } catch(e) {}
 }
 
-function addField(placeholder) {
+// ── DEPTH SELECTOR ────────────────────────────────────────────
+function setDepth(d, btn) {
+  searchDepth = d;
+  document.querySelectorAll('.depth-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+// ── BOOT ──────────────────────────────────────────────────────
+function init() {
+  loadTheme();
+  addField();
+  addField();
+  initScrollNav();
+}
+
+// ── FIELD MANAGEMENT ──────────────────────────────────────────
+function addField() {
   if (fields.length >= MAX_FIELDS) return;
   const id = ++fieldIdx;
   fields.push({ id, qid: null, label: '', desc: '' });
   renderFields();
   updateAddBtn();
-  // Focus new field
-  setTimeout(() => { const el = document.getElementById('ei-' + id); if (el) el.focus(); }, 60);
+  setTimeout(() => {
+    const el = document.getElementById('ei-' + id);
+    if (el) el.focus();
+  }, 60);
 }
 
 function removeField(id) {
@@ -557,41 +783,42 @@ function updateAddBtn() {
   const b = document.getElementById('btn-add');
   if (!b) return;
   b.disabled = fields.length >= MAX_FIELDS;
-  b.children[1] && (b.children[1].textContent = fields.length >= MAX_FIELDS
-    ? ' Max entities reached'
-    : ` Add another entity (${fields.length}/5)`);
+  const sp = b.querySelector('span');
+  if (sp) sp.textContent = fields.length >= MAX_FIELDS
+    ? 'Max 5 entities reached'
+    : `Add another entity (${fields.length}/5)`;
 }
 
 function renderFields() {
   const container = document.getElementById('ef');
   container.innerHTML = '';
   fields.forEach((f, i) => {
-    const c = COLORS[i];
+    const c   = COLORS[i];
     const row = document.createElement('div');
-    row.className = 'entity-row';
+    row.className   = 'entity-row';
     row.dataset.fid = f.id;
     row.innerHTML = `
       <div class="entity-badge" style="background:${c}22;border:1.5px solid ${c};color:${c}">${i + 1}</div>
       <div class="ac-wrap" id="acw-${f.id}">
-        <input id="ei-${f.id}" class="entity-input${f.qid ? ' is-selected' : ''}"
+        <input
+          id="ei-${f.id}"
+          class="entity-input${f.qid ? ' is-selected' : ''}"
           type="text" autocomplete="off" spellcheck="false"
-          placeholder="${i === 0 ? 'e.g. Amitabh Bachchan or Q37079' : i === 1 ? 'e.g. Bhopal or Q200057' : 'Enter entity or QID…'}"
+          placeholder="${escH(PLACEHOLDERS[i] || PLACEHOLDERS[4])}"
           value="${escH(f.label)}"
-        />
+        >
         <div class="ac-dropdown" id="acd-${f.id}"></div>
       </div>
-      ${fields.length > 2 ? `<button class="btn-rm" onclick="removeField(${f.id})" title="Remove">×</button>` : ''}
+      ${fields.length > 2
+        ? `<button class="btn-rm" onclick="removeField(${f.id})" title="Remove">×</button>`
+        : ''}
     `;
     container.appendChild(row);
     bindInput(f.id);
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-// AUTOCOMPLETE
-// ═══════════════════════════════════════════════════════════════
-let debouncers = {};
-
+// ── AUTOCOMPLETE ──────────────────────────────────────────────
 function bindInput(fid) {
   const inp = document.getElementById('ei-' + fid);
   if (!inp) return;
@@ -608,23 +835,29 @@ function bindInput(fid) {
   });
 
   inp.addEventListener('keydown', e => onAcKey(e, fid));
-  inp.addEventListener('blur', () => setTimeout(() => closeAc(fid), 180));
-  inp.addEventListener('focus', () => {
-    if (acResults[fid]?.length) openAc(fid);
+  inp.addEventListener('blur',    () => setTimeout(() => closeAc(fid), 180));
+  inp.addEventListener('focus',   () => {
+    if ((acResults[fid] || []).length) openAc(fid);
   });
 }
 
 async function doAc(fid, query) {
-  // Direct QID entry
+  // Raw QID entry
   if (/^Q\d+$/i.test(query)) {
     setAcMsg(fid, 'Looking up QID…');
     openAc(fid);
     try {
-      const r = await fetch(`${WD_API}?action=wbgetentities&ids=${query.toUpperCase()}&props=labels|descriptions&languages=en&format=json&origin=*`);
-      const d = await r.json();
-      const e = d.entities?.[query.toUpperCase()];
-      if (e && !e.missing) {
-        populateAc(fid, [{ id: query.toUpperCase(), label: e.labels?.en?.value || query, description: e.descriptions?.en?.value || '' }]);
+      const r = await fetch(
+        `${WD_API}?action=wbgetentities&ids=${query.toUpperCase()}&props=labels|descriptions&languages=en&format=json&origin=*`
+      );
+      const d   = await r.json();
+      const ent = d.entities?.[query.toUpperCase()];
+      if (ent && !ent.missing) {
+        populateAc(fid, [{
+          id: query.toUpperCase(),
+          label: ent.labels?.en?.value || query,
+          description: ent.descriptions?.en?.value || ''
+        }]);
       } else {
         setAcMsg(fid, 'QID not found in Wikidata');
       }
@@ -636,15 +869,15 @@ async function doAc(fid, query) {
   openAc(fid);
   try {
     const url = `${WD_API}?action=wbsearchentities&search=${encodeURIComponent(query)}&language=en&format=json&origin=*&limit=8&type=item`;
-    const r = await fetch(url);
-    const d = await r.json();
+    const r   = await fetch(url);
+    const d   = await r.json();
     populateAc(fid, d.search || []);
   } catch { setAcMsg(fid, 'Search failed'); }
 }
 
 function populateAc(fid, results) {
   acResults[fid] = results;
-  acHi[fid] = -1;
+  acHi[fid]      = -1;
   const drop = document.getElementById('acd-' + fid);
   if (!drop) return;
   if (!results.length) { setAcMsg(fid, 'No results found'); return; }
@@ -657,10 +890,7 @@ function populateAc(fid, results) {
       <div class="ac-qid">${r.id}</div>
     </div>`).join('');
   drop.querySelectorAll('.ac-item').forEach((el, i) => {
-    el.addEventListener('mousedown', ev => {
-      ev.preventDefault();
-      pickAc(fid, i);
-    });
+    el.addEventListener('mousedown', ev => { ev.preventDefault(); pickAc(fid, i); });
   });
   openAc(fid);
 }
@@ -672,12 +902,19 @@ function setAcMsg(fid, msg) {
 }
 
 function openAc(fid) {
-  const d = document.getElementById('acd-' + fid);
-  if (d) d.classList.add('open');
+  const drop = document.getElementById('acd-' + fid);
+  const inp  = document.getElementById('ei-' + fid);
+  if (!drop || !inp) return;
+  const rect = inp.getBoundingClientRect();
+  drop.style.top   = (rect.bottom + 5) + 'px';
+  drop.style.left  = rect.left + 'px';
+  drop.style.width = rect.width + 'px';
+  drop.classList.add('open');
 }
+
 function closeAc(fid) {
-  const d = document.getElementById('acd-' + fid);
-  if (d) d.classList.remove('open');
+  const drop = document.getElementById('acd-' + fid);
+  if (drop) drop.classList.remove('open');
 }
 
 function pickAc(fid, idx) {
@@ -702,133 +939,251 @@ function onAcKey(e, fid) {
     acHi[fid] = Math.max((acHi[fid] ?? 0) - 1, 0);
   } else if (e.key === 'Enter') {
     e.preventDefault();
-    const hi = acHi[fid] ?? 0;
-    if (hi >= 0) pickAc(fid, hi);
+    if ((acHi[fid] ?? -1) >= 0) pickAc(fid, acHi[fid]);
     return;
-  } else if (e.key === 'Escape') { closeAc(fid); return; }
+  } else if (e.key === 'Escape') {
+    closeAc(fid); return;
+  }
   items.forEach((el, i) => el.classList.toggle('hi', i === acHi[fid]));
 }
 
-// ═══════════════════════════════════════════════════════════════
-// SPARQL HELPERS
-// ═══════════════════════════════════════════════════════════════
+// Keep open dropdowns positioned on scroll / resize
+function repositionOpenDropdowns() {
+  document.querySelectorAll('.ac-dropdown.open').forEach(drop => {
+    const fid = drop.id.replace('acd-', '');
+    const inp = document.getElementById('ei-' + fid);
+    if (!inp) return;
+    const rect = inp.getBoundingClientRect();
+    drop.style.top   = (rect.bottom + 5) + 'px';
+    drop.style.left  = rect.left + 'px';
+    drop.style.width = rect.width + 'px';
+  });
+}
+window.addEventListener('scroll', repositionOpenDropdowns, { passive: true });
+window.addEventListener('resize', repositionOpenDropdowns);
+
+// ── SPARQL HELPERS ────────────────────────────────────────────
 async function runSparql(q, timeoutMs = 18000) {
   const ctrl = new AbortController();
-  const tid = setTimeout(() => ctrl.abort(), timeoutMs);
+  const tid  = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
-    const r = await fetch(`${SPARQL}?query=${encodeURIComponent(q)}&format=json`, {
+    const r = await fetch(`${SPARQL_URL}?query=${encodeURIComponent(q)}&format=json`, {
       headers: { Accept: 'application/sparql-results+json' },
       signal: ctrl.signal
     });
     clearTimeout(tid);
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
-  } catch(e) {
-    clearTimeout(tid);
-    return null;
-  }
+  } catch (e) { clearTimeout(tid); return null; }
 }
 
-function binds(res) { return res?.results?.bindings || []; }
-function vv(b, k) { return b?.[k]?.value || ''; }
-function qidFromUri(uri) { return uri?.split('/').pop() || ''; }
+const binds      = res => res?.results?.bindings || [];
+const vv         = (b, k) => b?.[k]?.value || '';
+const qidFromUri = uri => uri?.split('/').pop() || '';
 
-// Direct property links A↔B
 async function qDirect(qa, qb) {
-  const q = `SELECT DISTINCT ?prop ?propLabel WHERE {
-  { wd:${qa} ?prop wd:${qb} . } UNION { wd:${qb} ?prop wd:${qa} . }
-  ?pe wikibase:directClaim ?prop .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
-} LIMIT 30`;
-  const res = await runSparql(q);
-  return binds(res).map(b => ({
-    prop: vv(b, 'propLabel') || qidFromUri(vv(b, 'prop'))
-  }));
+  const res = await runSparql(`
+    SELECT DISTINCT ?prop ?propLabel WHERE {
+      { wd:${qa} ?prop wd:${qb} . } UNION { wd:${qb} ?prop wd:${qa} . }
+      ?pe wikibase:directClaim ?prop .
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
+    } LIMIT 40`);
+  return binds(res).map(b => ({ prop: vv(b,'propLabel') || qidFromUri(vv(b,'prop')) }));
 }
 
-// Shared property values
+// Shared property values — excludes noisy props, depth-aware limits
 async function qShared(qa, qb) {
-  const q = `SELECT DISTINCT ?pLabel ?valueLabel WHERE {
-  wd:${qa} ?p ?value . wd:${qb} ?p ?value .
-  FILTER(?p NOT IN (wdt:P31,wdt:P279,wdt:P18,wdt:P856,wdt:P910,wdt:P973,wdt:P1441,wdt:P3373,wdt:P2959))
-  FILTER(isIRI(?value))
-  FILTER(?value != wd:${qa} && ?value != wd:${qb})
-  ?pe wikibase:directClaim ?p .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
-} LIMIT 30`;
-  const res = await runSparql(q);
+  const lim = searchDepth === 'max' ? 60 : searchDepth === 'deep' ? 45 : 30;
+  const res = await runSparql(`
+    SELECT DISTINCT ?pLabel ?valueLabel WHERE {
+      wd:${qa} ?p ?value . wd:${qb} ?p ?value .
+      FILTER(?p NOT IN (wdt:P31,wdt:P279,wdt:P18,wdt:P856,wdt:P910,
+        wdt:P973,wdt:P1441,wdt:P3373,wdt:P2959,wdt:P571,wdt:P580,wdt:P582))
+      FILTER(isIRI(?value))
+      FILTER(?value != wd:${qa} && ?value != wd:${qb})
+      ?pe wikibase:directClaim ?p .
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
+    } LIMIT ${lim}`);
   return binds(res)
     .map(b => ({ prop: vv(b,'pLabel'), value: vv(b,'valueLabel') }))
     .filter(x => x.prop && x.value && x.prop !== x.value);
 }
 
-// Common intermediary nodes
+// Common intermediaries
 async function qCommon(qa, qb) {
-  const q = `SELECT DISTINCT ?mid ?midLabel ?p1Label ?p2Label WHERE {
-  wd:${qa} ?p1 ?mid . wd:${qb} ?p2 ?mid .
-  FILTER(isIRI(?mid))
-  FILTER(?mid != wd:${qa} && ?mid != wd:${qb})
-  FILTER(?p1 NOT IN (wdt:P31,wdt:P279,wdt:P18,wdt:P856,wdt:P910))
-  FILTER(?p2 NOT IN (wdt:P31,wdt:P279,wdt:P18,wdt:P856,wdt:P910))
-  ?pe1 wikibase:directClaim ?p1 . ?pe2 wikibase:directClaim ?p2 .
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
-} LIMIT 12`;
-  const res = await runSparql(q);
+  const lim = searchDepth === 'max' ? 20 : searchDepth === 'deep' ? 16 : 12;
+  const res = await runSparql(`
+    SELECT DISTINCT ?mid ?midLabel ?p1Label ?p2Label WHERE {
+      wd:${qa} ?p1 ?mid . wd:${qb} ?p2 ?mid .
+      FILTER(isIRI(?mid))
+      FILTER(?mid != wd:${qa} && ?mid != wd:${qb})
+      FILTER(?p1 NOT IN (wdt:P31,wdt:P279,wdt:P18,wdt:P856,wdt:P910))
+      FILTER(?p2 NOT IN (wdt:P31,wdt:P279,wdt:P18,wdt:P856,wdt:P910))
+      ?pe1 wikibase:directClaim ?p1 . ?pe2 wikibase:directClaim ?p2 .
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
+    } LIMIT ${lim}`);
   return binds(res)
-    .map(b => ({
-      mid: qidFromUri(vv(b,'mid')),
-      midLabel: vv(b,'midLabel'),
-      p1: vv(b,'p1Label'),
-      p2: vv(b,'p2Label')
-    }))
+    .map(b => ({ mid: qidFromUri(vv(b,'mid')), midLabel: vv(b,'midLabel'), p1: vv(b,'p1Label'), p2: vv(b,'p2Label') }))
     .filter(x => x.midLabel && x.midLabel !== x.mid);
 }
 
-// ═══════════════════════════════════════════════════════════════
-// MAIN SEARCH
-// ═══════════════════════════════════════════════════════════════
+// ── DEEP: 2-hop paths A→X→B ───────────────────────────────────
+async function qTwoHop(qa, qb) {
+  if (searchDepth === 'standard') return [];
+  const lim = searchDepth === 'max' ? 14 : 10;
+  const res = await runSparql(`
+    SELECT DISTINCT ?hop ?hopLabel ?p1Label ?p2Label WHERE {
+      wd:${qa} ?p1 ?hop .
+      ?hop ?p2 wd:${qb} .
+      FILTER(isIRI(?hop))
+      FILTER(?hop != wd:${qa} && ?hop != wd:${qb})
+      FILTER(?p1 NOT IN (wdt:P31,wdt:P279,wdt:P18,wdt:P856))
+      FILTER(?p2 NOT IN (wdt:P31,wdt:P279,wdt:P18,wdt:P856))
+      ?pe1 wikibase:directClaim ?p1 . ?pe2 wikibase:directClaim ?p2 .
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
+    } LIMIT ${lim}`, 22000);
+  return binds(res)
+    .map(b => ({ hop: qidFromUri(vv(b,'hop')), hopLabel: vv(b,'hopLabel'), p1: vv(b,'p1Label'), p2: vv(b,'p2Label') }))
+    .filter(x => x.hopLabel && x.hopLabel !== x.hop);
+}
+
+// ── DEEP: shared Wikipedia categories ─────────────────────────
+async function qSharedCategories(qa, qb) {
+  if (searchDepth === 'standard') return [];
+  const res = await runSparql(`
+    SELECT DISTINCT ?catLabel WHERE {
+      wd:${qa} wdt:P910 ?cat . wd:${qb} wdt:P910 ?cat .
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
+    } LIMIT 12`, 15000);
+  return binds(res).map(b => vv(b,'catLabel')).filter(Boolean);
+}
+
+// ── DEEP: shared awards / honours ─────────────────────────────
+async function qSharedAwards(qa, qb) {
+  if (searchDepth === 'standard') return [];
+  const res = await runSparql(`
+    SELECT DISTINCT ?awardLabel WHERE {
+      wd:${qa} wdt:P166 ?award . wd:${qb} wdt:P166 ?award .
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
+    } LIMIT 12`, 15000);
+  return binds(res).map(b => vv(b,'awardLabel')).filter(Boolean);
+}
+
+// ── DEEP/MAX: shared occupation / field of work ───────────────
+async function qSharedOccupation(qa, qb) {
+  if (searchDepth === 'standard') return [];
+  const res = await runSparql(`
+    SELECT DISTINCT ?occLabel WHERE {
+      { wd:${qa} wdt:P106 ?occ . wd:${qb} wdt:P106 ?occ . }
+      UNION
+      { wd:${qa} wdt:P101 ?occ . wd:${qb} wdt:P101 ?occ . }
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
+    } LIMIT 10`, 12000);
+  return binds(res).map(b => vv(b,'occLabel')).filter(Boolean);
+}
+
+// ── MAX: family/associates network ────────────────────────────
+async function qFamilyNetwork(qa, qb) {
+  if (searchDepth !== 'max') return [];
+  const famProps = 'wdt:P26|wdt:P22|wdt:P25|wdt:P40|wdt:P3373|wdt:P451';
+  const res = await runSparql(`
+    SELECT DISTINCT ?rel ?relLabel ?pLabel WHERE {
+      wd:${qa} ?p ?rel .
+      FILTER(?p IN (${famProps.replace(/wdt:/g,'wdt:').split('|').join(',')}))
+      ?pe wikibase:directClaim ?p .
+      wd:${qb} wikibase:sitelinks ?sl . FILTER(?sl > 5)
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
+    } LIMIT 8`, 15000);
+  return binds(res)
+    .map(b => ({ rel: qidFromUri(vv(b,'rel')), relLabel: vv(b,'relLabel'), prop: vv(b,'pLabel') }))
+    .filter(x => x.relLabel);
+}
+
+// ── MAX: shared "notable work" connections ────────────────────
+async function qSharedWorks(qa, qb) {
+  if (searchDepth !== 'max') return [];
+  const res = await runSparql(`
+    SELECT DISTINCT ?workLabel ?pLabel WHERE {
+      { wd:${qa} wdt:P800 ?work . wd:${qb} wdt:P840 ?work . ?pe wikibase:directClaim wdt:P840. }
+      UNION
+      { ?work wdt:P161 wd:${qa} . ?work wdt:P161 wd:${qb} . }
+      UNION
+      { ?work wdt:P57 wd:${qa}  . ?work wdt:P161 wd:${qb} . }
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
+    } LIMIT 10`, 18000);
+  return binds(res).map(b => vv(b,'workLabel')).filter(Boolean);
+}
+
+// ── MAIN SEARCH ───────────────────────────────────────────────
 async function runSearch() {
   const sel = fields.filter(f => f.qid);
-  if (sel.length < 2) { showErr('Please pick at least 2 entities from the dropdown suggestions first.'); return; }
-
-  // De-duplicate
+  if (sel.length < 2) {
+    showErr('Please select at least 2 entities from the dropdown suggestions first.');
+    return;
+  }
   const seenQ = new Set();
   for (const f of sel) {
-    if (seenQ.has(f.qid)) { showErr('Duplicate entities detected — please pick different entities.'); return; }
+    if (seenQ.has(f.qid)) { showErr('Duplicate entities — please pick different ones.'); return; }
     seenQ.add(f.qid);
   }
 
-  hideErr();
-  showLoading();
-  hideResults();
+  hideErr(); showLoading(); hideResults();
 
   const allData = {
     entityNodes: sel.map((f, i) => ({ id: f.qid, label: f.label, desc: f.desc, color: COLORS[i], type: 'entity' })),
-    direct: [],
-    shared: [],
-    common: []
+    direct: [], shared: [], common: [],
+    twoHop: [], categories: [], awards: [], occupations: [], works: []
   };
 
-  // Pairwise queries
   for (let i = 0; i < sel.length; i++) {
     for (let j = i + 1; j < sel.length; j++) {
       const A = sel[i], B = sel[j];
       const lbl = `${A.label} ↔ ${B.label}`;
+      const pair = { src: A.qid, tgt: B.qid, srcL: A.label, tgtL: B.label };
 
-      logStep(`Checking direct links: ${lbl}`, 'run');
+      logStep(`Direct links: ${lbl}`, 'run');
       const dir = await qDirect(A.qid, B.qid);
-      dir.forEach(d => allData.direct.push({ ...d, src: A.qid, tgt: B.qid, srcL: A.label, tgtL: B.label }));
-      logStep(`Found ${dir.length} direct link${dir.length !== 1 ? 's' : ''}`, 'done');
+      dir.forEach(d => allData.direct.push({ ...d, ...pair }));
+      logStep(`${dir.length} direct link${dir.length !== 1 ? 's' : ''}`, 'done');
 
-      logStep(`Querying shared traits: ${lbl}`, 'run');
+      logStep(`Shared traits: ${lbl}`, 'run');
       const sh = await qShared(A.qid, B.qid);
-      sh.forEach(s => allData.shared.push({ ...s, src: A.qid, tgt: B.qid, srcL: A.label, tgtL: B.label }));
-      logStep(`Found ${sh.length} shared trait${sh.length !== 1 ? 's' : ''}`, 'done');
+      sh.forEach(s => allData.shared.push({ ...s, ...pair }));
+      logStep(`${sh.length} shared trait${sh.length !== 1 ? 's' : ''}`, 'done');
 
-      logStep(`Mapping common connections: ${lbl}`, 'run');
+      logStep(`Common connections: ${lbl}`, 'run');
       const co = await qCommon(A.qid, B.qid);
-      co.forEach(c => allData.common.push({ ...c, src: A.qid, tgt: B.qid, srcL: A.label, tgtL: B.label }));
-      logStep(`Found ${co.length} intermediar${co.length !== 1 ? 'ies' : 'y'}`, 'done');
+      co.forEach(c => allData.common.push({ ...c, ...pair }));
+      logStep(`${co.length} intermediar${co.length !== 1 ? 'ies' : 'y'}`, 'done');
+
+      if (searchDepth !== 'standard') {
+        logStep(`2-hop paths: ${lbl}`, 'run');
+        const th = await qTwoHop(A.qid, B.qid);
+        th.forEach(t => allData.twoHop.push({ ...t, ...pair }));
+        logStep(`${th.length} 2-hop path${th.length !== 1 ? 's' : ''}`, 'done');
+
+        logStep(`Shared categories: ${lbl}`, 'run');
+        const cats = await qSharedCategories(A.qid, B.qid);
+        if (cats.length) allData.categories.push({ cats, ...pair });
+        logStep(`${cats.length} shared categor${cats.length !== 1 ? 'ies' : 'y'}`, 'done');
+
+        logStep(`Shared awards: ${lbl}`, 'run');
+        const aw = await qSharedAwards(A.qid, B.qid);
+        if (aw.length) allData.awards.push({ awards: aw, ...pair });
+        logStep(`${aw.length} shared award${aw.length !== 1 ? 's' : ''}`, 'done');
+
+        logStep(`Shared occupations: ${lbl}`, 'run');
+        const oc = await qSharedOccupation(A.qid, B.qid);
+        if (oc.length) allData.occupations.push({ occs: oc, ...pair });
+        logStep(`${oc.length} shared occupation${oc.length !== 1 ? 's' : ''}`, 'done');
+      }
+
+      if (searchDepth === 'max') {
+        logStep(`Shared works/films: ${lbl}`, 'run');
+        const wk = await qSharedWorks(A.qid, B.qid);
+        if (wk.length) allData.works.push({ works: wk, ...pair });
+        logStep(`${wk.length} shared work${wk.length !== 1 ? 's' : ''}`, 'done');
+      }
     }
   }
 
@@ -839,33 +1194,24 @@ async function runSearch() {
   showResults();
 }
 
-// ═══════════════════════════════════════════════════════════════
-// D3 FORCE GRAPH
-// ═══════════════════════════════════════════════════════════════
+// ── D3 FORCE GRAPH ────────────────────────────────────────────
 function renderGraph(data) {
   const svgEl = document.getElementById('graph-svg');
-  const W = svgEl.clientWidth || 860;
-  const H = 480;
+  const W     = svgEl.clientWidth || 860;
+  const H     = 480;
 
   const svg = d3.select('#graph-svg');
   svg.selectAll('*').remove();
   svg.attr('viewBox', `0 0 ${W} ${H}`);
 
-  // Build nodes + links
-  const nodeMap = {};
-  const nodes = [];
-  const links = [];
+  const nodeMap = {}, nodes = [], links = [];
 
-  data.entityNodes.forEach(n => {
-    nodeMap[n.id] = { ...n };
-    nodes.push(nodeMap[n.id]);
-  });
+  data.entityNodes.forEach(n => { nodeMap[n.id] = { ...n }; nodes.push(nodeMap[n.id]); });
 
   data.common.forEach(c => {
     if (!nodeMap[c.mid]) {
       const nn = { id: c.mid, label: c.midLabel, type: 'inter', color: '#6b87b8', desc: '' };
-      nodeMap[c.mid] = nn;
-      nodes.push(nn);
+      nodeMap[c.mid] = nn; nodes.push(nn);
     }
     links.push({ source: c.src, target: c.mid, label: c.p1, ltype: 'common' });
     links.push({ source: c.tgt, target: c.mid, label: c.p2, ltype: 'common' });
@@ -875,7 +1221,6 @@ function renderGraph(data) {
     links.push({ source: d.src, target: d.tgt, label: d.prop, ltype: 'direct' });
   });
 
-  // Aggregate shared by pair, avoid duplicate edges
   const sharedMap = {};
   data.shared.forEach(s => {
     const key = [s.src, s.tgt].sort().join('__');
@@ -884,174 +1229,153 @@ function renderGraph(data) {
   });
   Object.values(sharedMap).forEach(sm => {
     links.push({
-      source: sm.src,
-      target: sm.tgt,
+      source: sm.src, target: sm.tgt,
       label: sm.props.slice(0, 2).join(', ') + (sm.props.length > 2 ? ` +${sm.props.length - 2}` : ''),
       ltype: 'shared'
     });
   });
 
-  // Stats
+  // Stats bar
   const gmeta = document.getElementById('gmeta');
-  if (gmeta) {
-    gmeta.innerHTML = [
-      `<span class="graph-meta-stat">${nodes.length} nodes</span>`,
-      `<span class="graph-meta-stat">${links.length} edges</span>`,
-      `<span class="graph-meta-stat">${data.direct.length} direct</span>`,
-      `<span class="graph-meta-stat">${data.shared.length} shared</span>`,
-    ].join('');
-  }
+  if (gmeta) gmeta.innerHTML = [
+    `<span class="graph-meta-stat">${nodes.length} nodes</span>`,
+    `<span class="graph-meta-stat">${links.length} edges</span>`,
+    `<span class="graph-meta-stat">${data.direct.length} direct</span>`,
+    `<span class="graph-meta-stat">${data.shared.length} shared</span>`
+  ].join('');
 
-  if (nodes.length === 0) return;
+  if (!nodes.length) return;
 
-  // Defs (arrowheads + glow filter)
+  // Defs: glow filter + arrowheads
   const defs = svg.append('defs');
-  const glowFilter = defs.append('filter').attr('id','glow').attr('x','-40%').attr('y','-40%').attr('width','180%').attr('height','180%');
-  glowFilter.append('feGaussianBlur').attr('stdDeviation','4').attr('result','blur');
-  const merge = glowFilter.append('feMerge');
-  merge.append('feMergeNode').attr('in','blur');
-  merge.append('feMergeNode').attr('in','SourceGraphic');
+  const gf   = defs.append('filter').attr('id','glow').attr('x','-40%').attr('y','-40%').attr('width','180%').attr('height','180%');
+  gf.append('feGaussianBlur').attr('stdDeviation','4').attr('result','blur');
+  const mg = gf.append('feMerge');
+  mg.append('feMergeNode').attr('in','blur');
+  mg.append('feMergeNode').attr('in','SourceGraphic');
 
   ['direct','shared','common'].forEach(t => {
-    const col = t==='direct'?'#3b82f6':t==='shared'?'#10b981':'#6b87b8';
+    const col = t === 'direct' ? '#3b82f6' : t === 'shared' ? '#10b981' : '#6b87b8';
     defs.append('marker').attr('id','arr-'+t)
       .attr('viewBox','0 -4 8 8').attr('refX',22).attr('refY',0)
       .attr('markerWidth',5).attr('markerHeight',5).attr('orient','auto')
-      .append('path').attr('d','M0,-4L8,0L0,4').attr('fill',col).attr('opacity',0.7);
+      .append('path').attr('d','M0,-4L8,0L0,4').attr('fill',col).attr('opacity',.7);
   });
 
-  // Background subtle grid
-  const bg = svg.append('g').attr('class','bg-grid');
-  for (let x = 0; x < W; x += 40) {
-    bg.append('line').attr('x1',x).attr('y1',0).attr('x2',x).attr('y2',H)
-      .attr('stroke','rgba(255,255,255,0.025)').attr('stroke-width',1);
-  }
-  for (let y = 0; y < H; y += 40) {
-    bg.append('line').attr('x1',0).attr('y1',y).attr('x2',W).attr('y2',y)
-      .attr('stroke','rgba(255,255,255,0.025)').attr('stroke-width',1);
-  }
+  // Background grid
+  const bg = svg.append('g');
+  for (let x = 0; x < W; x += 40) bg.append('line').attr('x1',x).attr('y1',0).attr('x2',x).attr('y2',H).attr('stroke','rgba(255,255,255,.022)').attr('stroke-width',1);
+  for (let y = 0; y < H; y += 40) bg.append('line').attr('x1',0).attr('y1',y).attr('x2',W).attr('y2',y).attr('stroke','rgba(255,255,255,.022)').attr('stroke-width',1);
 
   const g = svg.append('g');
 
-  // Zoom
-  svg.call(d3.zoom().scaleExtent([0.25, 4]).on('zoom', e => g.attr('transform', e.transform)));
+  // Zoom & pan
+  svg.call(d3.zoom().scaleExtent([.25, 4]).on('zoom', e => g.attr('transform', e.transform)));
 
-  // Simulation
+  // Force simulation
   const sim = d3.forceSimulation(nodes)
-    .force('link', d3.forceLink(links).id(d=>d.id).distance(l => l.ltype==='common' ? 90 : 150).strength(0.6))
-    .force('charge', d3.forceManyBody().strength(-500))
-    .force('center', d3.forceCenter(W/2, H/2))
-    .force('collision', d3.forceCollide(d => d.type==='entity' ? 48 : 35));
+    .force('link',      d3.forceLink(links).id(d => d.id).distance(l => l.ltype === 'common' ? 90 : 150).strength(.6))
+    .force('charge',    d3.forceManyBody().strength(-500))
+    .force('center',    d3.forceCenter(W / 2, H / 2))
+    .force('collision', d3.forceCollide(d => d.type === 'entity' ? 48 : 35));
 
-  // Link lines
-  const linkG = g.append('g');
+  // Links
+  const linkG   = g.append('g');
   const linkSel = linkG.selectAll('line').data(links).join('line')
-    .attr('stroke', l => l.ltype==='direct'?'#3b82f6':l.ltype==='shared'?'#10b981':'#6b87b8')
-    .attr('stroke-width', l => l.ltype==='direct' ? 2.5 : l.ltype==='shared' ? 1.8 : 1.2)
-    .attr('stroke-dasharray', l => l.ltype==='shared' ? '6,3' : null)
-    .attr('stroke-opacity', l => l.ltype==='common' ? 0.5 : 0.85)
-    .attr('marker-end', l => `url(#arr-${l.ltype})`);
+    .attr('stroke',           l => l.ltype === 'direct' ? '#3b82f6' : l.ltype === 'shared' ? '#10b981' : '#6b87b8')
+    .attr('stroke-width',     l => l.ltype === 'direct' ? 2.5 : l.ltype === 'shared' ? 1.8 : 1.2)
+    .attr('stroke-dasharray', l => l.ltype === 'shared' ? '6,3' : null)
+    .attr('stroke-opacity',   l => l.ltype === 'common' ? .5 : .85)
+    .attr('marker-end',       l => `url(#arr-${l.ltype})`);
 
-  // Link labels
   const linkLblSel = linkG.selectAll('text').data(links.filter(l => l.label)).join('text')
-    .attr('font-size', 9).attr('fill', '#3a5070')
-    .attr('font-family', "'IBM Plex Mono', monospace")
-    .attr('text-anchor', 'middle').attr('pointer-events','none')
-    .text(l => l.label?.length > 22 ? l.label.substring(0,20)+'…' : (l.label||''));
+    .attr('font-size', 9).attr('fill','#3a5070')
+    .attr('font-family',"'IBM Plex Mono',monospace")
+    .attr('text-anchor','middle').attr('pointer-events','none')
+    .text(l => l.label?.length > 22 ? l.label.substring(0, 20) + '…' : (l.label || ''));
 
   // Node groups
-  const nodeG = g.append('g');
+  const nodeG   = g.append('g');
   const nodeSel = nodeG.selectAll('g').data(nodes).join('g')
     .attr('cursor','grab')
     .call(d3.drag()
-      .on('start', (e,d) => { if(!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
-      .on('drag',  (e,d) => { d.fx=e.x; d.fy=e.y; })
-      .on('end',   (e,d) => { if(!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; })
+      .on('start', (e, d) => { if (!e.active) sim.alphaTarget(.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag',  (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end',   (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
     );
 
-  // Outer glow ring for entity nodes
-  nodeSel.filter(d=>d.type==='entity')
-    .append('circle')
-    .attr('r', 40)
-    .attr('fill', d => d.color)
-    .attr('opacity', 0.06)
-    .attr('filter', 'url(#glow)');
+  // Glow halo (entity only)
+  nodeSel.filter(d => d.type === 'entity')
+    .append('circle').attr('r',40).attr('fill',d=>d.color).attr('opacity',.06).attr('filter','url(#glow)');
 
   // Main circle
   nodeSel.append('circle')
-    .attr('r', d => d.type==='entity' ? 32 : 20)
-    .attr('fill', d => d.color + (d.type==='entity' ? '28' : '18'))
-    .attr('stroke', d => d.color)
-    .attr('stroke-width', d => d.type==='entity' ? 2 : 1.5)
-    .attr('stroke-opacity', d => d.type==='entity' ? 1 : 0.7);
+    .attr('r',     d => d.type === 'entity' ? 32 : 20)
+    .attr('fill',  d => d.color + (d.type === 'entity' ? '28' : '18'))
+    .attr('stroke',d => d.color)
+    .attr('stroke-width',   d => d.type === 'entity' ? 2 : 1.5)
+    .attr('stroke-opacity', d => d.type === 'entity' ? 1 : .7);
 
-  // Pulse animation for entity nodes
-  nodeSel.filter(d=>d.type==='entity')
-    .append('circle')
-    .attr('r', 32)
-    .attr('fill', 'none')
-    .attr('stroke', d => d.color)
-    .attr('stroke-width', 1)
-    .attr('stroke-opacity', 0.4)
-    .append('animate')
-      .attr('attributeName','r').attr('from',32).attr('to',45)
-      .attr('dur','2s').attr('repeatCount','indefinite');
-  nodeSel.filter(d=>d.type==='entity')
-    .select('circle:last-child animate')
-    .each(function(d, i) {
-      d3.select(this.parentNode).select('animate')
-        .attr('begin', `${i * 0.5}s`);
-      d3.select(this.parentNode)
-        .append('animate')
-        .attr('attributeName','stroke-opacity')
-        .attr('from', 0.4).attr('to', 0)
-        .attr('dur','2s').attr('repeatCount','indefinite');
-    });
+  // Pulse ring (entity only)
+  nodeSel.filter(d => d.type === 'entity').each(function(_, i) {
+    const ring = d3.select(this).append('circle')
+      .attr('r',32).attr('fill','none')
+      .attr('stroke',d=>d.color).attr('stroke-width',1).attr('stroke-opacity',.4);
+    ring.append('animate')
+      .attr('attributeName','r').attr('from',32).attr('to',46)
+      .attr('dur','2s').attr('begin', `${i * .6}s`).attr('repeatCount','indefinite');
+    ring.append('animate')
+      .attr('attributeName','stroke-opacity').attr('from',.4).attr('to',0)
+      .attr('dur','2s').attr('begin', `${i * .6}s`).attr('repeatCount','indefinite');
+  });
 
   // Text labels
   nodeSel.append('text')
     .attr('text-anchor','middle')
-    .attr('font-family', "'DM Sans', sans-serif")
+    .attr('font-family',"'DM Sans',sans-serif")
     .attr('pointer-events','none')
     .each(function(d) {
-      const el = d3.select(this);
-      const maxW = d.type==='entity' ? 11 : 9;
+      const el    = d3.select(this);
+      const maxW  = d.type === 'entity' ? 11 : 9;
       const words = d.label.split(' ');
-      el.attr('font-size', d.type==='entity' ? 10.5 : 9)
-        .attr('fill', d.color)
-        .attr('font-weight', d.type==='entity' ? '600' : '400');
+      el.attr('font-size',   d.type === 'entity' ? 10.5 : 9)
+        .attr('fill',        d.color)
+        .attr('font-weight', d.type === 'entity' ? '600' : '400');
       if (d.label.length <= maxW || words.length === 1) {
-        el.attr('dy','0.35em').text(d.label.length > maxW+2 ? d.label.substring(0,maxW)+'…' : d.label);
+        el.attr('dy','0.35em').text(d.label.length > maxW + 2 ? d.label.substring(0, maxW) + '…' : d.label);
       } else {
         el.text(null);
         const mid = Math.ceil(words.length / 2);
-        const l1 = words.slice(0,mid).join(' ');
-        const l2 = words.slice(mid).join(' ');
-        el.append('tspan').attr('x',0).attr('dy','-0.55em').text(l1.substring(0, maxW+2));
-        el.append('tspan').attr('x',0).attr('dy','1.2em').text(l2.substring(0, maxW+2));
+        el.append('tspan').attr('x',0).attr('dy','-0.55em').text(words.slice(0, mid).join(' ').substring(0, maxW + 2));
+        el.append('tspan').attr('x',0).attr('dy','1.2em').text(words.slice(mid).join(' ').substring(0, maxW + 2));
       }
     });
 
-  // Tooltip interactions
-  const tip = document.getElementById('tooltip');
-  const graphContainer = svgEl.parentElement;
+  // Tooltip
+  const tip      = document.getElementById('tooltip');
+  const graphWrap = document.getElementById('graph-svg').parentElement;
 
-  nodeSel.on('mouseover', (event, d) => {
-    tip.innerHTML = `
-      <div class="graph-tooltip-name">${escH(d.label)}</div>
-      ${d.desc ? `<div class="graph-tooltip-desc">${escH(d.desc)}</div>` : ''}
-      <div class="graph-tooltip-qid">${d.id}</div>`;
-    tip.classList.add('visible');
-  }).on('mousemove', event => {
-    const rect = graphContainer.getBoundingClientRect();
-    let tx = event.clientX - rect.left + 14;
-    let ty = event.clientY - rect.top - 10;
-    if (tx + 230 > rect.width) tx -= 240;
-    tip.style.left = tx + 'px';
-    tip.style.top = ty + 'px';
-  }).on('mouseout', () => {
-    tip.classList.remove('visible');
-  });
+  nodeSel
+    .on('mouseover', (event, d) => {
+      tip.innerHTML = `
+        <div class="graph-tooltip-name">${escH(d.label)}</div>
+        ${d.desc ? `<div class="graph-tooltip-desc">${escH(d.desc)}</div>` : ''}
+        <div class="graph-tooltip-qid">${d.id}</div>`;
+      tip.classList.add('visible');
+    })
+    .on('mousemove', event => {
+      const rect = graphWrap.getBoundingClientRect();
+      let tx = event.clientX - rect.left + 14;
+      let ty = event.clientY - rect.top  - 10;
+      if (tx + 230 > rect.width) tx -= 240;
+      tip.style.left = tx + 'px';
+      tip.style.top  = ty + 'px';
+    })
+    .on('mouseout', () => tip.classList.remove('visible'))
+    .on('click', (event, d) => {
+      if (event.defaultPrevented) return;
+      window.open(`https://www.wikidata.org/wiki/${d.id}`, '_blank');
+    });
 
   // Tick
   sim.on('tick', () => {
@@ -1063,69 +1387,90 @@ function renderGraph(data) {
       .attr('y', l => (l.source.y + l.target.y) / 2 - 4);
     nodeSel.attr('transform', d => `translate(${d.x},${d.y})`);
   });
-
-  // Open Wikidata on click
-  nodeSel.on('click', (event, d) => {
-    if (event.defaultPrevented) return;
-    window.open(`https://www.wikidata.org/wiki/${d.id}`, '_blank');
-  });
 }
 
-// ═══════════════════════════════════════════════════════════════
-// FACTS PANEL
-// ═══════════════════════════════════════════════════════════════
+// ── FACTS PANEL ───────────────────────────────────────────────
 function renderFacts(data) {
   const panel = document.getElementById('facts');
   panel.innerHTML = '';
-  const total = data.direct.length + data.shared.length + data.common.length;
+  const total = data.direct.length + data.shared.length + data.common.length
+    + data.twoHop.length + data.categories.length + data.awards.length
+    + data.occupations.length + data.works.length;
+
   if (total === 0) {
-    panel.innerHTML = '<div class="no-facts">No direct connections found in Wikidata for these entities. They may be connected through more distant relationships, or the connection may not be fully represented in Wikidata yet.</div>';
+    panel.innerHTML = `<div class="no-facts">
+      No connections found for these entities at <strong>${searchDepth}</strong> depth.
+      Try switching to <em>Deep</em> or <em>Max</em> search, or choose better-documented entities.
+    </div>`;
     return;
   }
 
   if (data.direct.length > 0) {
-    const cards = data.direct.map(d => ({
-      cls: 'direct', rel: d.prop,
-      main: `${d.srcL} → ${d.tgtL}`,
-      sub: 'Direct property link in Wikidata'
-    }));
-    panel.appendChild(mkGroup('⚡ Direct Links', cards));
+    panel.appendChild(mkGroup('⚡ Direct Links',
+      data.direct.map(d => ({ cls:'direct', rel: d.prop, main: `${d.srcL} → ${d.tgtL}`, sub: 'Direct Wikidata property' }))
+    ));
   }
 
   if (data.shared.length > 0) {
-    // Group by property
     const byProp = {};
-    data.shared.forEach(s => {
-      if (!byProp[s.prop]) byProp[s.prop] = [];
-      byProp[s.prop].push(s);
-    });
+    data.shared.forEach(s => { if (!byProp[s.prop]) byProp[s.prop] = []; byProp[s.prop].push(s); });
     const cards = [];
     for (const [prop, items] of Object.entries(byProp)) {
-      items.forEach(item => {
-        cards.push({
-          cls: 'shared', rel: prop,
-          main: item.value,
-          sub: `Shared between ${item.srcL} and ${item.tgtL}`
-        });
-      });
+      items.forEach(item => cards.push({ cls:'shared', rel: prop, main: item.value, sub: `Shared by ${item.srcL} & ${item.tgtL}` }));
     }
     panel.appendChild(mkGroup('🤝 Shared Traits', cards));
   }
 
   if (data.common.length > 0) {
-    const seen = new Set();
-    const cards = [];
+    const seen = new Set(), cards = [];
     data.common.forEach(c => {
       const key = `${c.src}-${c.tgt}-${c.mid}`;
-      if (seen.has(key)) return;
-      seen.add(key);
-      cards.push({
-        cls: 'common', rel: c.midLabel,
-        main: `${c.srcL} (${c.p1}) · ${c.tgtL} (${c.p2})`,
-        sub: 'Common intermediary connection'
-      });
+      if (seen.has(key)) return; seen.add(key);
+      cards.push({ cls:'common', rel: c.midLabel, main: `${c.srcL} (${c.p1}) · ${c.tgtL} (${c.p2})`, sub: 'Common intermediary' });
     });
     panel.appendChild(mkGroup('🕸 Common Connections', cards));
+  }
+
+  if (data.twoHop.length > 0) {
+    const seen = new Set(), cards = [];
+    data.twoHop.forEach(t => {
+      const key = `${t.src}-${t.tgt}-${t.hop}`;
+      if (seen.has(key)) return; seen.add(key);
+      cards.push({ cls:'direct', rel: '2-hop path', main: `${t.srcL} →[${t.p1}]→ ${t.hopLabel} →[${t.p2}]→ ${t.tgtL}`, sub: 'Indirect Wikidata path' });
+    });
+    panel.appendChild(mkGroup('🔁 2-Hop Paths', cards));
+  }
+
+  if (data.awards.length > 0) {
+    const cards = [];
+    data.awards.forEach(a => {
+      a.awards.forEach(aw => cards.push({ cls:'shared', rel: 'shared award', main: aw, sub: `Both ${a.srcL} and ${a.tgtL} received this` }));
+    });
+    panel.appendChild(mkGroup('🏆 Shared Awards', cards));
+  }
+
+  if (data.occupations.length > 0) {
+    const cards = [];
+    data.occupations.forEach(o => {
+      o.occs.forEach(oc => cards.push({ cls:'common', rel: 'occupation / field', main: oc, sub: `Shared by ${o.srcL} & ${o.tgtL}` }));
+    });
+    panel.appendChild(mkGroup('💼 Shared Occupations', cards));
+  }
+
+  if (data.categories.length > 0) {
+    const cards = [];
+    data.categories.forEach(c => {
+      c.cats.forEach(cat => cards.push({ cls:'common', rel: 'Wikipedia category', main: cat, sub: `${c.srcL} and ${c.tgtL} both appear here` }));
+    });
+    panel.appendChild(mkGroup('📂 Shared Categories', cards));
+  }
+
+  if (data.works.length > 0) {
+    const cards = [];
+    data.works.forEach(w => {
+      w.works.forEach(wk => cards.push({ cls:'shared', rel: 'shared work / film', main: wk, sub: `${w.srcL} and ${w.tgtL} connected via this work` }));
+    });
+    panel.appendChild(mkGroup('🎬 Shared Works', cards));
   }
 }
 
@@ -1133,7 +1478,7 @@ function mkGroup(title, cards) {
   const div = document.createElement('div');
   div.className = 'fact-group';
   div.innerHTML = `
-    <div class="fg-label">${title} <span class="fg-count">${cards.length}</span></div>
+    <div class="fg-label">${title}<span class="fg-count">${cards.length}</span></div>
     <div class="fact-cards">
       ${cards.slice(0, 15).map(c => `
         <div class="fcard ${c.cls}">
@@ -1145,48 +1490,95 @@ function mkGroup(title, cards) {
   return div;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// UI HELPERS
-// ═══════════════════════════════════════════════════════════════
+// ── UI HELPERS ────────────────────────────────────────────────
 function showLoading() {
   document.getElementById('loading').classList.add('show');
-  document.getElementById('log').innerHTML = '';
+  document.getElementById('log').innerHTML   = '';
   document.getElementById('btn-go').disabled = true;
 }
 function hideLoading() {
   document.getElementById('loading').classList.remove('show');
   document.getElementById('btn-go').disabled = false;
 }
-function showResults() { document.getElementById('results').classList.add('show'); }
+function showResults() {
+  document.getElementById('results').classList.add('show');
+  const dn = document.getElementById('scroll-results');
+  if (dn) dn.classList.add('visible');
+}
 function hideResults() { document.getElementById('results').classList.remove('show'); }
-function showErr(m) { const e=document.getElementById('errmsg'); e.textContent=m; e.classList.add('show'); }
+function showErr(m) {
+  const e = document.getElementById('errmsg');
+  e.textContent = m; e.classList.add('show');
+}
 function hideErr() { document.getElementById('errmsg').classList.remove('show'); }
 
 function logStep(msg, state) {
   const log = document.getElementById('log');
   if (state === 'run') {
-    // Mark previous running lines as done
     log.querySelectorAll('.log-line.running').forEach(el => {
       el.classList.remove('running'); el.classList.add('done');
-      el.querySelector('.dot') && el.querySelector('.dot') && (el.children[0].textContent = '✓');
+      if (el.children[0]) el.children[0].textContent = '✓';
     });
     const line = document.createElement('div');
     line.className = 'log-line running';
     line.innerHTML = `<span class="dot"></span>${escH(msg)}`;
     log.appendChild(line);
+    log.scrollTop = log.scrollHeight;
   } else if (state === 'done') {
-    const running = log.querySelector('.log-line.running');
-    if (running) { running.classList.remove('running'); running.classList.add('done'); }
+    const r = log.querySelector('.log-line.running');
+    if (r) { r.classList.remove('running'); r.classList.add('done'); }
   }
 }
 
 function escH(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// BOOT
-// ═══════════════════════════════════════════════════════════════
+// ── SCROLL NAV & PROGRESS BAR ─────────────────────────────────
+function smoothScrollTo(y, duration = 520) {
+  const start = window.scrollY;
+  const diff  = y - start;
+  let t0      = null;
+  const ease  = t => t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+  const step  = ts => {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / duration, 1);
+    window.scrollTo(0, start + diff * ease(p));
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function scrollToResults() {
+  const r = document.getElementById('results');
+  if (r && r.classList.contains('show')) {
+    smoothScrollTo(r.getBoundingClientRect().top + window.scrollY - 20);
+  } else {
+    smoothScrollTo(document.body.scrollHeight);
+  }
+}
+
+function initScrollNav() {
+  const topBtn = document.getElementById('scroll-top');
+  const dnBtn  = document.getElementById('scroll-results');
+  const bar    = document.getElementById('scroll-progress');
+
+  window.addEventListener('scroll', () => {
+    const scrolled  = window.scrollY;
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    const pct       = maxScroll > 0 ? scrolled / maxScroll : 0;
+
+    if (bar)    bar.style.transform = `scaleX(${pct})`;
+    if (topBtn) topBtn.classList.toggle('visible', scrolled > 220);
+    if (dnBtn) {
+      const res = document.getElementById('results');
+      const has = res && res.classList.contains('show');
+      dnBtn.classList.toggle('visible', has && pct < .92);
+    }
+  }, { passive: true });
+}
+
+// ── START ─────────────────────────────────────────────────────
 init();
 </script>
 </body>
