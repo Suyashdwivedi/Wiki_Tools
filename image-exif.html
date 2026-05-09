@@ -4,7 +4,8 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Metadata Explorer - EXIF & GPS Viewer</title>
 
@@ -39,7 +40,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"></script>
 
-    <!-- Google Analytics -->
+    <!-- Analytics -->
 
     <script async
         src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB">
@@ -50,7 +51,6 @@
         window.dataLayer = window.dataLayer || [];
 
         function gtag() {
-
             dataLayer.push(arguments);
         }
 
@@ -70,35 +70,35 @@
     <style>
 
         * {
-
             box-sizing: border-box;
         }
 
         :root {
 
-            --bg-color: #f5f5f5;
-            --card-color: #ffffff;
-            --text-color: #111;
-            --border-color: #ddd;
-            --accent: #4a90e2;
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --text: #111827;
+            --border: #dcdfe5;
+            --accent: #2563eb;
         }
 
         body.dark-mode {
 
-            --bg-color: #111315;
-            --card-color: #1c1e22;
-            --text-color: #ffffff;
-            --border-color: #333;
+            --bg: #111315;
+            --card: #1d1f24;
+            --text: #ffffff;
+            --border: #2d2f35;
         }
 
         body {
 
             margin: 0;
-            padding: 20px;
 
-            background: var(--bg-color);
+            padding: 25px;
 
-            color: var(--text-color);
+            background: var(--bg);
+
+            color: var(--text);
 
             font-family: Arial, sans-serif;
 
@@ -117,9 +117,9 @@
 
             padding-bottom: 20px;
 
-            margin-bottom: 30px;
+            margin-bottom: 35px;
 
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border);
         }
 
         .header-left {
@@ -133,23 +133,23 @@
 
         .logo {
 
-            width: 110px;
+            width: 95px;
         }
 
         h1 {
 
             margin: 0;
 
-            font-size: 60px;
+            font-size: 58px;
         }
 
         .night-btn {
 
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
 
-            background: var(--card-color);
+            background: var(--card);
 
-            color: var(--text-color);
+            color: var(--text);
 
             border-radius: 40px;
 
@@ -164,13 +164,13 @@
 
         #drop-zone {
 
-            background: var(--card-color);
+            background: var(--card);
 
-            border: 3px dashed var(--border-color);
+            border: 3px dashed var(--border);
 
-            border-radius: 20px;
+            border-radius: 25px;
 
-            padding: 70px 20px;
+            padding: 80px 20px;
 
             text-align: center;
 
@@ -191,54 +191,90 @@
 
         .card {
 
-            background: var(--card-color);
+            background: var(--card);
 
-            margin-top: 30px;
+            margin-top: 35px;
 
             padding: 25px;
 
-            border-radius: 20px;
+            border-radius: 25px;
 
-            border: 1px solid var(--border-color);
-
-            overflow: hidden;
+            border: 1px solid var(--border);
         }
 
         #preview-image {
 
             max-width: 100%;
 
-            max-height: 600px;
+            max-height: 650px;
 
             display: block;
 
             margin: auto;
 
-            border-radius: 15px;
+            border-radius: 18px;
         }
 
-        table {
+        h2 {
 
-            width: 100%;
+            margin-top: 0;
 
-            border-collapse: collapse;
+            font-size: 34px;
+
+            margin-bottom: 25px;
         }
 
-        th,
-        td {
+        .metadata-grid {
 
-            border-bottom: 1px solid var(--border-color);
+            display: grid;
 
-            padding: 12px;
+            grid-template-columns:
+                repeat(auto-fit, minmax(320px, 1fr));
 
-            text-align: left;
-
-            vertical-align: top;
+            gap: 22px;
         }
 
-        th {
+        .meta-box {
 
-            color: var(--accent);
+            background: rgba(255,255,255,0.02);
+
+            border: 1px solid var(--border);
+
+            border-radius: 24px;
+
+            padding: 24px;
+
+            transition: 0.2s;
+        }
+
+        .meta-box:hover {
+
+            transform: translateY(-2px);
+        }
+
+        .meta-key {
+
+            font-size: 20px;
+
+            font-weight: bold;
+
+            margin-bottom: 14px;
+
+            color: #374151;
+        }
+
+        body.dark-mode .meta-key {
+
+            color: #d1d5db;
+        }
+
+        .meta-value {
+
+            font-size: 20px;
+
+            line-height: 1.6;
+
+            overflow-wrap: break-word;
         }
 
         iframe {
@@ -249,7 +285,7 @@
 
             border: 0;
 
-            border-radius: 15px;
+            border-radius: 18px;
 
             margin-top: 20px;
         }
@@ -291,9 +327,9 @@
 
         footer {
 
-            margin-top: 60px;
+            margin-top: 70px;
 
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid var(--border);
 
             padding: 40px 0;
 
@@ -304,7 +340,7 @@
 
         a {
 
-            color: #4a90e2;
+            color: #2563eb;
 
             text-decoration: none;
         }
@@ -320,17 +356,28 @@
 
             h1 {
 
-                font-size: 36px;
+                font-size: 34px;
             }
 
             .logo {
 
-                width: 80px;
+                width: 75px;
             }
 
             .night-btn {
 
                 width: 100%;
+            }
+
+            .meta-box {
+
+                padding: 18px;
+            }
+
+            .meta-key,
+            .meta-value {
+
+                font-size: 18px;
             }
         }
 
@@ -338,7 +385,7 @@
 
 </head>
 
-<body id="top">
+<body>
 
     <!-- Header -->
 
@@ -407,23 +454,9 @@
 
         <h2>Detailed EXIF Metadata</h2>
 
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>Tag</th>
-
-                    <th>Value</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody id="metadata-body"></tbody>
-
-        </table>
+        <div id="metadata-grid"
+            class="metadata-grid">
+        </div>
 
     </div>
 
@@ -481,8 +514,8 @@
         const metadataCard =
             document.getElementById('metadata-card');
 
-        const metadataBody =
-            document.getElementById('metadata-body');
+        const metadataGrid =
+            document.getElementById('metadata-grid');
 
         const mapCard =
             document.getElementById('map-card');
@@ -490,28 +523,26 @@
         const gpsText =
             document.getElementById('gps-text');
 
+        // Dark Mode
+
         function toggleDarkMode() {
 
             document.body.classList.toggle('dark-mode');
         }
 
-        // Drag Over
+        // Drag Events
 
         dropZone.addEventListener('dragover', (e) => {
 
             e.preventDefault();
 
-            dropZone.style.borderColor = '#4a90e2';
+            dropZone.style.borderColor = '#2563eb';
         });
-
-        // Drag Leave
 
         dropZone.addEventListener('dragleave', () => {
 
             dropZone.style.borderColor = '';
         });
-
-        // Drop
 
         dropZone.addEventListener('drop', (e) => {
 
@@ -525,8 +556,6 @@
             processImage(file);
         });
 
-        // File Select
-
         fileInput.addEventListener('change', (e) => {
 
             const file =
@@ -535,7 +564,7 @@
             processImage(file);
         });
 
-        // Main Function
+        // Main
 
         async function processImage(file) {
 
@@ -551,7 +580,7 @@
 
             previewCard.classList.remove('hidden');
 
-            metadataBody.innerHTML = '';
+            metadataGrid.innerHTML = '';
 
             try {
 
@@ -564,13 +593,13 @@
 
                 if (!metadata) {
 
-                    metadataBody.innerHTML =
-                        '<tr><td colspan=\"2\">No EXIF metadata found.</td></tr>';
+                    metadataGrid.innerHTML =
+                        '<p>No EXIF metadata found.</p>';
 
                     return;
                 }
 
-                // Metadata Table
+                // Metadata Cards
 
                 Object.keys(metadata)
                     .sort()
@@ -585,17 +614,26 @@
                                 JSON.stringify(value, null, 2);
                         }
 
-                        const row =
-                            metadataBody.insertRow();
+                        const card =
+                            document.createElement('div');
 
-                        row.insertCell(0).innerHTML =
-                            `<strong>${tag}</strong>`;
+                        card.className =
+                            'meta-box';
 
-                        row.insertCell(1).innerText =
-                            value;
+                        card.innerHTML = `
+                            <div class="meta-key">
+                                ${tag}
+                            </div>
+
+                            <div class="meta-value">
+                                ${value}
+                            </div>
+                        `;
+
+                        metadataGrid.appendChild(card);
                     });
 
-                // Google Maps
+                // GPS
 
                 if (metadata.latitude &&
                     metadata.longitude) {
@@ -606,7 +644,8 @@
                         <p>
                             <strong>Latitude:</strong>
                             ${metadata.latitude}
-                            <br>
+                            <br><br>
+
                             <strong>Longitude:</strong>
                             ${metadata.longitude}
                         </p>
