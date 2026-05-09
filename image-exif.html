@@ -2,328 +2,638 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>EXIF & GPS Metadata Viewer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Full EXIF Library -->
-  <script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"></script>
+    <title>Metadata Explorer - EXIF & GPS Viewer</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f3f4f6;
-      margin: 0;
-      padding: 20px;
-      color: #111827;
-    }
+    <link rel="canonical"
+        href="https://suyashdwivedi.github.io/Wiki_Tools/image-exif.html">
 
-    .container {
-      max-width: 1100px;
-      margin: auto;
-    }
+    <link rel="icon"
+        type="image/png"
+        href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/250px-Wiki%27s_Lazy_Coders.png">
 
-    h1 {
-      font-size: 36px;
-      margin-bottom: 10px;
-    }
+    <!-- SEO -->
 
-    .subtitle {
-      color: #555;
-      margin-bottom: 25px;
-    }
+    <meta name="description"
+        content="Extract EXIF metadata and GPS location from images locally in your browser.">
 
-    .upload-box {
-      border: 3px dashed #aaa;
-      border-radius: 20px;
-      background: white;
-      padding: 50px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+    <meta property="og:title"
+        content="Metadata Explorer">
 
-    .upload-box:hover {
-      background: #f9fafb;
-    }
+    <meta property="og:description"
+        content="Analyze image metadata and GPS coordinates instantly.">
 
-    .upload-box.dragover {
-      background: #e5e7eb;
-      border-color: black;
-    }
+    <meta property="og:image"
+        content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
 
-    input[type=file] {
-      display: none;
-    }
+    <meta property="og:url"
+        content="https://suyashdwivedi.github.io/Wiki_Tools/image-exif.html">
 
-    .card {
-      background: white;
-      margin-top: 30px;
-      padding: 20px;
-      border-radius: 20px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    }
+    <meta name="twitter:card"
+        content="summary_large_image">
 
-    .preview img {
-      max-width: 100%;
-      max-height: 500px;
-      display: block;
-      margin: auto;
-      border-radius: 15px;
-    }
+    <!-- EXIF Library -->
 
-    iframe {
-      width: 100%;
-      height: 450px;
-      border: none;
-      border-radius: 15px;
-    }
+    <script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"></script>
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
+    <!-- Google Analytics -->
 
-    .meta-item {
-      background: #f9fafb;
-      border: 1px solid #ddd;
-      border-radius: 15px;
-      padding: 15px;
-      overflow-wrap: break-word;
-    }
+    <script async
+        src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB">
+    </script>
 
-    .meta-key {
-      font-weight: bold;
-      margin-bottom: 8px;
-      color: #444;
-    }
+    <script>
 
-    .error {
-      color: red;
-      margin-top: 15px;
-      font-weight: bold;
-    }
+        window.dataLayer = window.dataLayer || [];
 
-    .success {
-      color: green;
-      margin-top: 15px;
-      font-weight: bold;
-    }
+        function gtag() {
 
-    ul {
-      line-height: 1.8;
-    }
-  </style>
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-GC8PGC89NB');
+
+    </script>
+
+    <!-- Counter -->
+
+    <script src="https://cdn.counter.dev/script.js"
+        data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+        data-utcoffset="6">
+    </script>
+
+    <style>
+
+        * {
+
+            box-sizing: border-box;
+        }
+
+        :root {
+
+            --bg-color: #f5f5f5;
+            --card-color: #ffffff;
+            --text-color: #111;
+            --border-color: #ddd;
+            --accent: #4a90e2;
+        }
+
+        body.dark-mode {
+
+            --bg-color: #111315;
+            --card-color: #1c1e22;
+            --text-color: #ffffff;
+            --border-color: #333;
+        }
+
+        body {
+
+            margin: 0;
+            padding: 20px;
+
+            background: var(--bg-color);
+
+            color: var(--text-color);
+
+            font-family: Arial, sans-serif;
+
+            transition: 0.3s;
+        }
+
+        header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+
+            padding-bottom: 20px;
+
+            margin-bottom: 30px;
+
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-left {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 20px;
+        }
+
+        .logo {
+
+            width: 110px;
+        }
+
+        h1 {
+
+            margin: 0;
+
+            font-size: 60px;
+        }
+
+        .night-btn {
+
+            border: 1px solid var(--border-color);
+
+            background: var(--card-color);
+
+            color: var(--text-color);
+
+            border-radius: 40px;
+
+            padding: 18px 30px;
+
+            font-size: 20px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+        }
+
+        #drop-zone {
+
+            background: var(--card-color);
+
+            border: 3px dashed var(--border-color);
+
+            border-radius: 20px;
+
+            padding: 70px 20px;
+
+            text-align: center;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+        #drop-zone:hover {
+
+            border-color: var(--accent);
+        }
+
+        .hidden {
+
+            display: none;
+        }
+
+        .card {
+
+            background: var(--card-color);
+
+            margin-top: 30px;
+
+            padding: 25px;
+
+            border-radius: 20px;
+
+            border: 1px solid var(--border-color);
+
+            overflow: hidden;
+        }
+
+        #preview-image {
+
+            max-width: 100%;
+
+            max-height: 600px;
+
+            display: block;
+
+            margin: auto;
+
+            border-radius: 15px;
+        }
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+
+            border-bottom: 1px solid var(--border-color);
+
+            padding: 12px;
+
+            text-align: left;
+
+            vertical-align: top;
+        }
+
+        th {
+
+            color: var(--accent);
+        }
+
+        iframe {
+
+            width: 100%;
+
+            height: 450px;
+
+            border: 0;
+
+            border-radius: 15px;
+
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+
+            position: fixed;
+
+            right: 25px;
+
+            width: 70px;
+
+            height: 70px;
+
+            border-radius: 50%;
+
+            border: none;
+
+            background: #4a90e2;
+
+            color: white;
+
+            font-size: 35px;
+
+            cursor: pointer;
+
+            z-index: 999;
+        }
+
+        #top-btn {
+
+            bottom: 110px;
+        }
+
+        #bottom-btn {
+
+            bottom: 25px;
+        }
+
+        footer {
+
+            margin-top: 60px;
+
+            border-top: 1px solid var(--border-color);
+
+            padding: 40px 0;
+
+            text-align: center;
+
+            font-size: 18px;
+        }
+
+        a {
+
+            color: #4a90e2;
+
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+
+            header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+
+            h1 {
+
+                font-size: 36px;
+            }
+
+            .logo {
+
+                width: 80px;
+            }
+
+            .night-btn {
+
+                width: 100%;
+            }
+        }
+
+    </style>
+
 </head>
 
-<body>
+<body id="top">
 
-  <div class="container">
+    <!-- Header -->
 
-    <h1>EXIF & GPS Metadata Viewer</h1>
+    <header>
 
-    <p class="subtitle">
-      Drag & drop an image or upload one to inspect detailed EXIF metadata and GPS map location.
-    </p>
+        <div class="header-left">
+
+            <img class="logo"
+                src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+
+            <h1>Metadata Explorer</h1>
+
+        </div>
+
+        <button class="night-btn"
+            onclick="toggleDarkMode()">
+
+            🌗 Night Mode
+
+        </button>
+
+    </header>
 
     <!-- Upload -->
-    <div class="upload-box" id="uploadBox">
-      <h2>Drag & Drop Image Here</h2>
-      <p>or click to upload</p>
 
-      <input type="file" id="fileInput" accept="image/*">
+    <div id="drop-zone"
+        onclick="document.getElementById('file-input').click()">
+
+        <h2>Drag & Drop Image Here</h2>
+
+        <p>or click to upload image</p>
+
+        <input type="file"
+            id="file-input"
+            class="hidden"
+            accept="image/*">
+
     </div>
 
-    <div class="error" id="error"></div>
-    <div class="success" id="success"></div>
-
     <!-- Preview -->
-    <div class="card preview" id="previewSection" style="display:none;">
-      <h2>Image Preview</h2>
-      <img id="previewImage">
+
+    <div id="preview-card"
+        class="card hidden">
+
+        <h2>Image Preview</h2>
+
+        <img id="preview-image">
+
     </div>
 
     <!-- GPS -->
-    <div class="card" id="mapSection" style="display:none;">
-      <h2>GPS Location</h2>
 
-      <p id="gpsText"></p>
+    <div id="map-card"
+        class="card hidden">
 
-      <iframe id="mapFrame"></iframe>
+        <h2>GPS Location</h2>
+
+        <div id="gps-text"></div>
+
     </div>
 
     <!-- Metadata -->
-    <div class="card" id="metadataSection" style="display:none;">
 
-      <h2>Detailed EXIF Metadata</h2>
+    <div id="metadata-card"
+        class="card hidden">
 
-      <div class="grid" id="metadataGrid"></div>
+        <h2>Detailed EXIF Metadata</h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Tag</th>
+
+                    <th>Value</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="metadata-body"></tbody>
+
+        </table>
 
     </div>
 
-    <!-- Features -->
-    <div class="card">
-      <h2>Features</h2>
+    <!-- Navigation Buttons -->
 
-      <ul>
-        <li>Drag & drop image upload</li>
-        <li>Local file upload</li>
-        <li>Detailed EXIF metadata</li>
-        <li>GPS map display</li>
-        <li>No server upload required</li>
-        <li>Works directly in browser</li>
-      </ul>
-    </div>
+    <button id="top-btn"
+        class="nav-btn"
+        onclick="window.scrollTo({top:0,behavior:'smooth'})">
 
-  </div>
+        ↑
 
-  <script>
+    </button>
 
-    const uploadBox = document.getElementById('uploadBox');
-    const fileInput = document.getElementById('fileInput');
+    <button id="bottom-btn"
+        class="nav-btn"
+        onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">
 
-    const previewSection = document.getElementById('previewSection');
-    const previewImage = document.getElementById('previewImage');
+        ↓
 
-    const metadataSection = document.getElementById('metadataSection');
-    const metadataGrid = document.getElementById('metadataGrid');
+    </button>
 
-    const mapSection = document.getElementById('mapSection');
-    const mapFrame = document.getElementById('mapFrame');
-    const gpsText = document.getElementById('gpsText');
+    <!-- Footer -->
 
-    const errorDiv = document.getElementById('error');
-    const successDiv = document.getElementById('success');
+    <footer>
 
-    // Click Upload
-    uploadBox.addEventListener('click', () => {
-      fileInput.click();
-    });
+        Created by
 
-    // Drag Over
-    uploadBox.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      uploadBox.classList.add('dragover');
-    });
+        <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi"
+            target="_blank">
 
-    // Drag Leave
-    uploadBox.addEventListener('dragleave', () => {
-      uploadBox.classList.remove('dragover');
-    });
+            Suyash Dwivedi
 
-    // Drop
-    uploadBox.addEventListener('drop', (e) => {
-      e.preventDefault();
+        </a>
 
-      uploadBox.classList.remove('dragover');
+        |
 
-      const file = e.dataTransfer.files[0];
+        Updated on: 9 May 2026
 
-      processFile(file);
-    });
+    </footer>
 
-    // File Select
-    fileInput.addEventListener('change', (e) => {
+    <script>
 
-      const file = e.target.files[0];
+        const dropZone =
+            document.getElementById('drop-zone');
 
-      processFile(file);
-    });
+        const fileInput =
+            document.getElementById('file-input');
 
-    // Process Image
-    async function processFile(file) {
+        const previewCard =
+            document.getElementById('preview-card');
 
-      errorDiv.textContent = '';
-      successDiv.textContent = '';
+        const previewImage =
+            document.getElementById('preview-image');
 
-      metadataGrid.innerHTML = '';
+        const metadataCard =
+            document.getElementById('metadata-card');
 
-      mapSection.style.display = 'none';
+        const metadataBody =
+            document.getElementById('metadata-body');
 
-      if (!file) {
-        return;
-      }
+        const mapCard =
+            document.getElementById('map-card');
 
-      if (!file.type.startsWith('image/')) {
+        const gpsText =
+            document.getElementById('gps-text');
 
-        errorDiv.textContent = 'Please select a valid image file.';
-        return;
-      }
+        function toggleDarkMode() {
 
-      // Preview
-      const imageURL = URL.createObjectURL(file);
-
-      previewImage.src = imageURL;
-
-      previewSection.style.display = 'block';
-
-      try {
-
-        // Parse EXIF
-        const metadata = await exifr.parse(file);
-
-        console.log(metadata);
-
-        if (!metadata) {
-
-          errorDiv.textContent = 'No EXIF metadata found in this image.';
-          return;
+            document.body.classList.toggle('dark-mode');
         }
 
-        successDiv.textContent = 'EXIF metadata successfully loaded.';
+        // Drag Over
 
-        metadataSection.style.display = 'block';
+        dropZone.addEventListener('dragover', (e) => {
 
-        // Show Metadata
-        for (const key in metadata) {
+            e.preventDefault();
 
-          let value = metadata[key];
+            dropZone.style.borderColor = '#4a90e2';
+        });
 
-          if (typeof value === 'object') {
-            value = JSON.stringify(value, null, 2);
-          }
+        // Drag Leave
 
-          const item = document.createElement('div');
+        dropZone.addEventListener('dragleave', () => {
 
-          item.className = 'meta-item';
+            dropZone.style.borderColor = '';
+        });
 
-          item.innerHTML = `
-            <div class="meta-key">${key}</div>
-            <div>${value}</div>
-          `;
+        // Drop
 
-          metadataGrid.appendChild(item);
+        dropZone.addEventListener('drop', (e) => {
+
+            e.preventDefault();
+
+            dropZone.style.borderColor = '';
+
+            const file =
+                e.dataTransfer.files[0];
+
+            processImage(file);
+        });
+
+        // File Select
+
+        fileInput.addEventListener('change', (e) => {
+
+            const file =
+                e.target.files[0];
+
+            processImage(file);
+        });
+
+        // Main Function
+
+        async function processImage(file) {
+
+            if (!file) return;
+
+            // Preview
+
+            const imageURL =
+                URL.createObjectURL(file);
+
+            previewImage.src =
+                imageURL;
+
+            previewCard.classList.remove('hidden');
+
+            metadataBody.innerHTML = '';
+
+            try {
+
+                const metadata =
+                    await exifr.parse(file);
+
+                console.log(metadata);
+
+                metadataCard.classList.remove('hidden');
+
+                if (!metadata) {
+
+                    metadataBody.innerHTML =
+                        '<tr><td colspan=\"2\">No EXIF metadata found.</td></tr>';
+
+                    return;
+                }
+
+                // Metadata Table
+
+                Object.keys(metadata)
+                    .sort()
+                    .forEach(tag => {
+
+                        let value =
+                            metadata[tag];
+
+                        if (typeof value === 'object') {
+
+                            value =
+                                JSON.stringify(value, null, 2);
+                        }
+
+                        const row =
+                            metadataBody.insertRow();
+
+                        row.insertCell(0).innerHTML =
+                            `<strong>${tag}</strong>`;
+
+                        row.insertCell(1).innerText =
+                            value;
+                    });
+
+                // Google Maps
+
+                if (metadata.latitude &&
+                    metadata.longitude) {
+
+                    mapCard.classList.remove('hidden');
+
+                    gpsText.innerHTML = `
+                        <p>
+                            <strong>Latitude:</strong>
+                            ${metadata.latitude}
+                            <br>
+                            <strong>Longitude:</strong>
+                            ${metadata.longitude}
+                        </p>
+
+                        <iframe
+                            loading="lazy"
+                            allowfullscreen
+                            src="https://www.google.com/maps?q=${metadata.latitude},${metadata.longitude}&z=15&output=embed">
+                        </iframe>
+                    `;
+
+                } else {
+
+                    mapCard.classList.add('hidden');
+                }
+
+            } catch (err) {
+
+                console.error(err);
+
+                alert(
+                    'Failed to read EXIF metadata.'
+                );
+            }
         }
 
-        // GPS
-        if (metadata.latitude && metadata.longitude) {
-
-          mapSection.style.display = 'block';
-
-          gpsText.innerHTML = `
-            <strong>Latitude:</strong> ${metadata.latitude}<br>
-            <strong>Longitude:</strong> ${metadata.longitude}
-          `;
-
-          mapFrame.src =
-            `https://www.google.com/maps?q=${metadata.latitude},${metadata.longitude}&z=15&output=embed`;
-        }
-
-      } catch (err) {
-
-        console.error(err);
-
-        alert(err);
-
-        errorDiv.textContent =
-          'Failed to read EXIF metadata. Try an original camera JPG image.';
-      }
-    }
-
-  </script>
+    </script>
 
 </body>
 
