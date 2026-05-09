@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exif Viewer & GPS Mapper</title>
+    <link rel="canonical" href="https://suyashdwivedi.github.io/zonestamper.html">
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/250px-Wiki%27s_Lazy_Coders.png">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Extract detailed EXIF data and view GPS locations on a map from your photos locally.">
+    <meta property="og:title" content="Exif Viewer & GPS Mapper">
+    <meta property="og:description" content="Analyze image metadata and map GPS coordinates instantly.">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+    <meta property="og:url" content="https://suyashdwivedi.github.io/zonestamper.html">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-GC8PGC89NB');
+    </script>
+    <script src="https://cdn.counter.dev/script.js" data-id="cc7a036d-a904-4d76-bcac-37ea4196c014" data-utcoffset="6"></script>
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --container-bg: #fff;
+            --border-color: #ddd;
+            --accent-color: #4a90e2;
+        }
+
+        body.dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #f4f4f9;
+            --container-bg: #2d2d2d;
+            --border-color: #444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            transition: background 0.3s, color 0.3s;
+            line-height: 1.6;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            height: 75px;
+            margin-right: 15px;
+        }
+
+        .night-mode-btn {
+            padding: 10px 18px;
+            cursor: pointer;
+            border-radius: 25px;
+            border: 1px solid var(--border-color);
+            background: var(--container-bg);
+            color: var(--text-color);
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #drop-zone {
+            border: 3px dashed var(--border-color);
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            background: var(--container-bg);
+            cursor: pointer;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        #drop-zone:hover {
+            border-color: var(--accent-color);
+            background: rgba(74, 144, 226, 0.05);
+        }
+
+        #map {
+            height: 450px;
+            width: 100%;
+            border-radius: 15px;
+            display: none;
+            margin-top: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1;
+        }
+
+        .metadata-container {
+            margin-top: 25px;
+            background: var(--container-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: rgba(0,0,0,0.02);
+            color: var(--accent-color);
+        }
+
+        .nav-btn {
+            position: fixed;
+            right: 25px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            font-size: 22px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        #go-top { bottom: 85px; }
+        #go-bottom { bottom: 25px; }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.9em;
+        }
+        
+        a { color: var(--accent-color); text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body id="top">
+
+    <header>
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Logo" class="logo">
+            <h1 style="margin:0;">Metadata Explorer</h1>
+        </div>
+        <button class="night-mode-btn" onclick="toggleDarkMode()" aria-label="Toggle Night Mode">🌓 Night Mode</button>
+    </header>
+
+    <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <p style="font-size: 1.2em; margin: 0;"><strong>Drag & Drop an image</strong></p>
+        <p style="color: #888;">or click to select from your device</p>
+        <input type="file" id="file-input" class="hidden" accept="image/*">
+    </div>
+
+    <div id="map"></div>
+
+    <div id="result" class="metadata-container hidden">
+        <h3 style="margin-top: 0; color: var(--accent-color);">Image Details (EXIF)</h3>
+        <table id="exif-table">
+            <thead>
+                <tr>
+                    <th>Tag</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody id="exif-body"></tbody>
+        </table>
+    </div>
+
+    <button id="go-top" class="nav-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Go to Top">↑</button>
+    <button id="go-bottom" class="nav-btn" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" title="Go to Bottom">↓</button>
+
+    <footer>
+        <p>Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 9 May 2026</p>
+    </footer>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const mapElement = document.getElementById('map');
+        const resultContainer = document.getElementById('result');
+        const exifBody = document.getElementById('exif-body');
+        let map;
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // Drag and Drop listeners
+        dropZone.addEventListener('dragover', (e) => { 
+            e.preventDefault(); 
+            dropZone.style.borderColor = 'var(--accent-color)';
+            dropZone.style.background = 'rgba(74, 144, 226, 0.1)';
+        });
+
+        dropZone.addEventListener('dragleave', () => { 
+            dropZone.style.borderColor = 'var(--border-color)'; 
+            dropZone.style.background = 'var(--container-bg)';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border-color)';
+            dropZone.style.background = 'var(--container-bg)';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                processImage(file);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) processImage(file);
+        });
+
+        function processImage(file) {
+            EXIF.getData(file, function() {
+                const allMetadata = EXIF.getAllTags(this);
+                displayMetadata(allMetadata);
+
+                const lat = EXIF.getTag(this, "GPSLatitude");
+                const lon = EXIF.getTag(this, "GPSLongitude");
+                const latRef = EXIF.getTag(this, "GPSLatitudeRef") || "N";
+                const lonRef = EXIF.getTag(this, "GPSLongitudeRef") || "E";
+
+                if (lat && lon) {
+                    const latitude = convertDMSToDD(lat[0], lat[1], lat[2], latRef);
+                    const longitude = convertDMSToDD(lon[0], lon[1], lon[2], lonRef);
+                    showMap(latitude, longitude);
+                } else {
+                    mapElement.style.display = 'none';
+                }
+            });
+        }
+
+        function displayMetadata(data) {
+            exifBody.innerHTML = "";
+            resultContainer.classList.remove('hidden');
+
+            const keys = Object.keys(data).filter(k => typeof data[k] !== 'object' && typeof data[k] !== 'function');
+            
+            if (keys.length === 0) {
+                exifBody.innerHTML = "<tr><td colspan='2'>No standard EXIF data found.</td></tr>";
+                return;
+            }
+
+            keys.sort().forEach(tag => {
+                let row = exifBody.insertRow();
+                row.insertCell(0).innerHTML = `<strong>${tag}</strong>`;
+                row.insertCell(1).innerText = data[tag];
+            });
+        }
+
+        function convertDMSToDD(degrees, minutes, seconds, direction) {
+            let dd = degrees + minutes / 60 + seconds / (60 * 60);
+            if (direction === "S" || direction === "W") dd = dd * -1;
+            return dd;
+        }
+
+        function showMap(lat, lon) {
+            mapElement.style.display = 'block';
+            if (map) map.remove();
+            
+            map = L.map('map').setView([lat, lon], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+            L.marker([lat, lon]).addTo(map).bindPopup("Photo Captured Here").openPopup();
+            
+            setTimeout(() => { map.invalidateSize(); }, 200);
+            window.scrollTo({top: mapElement.offsetTop - 20, behavior: 'smooth'});
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>EXIF & GPS Metadata Viewer</title>
+
+  <!-- Full EXIF Library -->
+  <script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 20px;
+      color: #111827;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #555;
+      margin-bottom: 25px;
+    }
+
+    .upload-box {
+      border: 3px dashed #aaa;
+      border-radius: 20px;
+      background: white;
+      padding: 50px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .upload-box:hover {
+      background: #f9fafb;
+    }
+
+    .upload-box.dragover {
+      background: #e5e7eb;
+      border-color: black;
+    }
+
+    input[type=file] {
+      display: none;
+    }
+
+    .card {
+      background: white;
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .preview img {
+      max-width: 100%;
+      max-height: 500px;
+      display: block;
+      margin: auto;
+      border-radius: 15px;
+    }
+
+    iframe {
+      width: 100%;
+      height: 450px;
+      border: none;
+      border-radius: 15px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .meta-item {
+      background: #f9fafb;
+      border: 1px solid #ddd;
+      border-radius: 15px;
+      padding: 15px;
+      overflow-wrap: break-word;
+    }
+
+    .meta-key {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #444;
+    }
+
+    .error {
+      color: red;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .success {
+      color: green;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    ul {
+      line-height: 1.8;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>EXIF & GPS Metadata Viewer</h1>
+
+    <p class="subtitle">
+      Drag & drop an image or upload one to inspect detailed EXIF metadata and GPS map location.
+    </p>
+
+    <!-- Upload -->
+    <div class="upload-box" id="uploadBox">
+      <h2>Drag & Drop Image Here</h2>
+      <p>or click to upload</p>
+
+      <input type="file" id="fileInput" accept="image/*">
+    </div>
+
+    <div class="error" id="error"></div>
+    <div class="success" id="success"></div>
+
+    <!-- Preview -->
+    <div class="card preview" id="previewSection" style="display:none;">
+      <h2>Image Preview</h2>
+      <img id="previewImage">
+    </div>
+
+    <!-- GPS -->
+    <div class="card" id="mapSection" style="display:none;">
+      <h2>GPS Location</h2>
+
+      <p id="gpsText"></p>
+
+      <iframe id="mapFrame"></iframe>
+    </div>
+
+    <!-- Metadata -->
+    <div class="card" id="metadataSection" style="display:none;">
+
+      <h2>Detailed EXIF Metadata</h2>
+
+      <div class="grid" id="metadataGrid"></div>
+
+    </div>
+
+    <!-- Features -->
+    <div class="card">
+      <h2>Features</h2>
+
+      <ul>
+        <li>Drag & drop image upload</li>
+        <li>Local file upload</li>
+        <li>Detailed EXIF metadata</li>
+        <li>GPS map display</li>
+        <li>No server upload required</li>
+        <li>Works directly in browser</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+
+    const uploadBox = document.getElementById('uploadBox');
+    const fileInput = document.getElementById('fileInput');
+
+    const previewSection = document.getElementById('previewSection');
+    const previewImage = document.getElementById('previewImage');
+
+    const metadataSection = document.getElementById('metadataSection');
+    const metadataGrid = document.getElementById('metadataGrid');
+
+    const mapSection = document.getElementById('mapSection');
+    const mapFrame = document.getElementById('mapFrame');
+    const gpsText = document.getElementById('gpsText');
+
+    const errorDiv = document.getElementById('error');
+    const successDiv = document.getElementById('success');
+
+    // Click Upload
+    uploadBox.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // Drag Over
+    uploadBox.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadBox.classList.add('dragover');
+    });
+
+    // Drag Leave
+    uploadBox.addEventListener('dragleave', () => {
+      uploadBox.classList.remove('dragover');
+    });
+
+    // Drop
+    uploadBox.addEventListener('drop', (e) => {
+      e.preventDefault();
+
+      uploadBox.classList.remove('dragover');
+
+      const file = e.dataTransfer.files[0];
+
+      processFile(file);
+    });
+
+    // File Select
+    fileInput.addEventListener('change', (e) => {
+
+      const file = e.target.files[0];
+
+      processFile(file);
+    });
+
+    // Process Image
+    async function processFile(file) {
+
+      errorDiv.textContent = '';
+      successDiv.textContent = '';
+
+      metadataGrid.innerHTML = '';
+
+      mapSection.style.display = 'none';
+
+      if (!file) {
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+
+        errorDiv.textContent = 'Please select a valid image file.';
+        return;
+      }
+
+      // Preview
+      const imageURL = URL.createObjectURL(file);
+
+      previewImage.src = imageURL;
+
+      previewSection.style.display = 'block';
+
+      try {
+
+        // Parse EXIF
+        const metadata = await exifr.parse(file);
+
+        console.log(metadata);
+
+        if (!metadata) {
+
+          errorDiv.textContent = 'No EXIF metadata found in this image.';
+          return;
+        }
+
+        successDiv.textContent = 'EXIF metadata successfully loaded.';
+
+        metadataSection.style.display = 'block';
+
+        // Show Metadata
+        for (const key in metadata) {
+
+          let value = metadata[key];
+
+          if (typeof value === 'object') {
+            value = JSON.stringify(value, null, 2);
+          }
+
+          const item = document.createElement('div');
+
+          item.className = 'meta-item';
+
+          item.innerHTML = `
+            <div class="meta-key">${key}</div>
+            <div>${value}</div>
+          `;
+
+          metadataGrid.appendChild(item);
+        }
+
+        // GPS
+        if (metadata.latitude && metadata.longitude) {
+
+          mapSection.style.display = 'block';
+
+          gpsText.innerHTML = `
+            <strong>Latitude:</strong> ${metadata.latitude}<br>
+            <strong>Longitude:</strong> ${metadata.longitude}
+          `;
+
+          mapFrame.src =
+            `https://www.google.com/maps?q=${metadata.latitude},${metadata.longitude}&z=15&output=embed`;
+        }
+
+      } catch (err) {
+
+        console.error(err);
+
+        alert(err);
+
+        errorDiv.textContent =
+          'Failed to read EXIF metadata. Try an original camera JPG image.';
+      }
+    }
+
+  </script>
+
+</body>
+
+</html>
