@@ -4,6 +4,7 @@
 <head>
 
     <meta charset="UTF-8">
+
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
 
@@ -40,7 +41,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"></script>
 
-    <!-- Analytics -->
+    <!-- Google Analytics -->
 
     <script async
         src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB">
@@ -51,6 +52,7 @@
         window.dataLayer = window.dataLayer || [];
 
         function gtag() {
+
             dataLayer.push(arguments);
         }
 
@@ -70,6 +72,7 @@
     <style>
 
         * {
+
             box-sizing: border-box;
         }
 
@@ -140,7 +143,7 @@
 
             margin: 0;
 
-            font-size: 58px;
+            font-size: 44px;
         }
 
         .night-btn {
@@ -153,9 +156,9 @@
 
             border-radius: 40px;
 
-            padding: 18px 30px;
+            padding: 16px 26px;
 
-            font-size: 20px;
+            font-size: 16px;
 
             cursor: pointer;
 
@@ -182,6 +185,20 @@
         #drop-zone:hover {
 
             border-color: var(--accent);
+        }
+
+        #drop-zone h2 {
+
+            font-size: 28px;
+
+            margin-bottom: 10px;
+        }
+
+        #drop-zone p {
+
+            font-size: 15px;
+
+            opacity: 0.8;
         }
 
         .hidden {
@@ -219,7 +236,7 @@
 
             margin-top: 0;
 
-            font-size: 34px;
+            font-size: 28px;
 
             margin-bottom: 25px;
         }
@@ -242,7 +259,7 @@
 
             border-radius: 24px;
 
-            padding: 24px;
+            padding: 22px;
 
             transition: 0.2s;
         }
@@ -254,11 +271,11 @@
 
         .meta-key {
 
-            font-size: 20px;
+            font-size: 17px;
 
             font-weight: bold;
 
-            margin-bottom: 14px;
+            margin-bottom: 12px;
 
             color: #374151;
         }
@@ -270,7 +287,7 @@
 
         .meta-value {
 
-            font-size: 20px;
+            font-size: 16px;
 
             line-height: 1.6;
 
@@ -296,9 +313,9 @@
 
             right: 25px;
 
-            width: 70px;
+            width: 65px;
 
-            height: 70px;
+            height: 65px;
 
             border-radius: 50%;
 
@@ -308,7 +325,7 @@
 
             color: white;
 
-            font-size: 35px;
+            font-size: 30px;
 
             cursor: pointer;
 
@@ -317,7 +334,7 @@
 
         #top-btn {
 
-            bottom: 110px;
+            bottom: 105px;
         }
 
         #bottom-btn {
@@ -335,7 +352,7 @@
 
             text-align: center;
 
-            font-size: 18px;
+            font-size: 15px;
         }
 
         a {
@@ -356,7 +373,7 @@
 
             h1 {
 
-                font-size: 34px;
+                font-size: 32px;
             }
 
             .logo {
@@ -374,10 +391,14 @@
                 padding: 18px;
             }
 
-            .meta-key,
+            .meta-key {
+
+                font-size: 16px;
+            }
+
             .meta-value {
 
-                font-size: 18px;
+                font-size: 15px;
             }
         }
 
@@ -409,7 +430,7 @@
 
     </header>
 
-    <!-- Upload -->
+    <!-- Upload Area -->
 
     <div id="drop-zone"
         onclick="document.getElementById('file-input').click()">
@@ -460,7 +481,7 @@
 
     </div>
 
-    <!-- Navigation Buttons -->
+    <!-- Navigation -->
 
     <button id="top-btn"
         class="nav-btn"
@@ -523,48 +544,99 @@
         const gpsText =
             document.getElementById('gps-text');
 
-        // Dark Mode
+        // Persistent Dark Mode
 
         function toggleDarkMode() {
 
             document.body.classList.toggle('dark-mode');
+
+            if (
+                document.body.classList.contains(
+                    'dark-mode'
+                )
+            ) {
+
+                localStorage.setItem(
+                    'theme',
+                    'dark'
+                );
+
+            } else {
+
+                localStorage.setItem(
+                    'theme',
+                    'light'
+                );
+            }
         }
+
+        // Load Saved Theme
+
+        window.addEventListener('load', () => {
+
+            const savedTheme =
+                localStorage.getItem('theme');
+
+            if (savedTheme === 'dark') {
+
+                document.body.classList.add(
+                    'dark-mode'
+                );
+            }
+        });
 
         // Drag Events
 
-        dropZone.addEventListener('dragover', (e) => {
+        dropZone.addEventListener(
+            'dragover',
+            (e) => {
 
-            e.preventDefault();
+                e.preventDefault();
 
-            dropZone.style.borderColor = '#2563eb';
-        });
+                dropZone.style.borderColor =
+                    '#2563eb';
+            }
+        );
 
-        dropZone.addEventListener('dragleave', () => {
+        dropZone.addEventListener(
+            'dragleave',
+            () => {
 
-            dropZone.style.borderColor = '';
-        });
+                dropZone.style.borderColor =
+                    '';
+            }
+        );
 
-        dropZone.addEventListener('drop', (e) => {
+        dropZone.addEventListener(
+            'drop',
+            (e) => {
 
-            e.preventDefault();
+                e.preventDefault();
 
-            dropZone.style.borderColor = '';
+                dropZone.style.borderColor =
+                    '';
 
-            const file =
-                e.dataTransfer.files[0];
+                const file =
+                    e.dataTransfer.files[0];
 
-            processImage(file);
-        });
+                processImage(file);
+            }
+        );
 
-        fileInput.addEventListener('change', (e) => {
+        // File Select
 
-            const file =
-                e.target.files[0];
+        fileInput.addEventListener(
+            'change',
+            (e) => {
 
-            processImage(file);
-        });
+                const file =
+                    e.target.files[0];
 
-        // Main
+                processImage(file);
+            }
+        );
+
+        // Main EXIF Function
 
         async function processImage(file) {
 
@@ -578,7 +650,9 @@
             previewImage.src =
                 imageURL;
 
-            previewCard.classList.remove('hidden');
+            previewCard.classList.remove(
+                'hidden'
+            );
 
             metadataGrid.innerHTML = '';
 
@@ -589,7 +663,9 @@
 
                 console.log(metadata);
 
-                metadataCard.classList.remove('hidden');
+                metadataCard.classList.remove(
+                    'hidden'
+                );
 
                 if (!metadata) {
 
@@ -608,14 +684,23 @@
                         let value =
                             metadata[tag];
 
-                        if (typeof value === 'object') {
+                        if (
+                            typeof value ===
+                            'object'
+                        ) {
 
                             value =
-                                JSON.stringify(value, null, 2);
+                                JSON.stringify(
+                                    value,
+                                    null,
+                                    2
+                                );
                         }
 
                         const card =
-                            document.createElement('div');
+                            document.createElement(
+                                'div'
+                            );
 
                         card.className =
                             'meta-box';
@@ -630,20 +715,27 @@
                             </div>
                         `;
 
-                        metadataGrid.appendChild(card);
+                        metadataGrid.appendChild(
+                            card
+                        );
                     });
 
-                // GPS
+                // Google Maps
 
-                if (metadata.latitude &&
-                    metadata.longitude) {
+                if (
+                    metadata.latitude &&
+                    metadata.longitude
+                ) {
 
-                    mapCard.classList.remove('hidden');
+                    mapCard.classList.remove(
+                        'hidden'
+                    );
 
                     gpsText.innerHTML = `
                         <p>
                             <strong>Latitude:</strong>
                             ${metadata.latitude}
+
                             <br><br>
 
                             <strong>Longitude:</strong>
@@ -659,7 +751,9 @@
 
                 } else {
 
-                    mapCard.classList.add('hidden');
+                    mapCard.classList.add(
+                        'hidden'
+                    );
                 }
 
             } catch (err) {
