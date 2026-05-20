@@ -184,7 +184,7 @@
 </main>
 	
 <footer>
-    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Project: <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank">Wiki's Lazy Coders</a> | Updated on: <strong>08 May 2026</strong>
+    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Project: <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank">Wiki's Lazy Coders</a> | Updated on: <strong>21 May 2026</strong>
     👁 Views: <span id="tc-views"></span>
 👤 Unique: <span id="tc-sessions"></span>
 <script src="https://toolcounter.toolforge.org/embed.js.php?tool=YOUR_TOOL&page=index"></script>
@@ -596,7 +596,7 @@
         const currentDate = `${String(today.getDate()).padStart(2, '0')}/${today.toLocaleDateString('en-US', { month: 'long' })}/${today.getFullYear()}`;
         const joinDate = `${String(regDate.getDate()).padStart(2, '0')}/${regDate.toLocaleDateString('en-US', { month: 'long' })}/${regDate.getFullYear()}`;
         
-        const eventDetails = `Wiki anniversary of ${user.name}, joined on ${joinDate}, till ${currentDate} total edits calculated: ${user.editcount?.toLocaleString() || 'N/A'}. Click here https://suyashdwivedi.github.io/Wiki_Tools/Wiki_Anniversary.html to wish anniversary.`;
+        const eventDetails = `Wiki anniversary of ${user.name}, joined on ${joinDate}, till ${currentDate} total edits calculated: ${user.editcount?.toLocaleString() || 'N/A'}. Click here https://wiki-anniversary.toolforge.org/ to wish anniversary.`;
         
         const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${formattedDate}/${formattedDate}&details=${encodeURIComponent(eventDetails)}&sf=true&output=xml`;
         window.open(calendarUrl, '_blank');
