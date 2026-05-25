@@ -3,11 +3,16 @@ importScripts("languages.js");
 
 const DEFAULT = LANG_BY_CODE["hi"] || { code:"hi", name:"Hindi", flag:"🇮🇳" };
 
+// Wikipedia subdomains that are English (or redirect to English) — don't use as target
+const ENGLISH_WIKI_CODES = new Set(["en", "simple", "test", "test2"]);
+
 function detectLangFromUrl(url) {
   try {
     const parts = new URL(url).hostname.split(".");
     if (parts.length >= 3 && parts[1] === "wikipedia") {
-      return LANG_BY_WIKI[parts[0]] || null;
+      const sub = parts[0];
+      if (ENGLISH_WIKI_CODES.has(sub)) return null; // fall back to stored preference
+      return LANG_BY_WIKI[sub] || null;
     }
   } catch(_) {}
   return null;
@@ -76,9 +81,13 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
   if (req.action === "getPageLang") {
     chrome.tabs.query({ active:true, currentWindow:true }, async tabs => {
-      if (!tabs[0]) { sendResponse(DEFAULT); return; }
-      const lang = await getEffectiveLang(tabs[0].id, tabs[0].url);
-      sendResponse(lang);
+      if (!tabs[0]?.url) { sendResponse(DEFAULT); return; }
+      try {
+        const lang = await getEffectiveLang(tabs[0].id, tabs[0].url);
+        sendResponse(lang || DEFAULT);
+      } catch(_) {
+        sendResponse(DEFAULT);
+      }
     });
     return true;
   }

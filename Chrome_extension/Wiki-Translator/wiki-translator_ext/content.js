@@ -92,11 +92,9 @@ function detectPageLang() {
 })();
 
 // ── Translation fetch ──────────────────────────────────────────────────────────
-function fetchTranslation(text, cb) {
-  const lang = currentLang || {code:"hi"};
-  const code = lang.gtFallback || lang.code;
+function fetchTranslation(text, targetCode, cb) {
   fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl="
-    + encodeURIComponent(code) + "&dt=t&q=" + encodeURIComponent(text))
+    + encodeURIComponent(targetCode) + "&dt=t&q=" + encodeURIComponent(text))
     .then(r => r.json())
     .then(data => {
       let out = "";
@@ -104,6 +102,22 @@ function fetchTranslation(text, cb) {
       cb(null, out || "");
     })
     .catch(e => cb(e.message, null));
+}
+
+function fetchTargetTranslation(text, cb) {
+  const lang = currentLang || {code:"hi"};
+  const code = lang.gtFallback || lang.code;
+  // If the target language IS English, no need to translate
+  if (code === "en") { cb(null, text); return; }
+  fetchTranslation(text, code, cb);
+}
+
+function fetchEnglishTranslation(text, cb) {
+  const lang = currentLang || {code:"hi"};
+  const code = lang.gtFallback || lang.code;
+  // If the page language IS English, show source text as-is
+  if (code === "en") { cb(null, text); return; }
+  fetchTranslation(text, "en", cb);
 }
 
 // ── Build sticky Chrome-style popup ───────────────────────────────────────────
@@ -115,18 +129,21 @@ function buildPopup(anchorX, anchorY, text) {
   popup.id = "wt-popup";
   popup.innerHTML = `
     <div class="wt-header">
-      <button class="wt-tab" id="wt-tab-en">English</button>
-      <button class="wt-tab wt-tab-active" id="wt-tab-tgt">
+      <button class="wt-tab wt-tab-active" id="wt-tab-en">English</button>
+      <button class="wt-tab" id="wt-tab-tgt">
         <span>${lang.flag}</span> ${lang.name}
       </button>
       <div style="flex:1"></div>
       <button class="wt-close-btn" id="wt-close">✕</button>
     </div>
     <div class="wt-body">
-      <div id="wt-src-panel" style="display:none">
-        <p class="wt-src-text">${escapeHtml(truncate(text,400))}</p>
+      <div id="wt-src-panel">
+        <div class="wt-loading" id="wt-en-loading">
+          <div class="wt-spinner"></div><span>Translating…</span>
+        </div>
+        <p class="wt-tgt-text" id="wt-en-text"></p>
       </div>
-      <div id="wt-tgt-panel">
+      <div id="wt-tgt-panel" style="display:none">
         <div class="wt-loading" id="wt-loading">
           <div class="wt-spinner"></div><span>Translating…</span>
         </div>
@@ -158,22 +175,20 @@ function buildPopup(anchorX, anchorY, text) {
   popup.querySelector("#wt-close").addEventListener("click", closePopup);
 
   // Tab switching
-  popup.querySelector("#wt-tab-en").addEventListener("click", () => {
-    setTab("en");
-  });
-  popup.querySelector("#wt-tab-tgt").addEventListener("click", () => {
-    setTab("tgt");
-  });
+  popup.querySelector("#wt-tab-en").addEventListener("click", () => setTab("en"));
+  popup.querySelector("#wt-tab-tgt").addEventListener("click", () => setTab("tgt"));
 
-  // Copy → auto-close
+  // Copy → copies whichever tab is active, then auto-close
   popup.querySelector("#wt-copy").addEventListener("click", () => {
-    const tgt = popup.querySelector("#wt-tgt-text");
-    const val = tgt ? tgt.textContent : "";
+    const activeText = currentTab === "en"
+      ? popup.querySelector("#wt-en-text")?.textContent
+      : popup.querySelector("#wt-tgt-text")?.textContent;
+    const val = (activeText || "").trim();
     if (val) {
       navigator.clipboard.writeText(val).then(() => {
         const btn = popup.querySelector("#wt-copy");
         if (btn) btn.textContent = "✅ Copied!";
-        setTimeout(closePopup, 800); // close 0.8s after copy
+        setTimeout(closePopup, 800);
       }).catch(() => closePopup());
     }
   });
@@ -184,22 +199,30 @@ function buildPopup(anchorX, anchorY, text) {
     window.open("https://translate.google.com/translate?sl=auto&tl=" + c + "&u=" + encodeURIComponent(location.href), "_blank");
   });
 
-  // Fetch translation
-  fetchTranslation(text, (err, result) => {
+  // Fetch English translation
+  fetchEnglishTranslation(text, (err, result) => {
     if (!popup) return;
-    const loading = popup.querySelector("#wt-loading");
-    const tgtText = popup.querySelector("#wt-tgt-text");
-    if (loading) loading.style.display = "none";
-    if (tgtText) {
-      tgtText.textContent = (err || !result)
-        ? "⚠️ Translation failed. Please try again."
-        : result;
-    }
+    popup.querySelector("#wt-en-loading").style.display = "none";
+    popup.querySelector("#wt-en-text").textContent = (err || !result)
+      ? "⚠️ Translation failed. Please try again."
+      : result;
+  });
+
+  // Fetch target language translation
+  fetchTargetTranslation(text, (err, result) => {
+    if (!popup) return;
+    popup.querySelector("#wt-loading").style.display = "none";
+    popup.querySelector("#wt-tgt-text").textContent = (err || !result)
+      ? "⚠️ Translation failed. Please try again."
+      : result;
   });
 }
 
+let currentTab = "en";
+
 function setTab(which) {
   if (!popup) return;
+  currentTab = which;
   const tabEn  = popup.querySelector("#wt-tab-en");
   const tabTgt = popup.querySelector("#wt-tab-tgt");
   const srcPanel = popup.querySelector("#wt-src-panel");
