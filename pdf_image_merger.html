@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PDF & Image Merger 📄</title>
     <meta name="description" content="A powerful tool to merge PDF files and images (JPG, PNG, GIF) into a single PDF. Features compression, custom sizing, and works entirely in your browser.">
     <meta name="keywords" content="PDF merger, PDF combiner, merge PDF, combine PDF, image to PDF, JPG to PDF, PNG to PDF, PDF tools, merge images, PDF compression">
@@ -34,114 +34,109 @@
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent-warm: #fcb69f;
+            --accent-warm-light: #ffecd2;
+            --green: #11998e;
+            --green2: #38ef7d;
+            --red: #ff6b6b;
+            --red2: #ee5a6f;
+            --pink: #ee9ca7;
+            --pink2: #ffdde1;
+            --text: #333;
+            --muted: #666;
+            --border-radius: 10px;
+            --touch-min: 44px; /* WCAG touch target */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
+            font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 12px;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
         }
 
         .container {
             background: white;
             border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            padding: 24px 20px;
             max-width: 700px;
             width: 100%;
-            animation: slideIn 0.5s ease-out;
+            animation: slideIn 0.4s ease-out;
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-20px); }
+            from { opacity: 0; transform: translateY(-16px); }
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── HEADER / LOGO ── */
+        /* ── HEADER ── */
         .header {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 25px;
-            gap: 20px;
+            margin-bottom: 20px;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        .logo { flex-shrink: 0; }
         .logo a { text-decoration: none; display: inline-block; }
         .logo img {
-            width: 70px; height: 70px;
+            width: 60px; height: 60px;
             object-fit: contain;
             transition: transform 0.3s, filter 0.3s;
             cursor: pointer;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.12));
+            display: block;
         }
-        .logo img:hover {
-            transform: scale(1.15) rotate(5deg);
-            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.2));
-        }
-        /* Fallback SVG logo shown when the external image fails */
-        .logo-fallback {
-            display: none;
-            width: 70px; height: 70px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 50%;
-            align-items: center; justify-content: center;
-            font-size: 32px;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 4px 12px rgba(102,126,234,0.3);
-        }
-        .logo-fallback:hover {
-            transform: scale(1.15) rotate(5deg);
-            box-shadow: 0 8px 20px rgba(102,126,234,0.5);
-        }
+        .logo img:hover { transform: scale(1.12) rotate(5deg); filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2)); }
 
         .header-text { text-align: center; }
 
         h1 {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-size: 32px;
-            margin: 0 0 8px 0;
-            font-weight: bold;
-            animation: fadeIn 0.8s ease-out;
+            font-size: clamp(22px, 5vw, 30px);
+            font-weight: 800;
+            margin-bottom: 4px;
         }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .subtitle { color: var(--muted); font-size: 13px; }
 
-        .subtitle { color: #666; font-size: 15px; margin: 0; animation: fadeIn 1s ease-out; }
-
-        /* ── DROP ZONE / FILE LIST ── */
+        /* ── FILE LIST ── */
         .file-list {
-            border: 3px dashed #667eea;
-            background: linear-gradient(white, white) padding-box;
-            border-radius: 10px;
-            min-height: 300px;
-            max-height: 300px;
+            border: 3px dashed var(--primary);
+            border-radius: var(--border-radius);
+            min-height: 220px;
+            max-height: 280px;
             overflow-y: auto;
-            padding: 10px;
-            margin-bottom: 20px;
-            margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(102,126,234,0.1);
-            transition: all 0.25s ease;
+            -webkit-overflow-scrolling: touch;
+            padding: 8px;
+            margin-bottom: 16px;
+            margin-top: 16px;
             position: relative;
+            transition: all 0.2s ease;
         }
 
         .file-list.drag-over {
-            border-color: #764ba2;
+            border-color: var(--secondary);
             border-style: solid;
-            background: rgba(102,126,234,0.05);
-            box-shadow: 0 4px 25px rgba(102,126,234,0.3);
+            background: rgba(102,126,234,0.04);
+            box-shadow: 0 4px 20px rgba(102,126,234,0.25);
         }
 
-        /* Drop hint banner */
         .drop-hint {
             position: absolute;
             inset: 0;
@@ -150,160 +145,237 @@
             align-items: center;
             justify-content: center;
             pointer-events: none;
-            gap: 8px;
-            color: #764ba2;
+            gap: 6px;
+            color: var(--secondary);
             font-weight: 700;
-            font-size: 18px;
+            font-size: 16px;
             opacity: 0;
             transition: opacity 0.2s;
         }
-        .drop-hint span { font-size: 42px; }
+        .drop-hint span { font-size: 38px; }
         .file-list.drag-over .drop-hint { opacity: 1; }
 
-        .file-list::-webkit-scrollbar { width: 8px; }
+        /* scrollbar */
+        .file-list::-webkit-scrollbar { width: 6px; }
         .file-list::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        .file-list::-webkit-scrollbar-thumb { background: linear-gradient(135deg,#667eea,#764ba2); border-radius: 10px; }
-        .file-list::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg,#764ba2,#667eea); }
+        .file-list::-webkit-scrollbar-thumb { background: linear-gradient(var(--primary), var(--secondary)); border-radius: 10px; }
 
-        /* ── FILE ITEMS (drag-to-reorder) ── */
+        /* ── FILE ITEMS ── */
         .file-item {
-            background: linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #dde4f0 100%);
             padding: 10px 12px;
-            margin-bottom: 8px;
+            margin-bottom: 7px;
             border-radius: 8px;
             display: flex;
             align-items: center;
-            cursor: grab;
-            transition: all 0.25s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            user-select: none;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            min-height: var(--touch-min);
+            /* allow tap/touch selection on mobile */
+            touch-action: manipulation;
         }
 
-        .file-item:hover { background: linear-gradient(135deg,#ffecd2 0%,#fcb69f 100%); transform: translateX(5px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .file-item.selected { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: white; transform: scale(1.02); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
-        .file-item.dragging { opacity: 0.45; cursor: grabbing; transform: scale(0.97); }
-        .file-item.drag-target { border: 2px dashed #667eea; }
+        .file-item:active { transform: scale(0.98); }
+        .file-item.selected {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(102,126,234,0.4);
+        }
+        .file-item.dragging { opacity: 0.4; }
+        .file-item.drag-target { border: 2px dashed var(--primary); }
 
-        .drag-handle { font-size: 16px; margin-right: 8px; opacity: 0.45; cursor: grab; }
-        .file-icon { font-size: 20px; margin-right: 10px; }
-        .file-name { flex: 1; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .file-size { font-size: 11px; color: #888; margin-left: 8px; }
+        .drag-handle {
+            font-size: 17px;
+            margin-right: 8px;
+            opacity: 0.35;
+            /* hide on touch; reorder via move buttons */
+            cursor: grab;
+            flex-shrink: 0;
+        }
+        .file-icon { font-size: 20px; margin-right: 8px; flex-shrink: 0; }
+        .file-name { flex: 1; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+        .file-size { font-size: 11px; color: #888; margin-left: 6px; flex-shrink: 0; }
         .file-item.selected .file-size { color: rgba(255,255,255,0.7); }
+
+        /* Mobile move buttons (up/down) */
+        .move-btns {
+            display: none;
+            gap: 3px;
+            margin-left: 6px;
+            flex-shrink: 0;
+        }
+        .move-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            border-radius: 4px;
+            width: 26px;
+            height: 26px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            color: inherit;
+            touch-action: manipulation;
+            transition: background 0.15s;
+        }
+        .move-btn:active { background: rgba(255,255,255,0.5); }
 
         /* ── OPTIONS ── */
         .options {
-            background: linear-gradient(135deg,#ffecd2 0%,#fcb69f 20%,#ffecd2 100%);
-            padding: 18px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(252,182,159,0.3);
-            border: 2px solid rgba(255,255,255,0.5);
+            background: linear-gradient(135deg, var(--accent-warm-light) 0%, var(--accent-warm) 60%, var(--accent-warm-light) 100%);
+            padding: 14px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
         }
 
         .option-row {
-            margin-bottom: 12px;
-            background: rgba(255,255,255,0.7);
-            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(255,255,255,0.75);
+            padding: 10px 12px;
             border-radius: 6px;
-            transition: all 0.3s ease;
         }
-        .option-row:hover { background: rgba(255,255,255,0.9); transform: translateX(3px); }
         .option-row:last-child { margin-bottom: 0; }
 
-        label { display: flex; align-items: center; font-size: 14px; color: #333; cursor: pointer; flex-wrap: wrap; gap: 6px; }
+        label {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text);
+            cursor: pointer;
+            min-height: var(--touch-min);
+        }
+
+        input[type="checkbox"] {
+            width: 22px; height: 22px;
+            flex-shrink: 0;
+            accent-color: var(--primary);
+            cursor: pointer;
+            margin-right: 6px;
+            touch-action: manipulation;
+        }
 
         select, input[type="number"] {
-            padding: 10px; border: 2px solid #667eea; border-radius: 6px;
-            font-size: 14px; margin-left: 10px; background: white; transition: all 0.3s;
+            padding: 9px 10px;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+            transition: border-color 0.2s;
+            /* full-width on mobile so it doesn't overflow */
+            max-width: 100%;
+            touch-action: manipulation;
+            -webkit-appearance: none;
+            appearance: none;
         }
-        select:hover, input[type="number"]:hover { border-color: #764ba2; box-shadow: 0 2px 8px rgba(102,126,234,0.2); }
-        select:focus, input[type="number"]:focus { outline: none; border-color: #764ba2; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
-        select { cursor: pointer; }
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23667eea' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+            cursor: pointer;
+        }
+        select:focus, input[type="number"]:focus { outline: none; border-color: var(--secondary); }
 
-        input[type="checkbox"] { margin-right: 8px; cursor: pointer; width: 20px; height: 20px; accent-color: #667eea; }
-
-        .custom-width { display: none; margin-top: 8px; align-items: center; gap: 6px; }
+        .custom-width { display: none; margin-top: 8px; align-items: center; gap: 6px; flex-wrap: wrap; }
         .custom-width.show { display: flex; }
-        .custom-width input { width: 90px; margin-left: 0; }
-        .cm-label { font-size: 13px; color: #555; font-weight: 600; }
+        .custom-width input { width: 90px; }
+        .cm-label { font-size: 12px; color: #555; font-weight: 600; }
 
         /* ── BUTTONS ── */
-        .buttons { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 15px; }
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
 
         button {
-            padding: 14px; border: none; border-radius: 8px;
-            font-size: 14px; font-weight: bold; cursor: pointer;
-            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: relative; overflow: hidden;
+            padding: 0 14px;
+            height: var(--touch-min);
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            white-space: nowrap;
         }
-        button::before {
-            content: ''; position: absolute; top: 50%; left: 50%;
-            width: 0; height: 0; border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%,-50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        button:hover::before { width: 300px; height: 300px; }
-        button:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-        button:active { transform: translateY(-1px); }
+        button:active { transform: scale(0.96); filter: brightness(0.92); }
 
-        .btn-add   { background: linear-gradient(135deg,#11998e,#38ef7d); color: white; }
-        .btn-add:hover { background: linear-gradient(135deg,#38ef7d,#11998e); }
-        .btn-remove { background: linear-gradient(135deg,#ee9ca7,#ffdde1); color: #333; }
-        .btn-remove:hover { background: linear-gradient(135deg,#ffdde1,#ee9ca7); }
-        .btn-clear  { background: linear-gradient(135deg,#ff6b6b,#ee5a6f); color: white; }
-        .btn-clear:hover  { background: linear-gradient(135deg,#ee5a6f,#ff6b6b); }
-        .btn-merge  { background: linear-gradient(135deg,#667eea,#764ba2); color: white; }
-        .btn-merge:hover  { background: linear-gradient(135deg,#764ba2,#667eea); }
+        .btn-add    { background: linear-gradient(135deg, var(--green), var(--green2)); color: white; }
+        .btn-remove { background: linear-gradient(135deg, var(--pink), var(--pink2)); color: #333; }
+        .btn-clear  { background: linear-gradient(135deg, var(--red), var(--red2)); color: white; }
+        .btn-merge  { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; grid-column: span 2; height: 50px; font-size: 16px; }
 
         /* ── STATUS / PROGRESS ── */
         .status {
-            text-align: center; color: #667eea; font-size: 14px;
-            margin-bottom: 10px; font-weight: 600;
-            animation: pulse 2s ease-in-out infinite;
+            text-align: center;
+            color: var(--primary);
+            font-size: 13px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            min-height: 20px;
         }
-        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.7; } }
 
-        .progress { display: none; margin-top: 10px; }
+        .progress { display: none; margin-top: 8px; margin-bottom: 8px; }
         .progress-bar {
-            width: 100%; height: 30px;
-            background: linear-gradient(135deg,#f5f7fa,#c3cfe2);
-            border-radius: 15px; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            width: 100%; height: 28px;
+            background: linear-gradient(135deg, #f0f2f8, #d5ddf0);
+            border-radius: 14px;
+            overflow: hidden;
         }
         .progress-fill {
-            height: 100%; background: linear-gradient(135deg,#667eea,#764ba2);
-            width: 0%; transition: width 0.3s;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s;
             display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 13px; font-weight: bold;
-            box-shadow: 0 2px 10px rgba(102,126,234,0.5);
-            animation: progressGlow 1.5s ease-in-out infinite;
-        }
-        @keyframes progressGlow {
-            0%,100% { box-shadow: 0 2px 10px rgba(102,126,234,0.5); }
-            50%      { box-shadow: 0 2px 20px rgba(102,126,234,0.8); }
+            color: white; font-size: 12px; font-weight: 700;
         }
 
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center;
+            color: var(--muted);
+            padding: 40px 16px;
+            font-size: 14px;
+            background: linear-gradient(135deg, var(--accent-warm-light) 0%, var(--accent-warm) 100%);
+            border-radius: 8px;
+            font-weight: 500;
+            pointer-events: none;
+        }
+        .empty-state .drop-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+
         /* ── CREDIT ── */
-        .credit { text-align: center; font-size: 12px; color: #999; margin-top: 8px; }
-        .credit a { color: #667eea; text-decoration: none; font-weight: 600; transition: all 0.3s; }
-        .credit a:hover { color: #764ba2; text-decoration: underline; }
+        .credit { text-align: center; font-size: 12px; color: #aaa; margin-top: 10px; }
+        .credit a { color: var(--primary); text-decoration: none; font-weight: 600; }
 
         input[type="file"] { display: none; }
 
-        .empty-state {
-            text-align: center; color: #666;
-            padding: 50px 20px; font-size: 15px;
-            background: linear-gradient(135deg,#ffecd2 0%,#fcb69f 100%);
-            border-radius: 10px; animation: fadeIn 1s ease-out; font-weight: 500;
-            pointer-events: none;
+        /* ── RESPONSIVE ── */
+        @media (min-width: 500px) {
+            .buttons { grid-template-columns: repeat(4, 1fr); }
+            .btn-merge { grid-column: span 1; height: var(--touch-min); font-size: 14px; }
+            .drag-handle { display: block; }
+            body { padding: 20px; align-items: center; }
         }
-        .empty-state .drop-icon { font-size: 48px; display: block; margin-bottom: 12px; }
 
-        /* Responsive */
-        @media (max-width: 600px) {
-            .header { flex-direction: column; text-align: center; gap: 10px; }
-            .buttons { grid-template-columns: 1fr 1fr; }
-            h1 { font-size: 24px; }
+        @media (max-width: 499px) {
+            .move-btns { display: flex; }
+            .drag-handle { display: none; }
+            .container { padding: 18px 14px; }
+            .file-list { min-height: 180px; max-height: 240px; }
         }
     </style>
 </head>
@@ -317,16 +389,12 @@
                 <img id="logoImg"
                      src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png"
                      alt="Wiki's Lazy Coders Logo"
-                   onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
+                     onerror="this.style.display='none';">
             </a>
-       <!--     <a id="logoFallback" class="logo-fallback"
-               href="https://suyashdwivedi.github.io/Wiki_Tools/" target="_blank" title="Wiki's Lazy Coders">
-                📄
-            </a> -->
         </div>
         <div class="header-text">
             <h1>PDF &amp; Image Merger</h1>
-            <p class="subtitle">Merge PDF files and images (JPG, PNG, GIF) into a single PDF</p>
+            <p class="subtitle">Merge PDFs and images (JPG, PNG, GIF) into one PDF</p>
         </div>
     </div>
 
@@ -335,7 +403,7 @@
         <div class="empty-state" id="emptyState">
             <span class="drop-icon">📂</span>
             No files added yet.<br>
-            Click <strong>Add Files</strong> or <strong>drag &amp; drop files here</strong>.
+            Tap <strong>Add Files</strong> or drag &amp; drop files here.
         </div>
         <div class="drop-hint" id="dropHint">
             <span>⬇️</span>
@@ -348,7 +416,7 @@
         <div class="option-row">
             <label>
                 <input type="checkbox" id="compressCheck" checked>
-                📦 Compress images for A4 print quality (reduces file size)
+                📦 Compress images for A4 print quality
             </label>
         </div>
         <div class="option-row">
@@ -356,16 +424,22 @@
                 📏 Image width:
                 <select id="widthSelect">
                     <option value="fit">Fit to Page</option>
-                    <option value="half">Half Size of Page</option>
-                    <option value="quarter">Quarter Size</option>
+                    <option value="half">Half Page</option>
+                    <option value="quarter">Quarter Page</option>
                     <option value="custom">Custom Width</option>
                 </select>
             </label>
             <div class="custom-width" id="customWidth">
                 <input type="number" id="customWidthValue" placeholder="e.g. 10" value="10" min="1" max="21" step="0.5">
                 <span class="cm-label">cm</span>
-                <span style="font-size:11px;color:#888;">(max 21 cm = A4 width)</span>
+                <span style="font-size:11px;color:#888;">(max 21 cm)</span>
             </div>
+        </div>
+        <div class="option-row">
+            <label>
+                <input type="checkbox" id="showFilenameHeader">
+                🏷️ Add filename as header on each image page
+            </label>
         </div>
     </div>
 
@@ -386,24 +460,24 @@
     <div class="status" id="status">Ready to merge files</div>
 
     <div class="credit">
-        Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi | Updated on  03/April/2026</a>
+        Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> · Updated May 2026
     </div>
 
-    <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.gif,.html">
+    <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.gif">
 </div>
 
 <script>
-    const { PDFDocument } = PDFLib;
+    const { PDFDocument, rgb, StandardFonts } = PDFLib;
     let files = [];
     let selectedIndices = new Set();
-    let dragSrcIndex = null;  // for item-reorder drag
+    let dragSrcIndex = null;
 
-    // ── Show/hide custom width ──────────────────────────────────────
+    // ── Custom width toggle ─────────────────────────────────────────
     document.getElementById('widthSelect').addEventListener('change', function () {
         document.getElementById('customWidth').classList.toggle('show', this.value === 'custom');
     });
 
-    // ── File input (button) ─────────────────────────────────────────
+    // ── File input (button / tap) ───────────────────────────────────
     function selectFiles() { document.getElementById('fileInput').click(); }
 
     document.getElementById('fileInput').addEventListener('change', function (e) {
@@ -412,71 +486,52 @@
     });
 
     function addFiles(newFiles) {
-        newFiles.forEach(f => files.push(f));
+        const supported = newFiles.filter(f =>
+            f.type === 'application/pdf' || f.type.startsWith('image/')
+        );
+        if (!supported.length) { updateStatus('⚠️ Only PDF and image files are supported'); return; }
+        supported.forEach(f => files.push(f));
         renderFileList();
-        updateStatus(`Added ${newFiles.length} file(s) — Total: ${files.length} file(s)`);
+        updateStatus(`Added ${supported.length} file(s) — Total: ${files.length}`);
     }
 
-    // ── Drag-and-drop FILES onto the list area ───────────────────────
+    // ── Drag-and-drop FILES onto list area ──────────────────────────
     const fileList = document.getElementById('fileList');
 
     fileList.addEventListener('dragenter', e => {
-        if (e.dataTransfer.types.includes('Files')) {
-            e.preventDefault();
-            fileList.classList.add('drag-over');
-        }
+        if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); fileList.classList.add('drag-over'); }
     });
     fileList.addEventListener('dragover', e => {
-        if (e.dataTransfer.types.includes('Files')) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'copy';
-        }
+        if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; }
     });
     fileList.addEventListener('dragleave', e => {
-        // Only remove class when leaving the list itself (not a child)
-        if (!fileList.contains(e.relatedTarget)) {
-            fileList.classList.remove('drag-over');
-        }
+        if (!fileList.contains(e.relatedTarget)) fileList.classList.remove('drag-over');
     });
     fileList.addEventListener('drop', e => {
         e.preventDefault();
         fileList.classList.remove('drag-over');
-        const dropped = Array.from(e.dataTransfer.files).filter(f =>
-            f.type === 'application/pdf' || f.type.startsWith('image/')
-        );
-        if (dropped.length) {
-            addFiles(dropped);
-        } else {
-            updateStatus('⚠️ Only PDF and image files are supported');
-        }
+        const dropped = Array.from(e.dataTransfer.files);
+        if (dropped.length) addFiles(dropped);
     });
 
-    // Also accept drops on the whole page (convenience)
     document.addEventListener('dragover', e => e.preventDefault());
     document.addEventListener('drop', e => {
         if (e.target === fileList || fileList.contains(e.target)) return;
         e.preventDefault();
-        const dropped = Array.from(e.dataTransfer.files).filter(f =>
-            f.type === 'application/pdf' || f.type.startsWith('image/')
-        );
-        if (dropped.length) addFiles(dropped);
+        addFiles(Array.from(e.dataTransfer.files));
     });
 
     // ── Render file list ────────────────────────────────────────────
     function renderFileList() {
-        const list = document.getElementById('fileList');
+        const list  = document.getElementById('fileList');
         const empty = document.getElementById('emptyState');
         const hint  = document.getElementById('dropHint');
 
-        // remove old items (keep emptyState & dropHint)
         Array.from(list.children).forEach(c => {
             if (c !== empty && c !== hint) list.removeChild(c);
         });
 
-        if (files.length === 0) {
-            empty.style.display = 'block';
-            return;
-        }
+        if (files.length === 0) { empty.style.display = 'block'; return; }
         empty.style.display = 'none';
 
         files.forEach((file, index) => {
@@ -486,22 +541,27 @@
             item.dataset.index = index;
 
             const icon   = file.type === 'application/pdf' ? '📄' : '🖼️';
-            const sizeKB = (file.size / 1024).toFixed(1);
-            const sizeStr = file.size > 1024 * 1024
-                ? (file.size / (1024 * 1024)).toFixed(1) + ' MB'
-                : sizeKB + ' KB';
+            const sizeStr = file.size > 1048576
+                ? (file.size / 1048576).toFixed(1) + ' MB'
+                : (file.size / 1024).toFixed(1) + ' KB';
 
             item.innerHTML = `
                 <span class="drag-handle" title="Drag to reorder">⠿</span>
                 <span class="file-icon">${icon}</span>
-                <span class="file-name">${file.name}</span>
+                <span class="file-name" title="${file.name}">${file.name}</span>
                 <span class="file-size">${sizeStr}</span>
+                <span class="move-btns">
+                    <button class="move-btn" title="Move up" onclick="moveItem(event,${index},-1)">▲</button>
+                    <button class="move-btn" title="Move down" onclick="moveItem(event,${index},1)">▼</button>
+                </span>
             `;
 
-            // Click = select/deselect
-            item.addEventListener('click', () => toggleSelection(index));
+            item.addEventListener('click', (e) => {
+                // Don't toggle selection when tapping move buttons
+                if (e.target.closest('.move-btn')) return;
+                toggleSelection(index);
+            });
 
-            // Drag-to-reorder events
             item.addEventListener('dragstart', onItemDragStart);
             item.addEventListener('dragover',  onItemDragOver);
             item.addEventListener('drop',      onItemDrop);
@@ -511,15 +571,23 @@
         });
     }
 
-    // ── Drag-to-reorder logic ───────────────────────────────────────
+    // ── Mobile move buttons ─────────────────────────────────────────
+    function moveItem(e, index, dir) {
+        e.stopPropagation();
+        const target = index + dir;
+        if (target < 0 || target >= files.length) return;
+        [files[index], files[target]] = [files[target], files[index]];
+        selectedIndices.clear();
+        renderFileList();
+    }
+
+    // ── Drag-to-reorder (desktop) ───────────────────────────────────
     function onItemDragStart(e) {
-        // Only proceed for item-reorder (not file drop from OS)
         dragSrcIndex = parseInt(e.currentTarget.dataset.index);
         e.currentTarget.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', dragSrcIndex); // required for FF
+        e.dataTransfer.setData('text/plain', dragSrcIndex);
     }
-
     function onItemDragOver(e) {
         if (dragSrcIndex === null) return;
         e.preventDefault();
@@ -527,26 +595,21 @@
         document.querySelectorAll('.file-item').forEach(el => el.classList.remove('drag-target'));
         e.currentTarget.classList.add('drag-target');
     }
-
     function onItemDrop(e) {
         e.preventDefault();
-        e.stopPropagation(); // prevent window drop handler
+        e.stopPropagation();
         const targetIndex = parseInt(e.currentTarget.dataset.index);
         if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
             const moved = files.splice(dragSrcIndex, 1)[0];
             files.splice(targetIndex, 0, moved);
-            // Adjust selectedIndices
             selectedIndices.clear();
             renderFileList();
             updateStatus('Files reordered');
         }
     }
-
-    function onItemDragEnd(e) {
+    function onItemDragEnd() {
         dragSrcIndex = null;
-        document.querySelectorAll('.file-item').forEach(el => {
-            el.classList.remove('dragging', 'drag-target');
-        });
+        document.querySelectorAll('.file-item').forEach(el => el.classList.remove('dragging', 'drag-target'));
     }
 
     // ── Selection ───────────────────────────────────────────────────
@@ -562,11 +625,11 @@
         files = files.filter((_, i) => !selectedIndices.has(i));
         selectedIndices.clear();
         renderFileList();
-        updateStatus(`Removed ${count} file(s) — Total: ${files.length} file(s)`);
+        updateStatus(`Removed ${count} file(s) — Total: ${files.length}`);
     }
 
     function clearAll() {
-        if (files.length === 0) return;
+        if (!files.length) return;
         if (confirm('Clear all files from the list?')) {
             files = []; selectedIndices.clear();
             renderFileList();
@@ -590,8 +653,6 @@
     }
 
     // ── Image helper ────────────────────────────────────────────────
-    // Always converts to JPEG via canvas (handles PNG, GIF, JPG uniformly).
-    // Returns { base64, mimeType } – base64 has NO data-URL prefix.
     async function imageToBase64(file, compress) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -602,20 +663,15 @@
                     let w = img.width, h = img.height;
                     if (compress && (w > 1240 || h > 1754)) {
                         const s = Math.min(1240 / w, 1754 / h);
-                        w = Math.round(w * s);
-                        h = Math.round(h * s);
+                        w = Math.round(w * s); h = Math.round(h * s);
                     }
                     canvas.width = w; canvas.height = h;
-                    // White background so transparent PNGs look correct in PDF
                     const ctx = canvas.getContext('2d');
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, w, h);
                     ctx.drawImage(img, 0, 0, w, h);
-                    // Always output as JPEG – pdf-lib embedJpg is most compatible
                     const dataUrl = canvas.toDataURL('image/jpeg', compress ? 0.88 : 1.0);
-                    // Strip the data-URL prefix; pdf-lib needs raw base64
-                    const base64 = dataUrl.split(',')[1];
-                    resolve({ base64, mimeType: 'image/jpeg' });
+                    resolve({ base64: dataUrl.split(',')[1] });
                 };
                 img.onerror = reject;
                 img.src = e.target.result;
@@ -625,90 +681,143 @@
         });
     }
 
+    // ── Truncate long filenames for the header label (keep extension) ──
+    function truncateFilename(name, maxLen = 80) {
+        return name.length > maxLen ? name.substring(0, maxLen - 1) + '…' : name;
+    }
+
+    // ── Draw filename header onto a pdf-lib page ─────────────────────
+    function drawHeader(page, label, font, pageW, pageH, margin, headerH, topPad, fontSize) {
+        const textWidth = font.widthOfTextAtSize(label, fontSize);
+        const textX     = Math.max(margin, (pageW - textWidth) / 2);
+        const textY     = pageH - margin - topPad - fontSize;
+
+        page.drawLine({
+            start: { x: margin, y: pageH - margin - headerH },
+            end:   { x: pageW - margin, y: pageH - margin - headerH },
+            thickness: 0.5,
+            color: rgb(0.7, 0.7, 0.8),
+        });
+
+        page.drawText(label, {
+            x: textX, y: textY,
+            font, size: fontSize,
+            color: rgb(0.25, 0.30, 0.60),
+        });
+    }
+
     // ── Merge ───────────────────────────────────────────────────────
     async function mergeFiles() {
-        if (files.length === 0) { alert('No files to merge!'); return; }
+        if (!files.length) { alert('No files to merge!'); return; }
 
         try {
             updateStatus('Merging files… Please wait');
-            updateProgress(0, 'Starting…');
+            updateProgress(1, 'Starting…');
 
-            const mergedPdf = await PDFDocument.create();
+            const mergedPdf     = await PDFDocument.create();
             const compress      = document.getElementById('compressCheck').checked;
             const widthOption   = document.getElementById('widthSelect').value;
             const customWidthCm = parseFloat(document.getElementById('customWidthValue').value) || 10;
-            const CM_TO_PT      = 28.3465;  // 1 cm = 28.3465 PDF points
+            const showHeader    = document.getElementById('showFilenameHeader').checked;
 
-            const A4_W   = 210 * 2.83465;  // ≈ 595 pt
-            const A4_H   = 297 * 2.83465;  // ≈ 842 pt
-            const MARGIN =  10 * 2.83465;  // ≈  28 pt
+            const CM_TO_PT = 28.3465;
+            const A4_W     = 210 * 2.83465;   // ≈ 595 pt
+            const A4_H     = 297 * 2.83465;   // ≈ 842 pt
+            const MARGIN   =  10 * 2.83465;   // ≈  28 pt
+
+            // Header layout constants (only matter when showHeader = true)
+            const HEADER_FONT_SIZE = 14;          // pt — "medium" as requested
+            const HEADER_H         = HEADER_FONT_SIZE + 16;  // space reserved at top
+            const HEADER_TOP_PAD   = 8;           // pt from page top to text baseline
+
+            // Embed font once for all headers
+            let helveticaBold = null;
+            if (showHeader) {
+                helveticaBold = await mergedPdf.embedFont(StandardFonts.HelveticaBold);
+            }
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                updateProgress(Math.round(((i + 1) / files.length) * 100), `Processing ${i+1}/${files.length}`);
+                updateProgress(Math.round(((i + 0.5) / files.length) * 95), `Processing ${i+1}/${files.length}`);
 
                 if (file.type === 'application/pdf') {
-                    const buf  = await file.arrayBuffer();
-                    const pdf  = await PDFDocument.load(buf);
+                    const buf   = await file.arrayBuffer();
+                    const pdf   = await PDFDocument.load(buf);
                     const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-                    pages.forEach(p => mergedPdf.addPage(p));
+                    pages.forEach(p => {
+                        mergedPdf.addPage(p);
+                        if (showHeader) {
+                            const { width: pW, height: pH } = p.getSize();
+                            const label = truncateFilename(file.name);
+                            drawHeader(p, label, helveticaBold, pW, pH, MARGIN, HEADER_H, HEADER_TOP_PAD, HEADER_FONT_SIZE);
+                        }
+                    });
 
                 } else if (file.type.startsWith('image/')) {
-                    // Convert any image → JPEG base64 (no data-URL prefix)
                     const { base64 } = await imageToBase64(file, compress);
-
-                    // Decode base64 → Uint8Array for pdf-lib
                     const binaryStr  = atob(base64);
                     const imgBytes   = new Uint8Array(binaryStr.length);
                     for (let b = 0; b < binaryStr.length; b++) imgBytes[b] = binaryStr.charCodeAt(b);
 
-                    // Embed as JPEG (canvas always outputs JPEG regardless of input type)
                     const embeddedImage = await mergedPdf.embedJpg(imgBytes);
 
-                    const page    = mergedPdf.addPage([A4_W, A4_H]);
-                    const usableW = A4_W - 2 * MARGIN;
-                    const usableH = A4_H - 2 * MARGIN;
-                    const iw = embeddedImage.width, ih = embeddedImage.height;
+                    const page = mergedPdf.addPage([A4_W, A4_H]);
 
+                    // If header enabled, reserve space at top and draw it
+                    const topReserved = showHeader ? HEADER_H : 0;
+                    const usableW     = A4_W - 2 * MARGIN;
+                    const usableH     = A4_H - 2 * MARGIN - topReserved;
+
+                    const iw = embeddedImage.width, ih = embeddedImage.height;
                     let scale;
                     switch (widthOption) {
-                        case 'half':    scale = (usableW / 2) / iw;           break;
-                        case 'quarter': scale = (usableW / 4) / iw;           break;
+                        case 'half':    scale = (usableW / 2) / iw; break;
+                        case 'quarter': scale = (usableW / 4) / iw; break;
                         case 'custom':  scale = (customWidthCm * CM_TO_PT) / iw; break;
-                        default:        scale = Math.min(usableW / iw, usableH / ih); // fit
+                        default:        scale = Math.min(usableW / iw, usableH / ih);
                     }
-                    // Clamp height overflow
                     if (ih * scale > usableH) scale = usableH / ih;
-                    // Never upscale past native resolution
                     if (scale > 1) scale = 1;
 
                     const sw = iw * scale, sh = ih * scale;
-                    page.drawImage(embeddedImage, {
-                        x: (A4_W - sw) / 2,
-                        y: (A4_H - sh) / 2,
-                        width: sw, height: sh
-                    });
+
+                    // Center image in the available area (below header strip)
+                    const imgX = (A4_W - sw) / 2;
+                    // Available area starts from bottom of page to (MARGIN + topReserved) from top
+                    const availableAreaBottom = MARGIN;
+                    const availableAreaTop    = A4_H - MARGIN - topReserved;
+                    const imgY = availableAreaBottom + (availableAreaTop - availableAreaBottom - sh) / 2;
+
+                    page.drawImage(embeddedImage, { x: imgX, y: imgY, width: sw, height: sh });
+
+                    // Draw filename header
+                    if (showHeader) {
+                        const label = truncateFilename(file.name);
+                        drawHeader(page, label, helveticaBold, A4_W, A4_H, MARGIN, HEADER_H, HEADER_TOP_PAD, HEADER_FONT_SIZE);
+                    }
                 }
             }
 
-            updateProgress(100, 'Saving…');
+            updateProgress(98, 'Saving…');
             const pdfBytes = await mergedPdf.save();
             const blob = new Blob([pdfBytes], { type: 'application/pdf' });
             const url  = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
+            const a    = document.createElement('a');
+            a.href     = url;
             a.download = 'merged_output.pdf';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
             updateProgress(0);
-            updateStatus(`✅ Success! Merged ${files.length} file(s)`);
+            updateStatus(`✅ Done! Merged ${files.length} file(s)`);
 
             setTimeout(() => {
                 files = []; selectedIndices.clear();
                 renderFileList();
                 updateStatus('Ready to merge files');
-            }, 2500);
+            }, 3000);
 
         } catch (err) {
             console.error(err);
