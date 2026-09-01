@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merge Excel & CSV Files</title>
+
+<!-- SEO & Meta Tags -->
+<meta name="description" content="Merge multiple XLS, XLSX, XLSB, XLSM, and CSV spreadsheet files into a single consolidated sheet right in your browser.">
+<meta name="keywords" content="Merge Excel, XLSX Merger, CSV Merger, XLS Combiner, Excel Tools, Wiki's Lazy Coders">
+<meta name="author" content="Suyash Dwivedi">
+<link rel="canonical" href="https://suyashdwivedi.github.io/zonestamper.html">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://suyashdwivedi.github.io/zonestamper.html">
+<meta property="og:title" content="Merge Excel & CSV Files">
+<meta property="og:description" content="Merge multiple XLS, XLSX, XLSB, XLSM, and CSV files into a single consolidated spreadsheet directly in your browser.">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://suyashdwivedi.github.io/zonestamper.html">
+<meta property="twitter:title" content="Merge Excel & CSV Files">
+<meta property="twitter:description" content="Merge multiple XLS, XLSX, XLSB, XLSM, and CSV files into a single consolidated spreadsheet directly in your browser.">
+<meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Wiki%27s_Lazy_Coders.png/250px-Wiki%27s_Lazy_Coders.png">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GC8PGC89NB');
+</script>
+<script src="https://cdn.counter.dev/script.js" data-id="cc7a036d-a904-4d76-bcac-37ea4196c014" data-utcoffset="6"></script>
+
+<!-- SheetJS Library for Excel/CSV Handling -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+    :root {
+        --bg-color: #f4f6f8;
+        --card-bg: #ffffff;
+        --text-color: #333333;
+        --subtext-color: #666666;
+        --border-color: #999999;
+        --status-bg: #f1f1f1;
+        --example-bg: #fff8e1;
+        --example-border: #ffc107;
+        --btn-bg: #217346;
+        --btn-hover: #185c37;
+    }
+
+    body.night-mode {
+        --bg-color: #121212 !important;
+        --card-bg: #1e1e1e !important;
+        --text-color: #e0e0e0 !important;
+        --subtext-color: #aaa !important;
+        --border-color: #555555 !important;
+        --status-bg: #2d2d2d !important;
+        --example-bg: #2a281e !important;
+        --example-border: #d4a017 !important;
+        --btn-bg: #2e7d32 !important;
+        --btn-hover: #1b5e20 !important;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 40px;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .top-bar {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        z-index: 1000;
+    }
+
+    .theme-toggle {
+        background: var(--btn-bg);
+        color: #fff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .header-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .header-logo {
+        width: 75px;
+        height: auto;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: auto;
+        background: var(--card-bg);
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        transition: background-color 0.3s;
+    }
+
+    h1 {
+        margin: 0;
+        color: var(--text-color);
+    }
+
+    p {
+        color: var(--subtext-color);
+    }
+
+    input[type="file"] {
+        width: 100%;
+        padding: 15px;
+        border: 2px dashed var(--border-color);
+        border-radius: 8px;
+        box-sizing: border-box;
+        margin: 20px 0;
+        background: transparent;
+        color: var(--text-color);
+    }
+
+    .format-selection {
+        margin: 15px 0 25px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .format-selection label {
+        font-weight: bold;
+        color: var(--text-color);
+    }
+
+    .format-selection select {
+        padding: 8px 12px;
+        font-size: 15px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background: var(--card-bg);
+        color: var(--text-color);
+        cursor: pointer;
+    }
+
+    .action-btn {
+        background: var(--btn-bg);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .action-btn:hover {
+        background: var(--btn-hover);
+    }
+
+    #status {
+        margin-top: 20px;
+        padding: 15px;
+        background: var(--status-bg);
+        border-radius: 6px;
+        white-space: pre-line;
+        color: var(--text-color);
+    }
+
+    .example {
+        margin-top: 20px;
+        background: var(--example-bg);
+        padding: 15px;
+        border-left: 4px solid var(--example-border);
+        color: var(--text-color);
+    }
+
+    footer {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 14px;
+        color: var(--subtext-color);
+    }
+
+    footer a {
+        color: var(--btn-bg);
+        text-decoration: none;
+    }
+
+    footer a:hover {
+        text-decoration: underline;
+    }
+
+    .nav-arrow {
+        position: fixed;
+        right: 20px;
+        background: var(--btn-bg);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .nav-arrow:hover {
+        background: var(--btn-hover);
+    }
+
+    #goTop { bottom: 70px; }
+    #goBottom { bottom: 20px; }
+</style>
+</head>
+
+<body>
+
+<div class="top-bar">
+    <button class="theme-toggle" onclick="toggleNightMode()">Toggle Night Mode</button>
+</div>
+
+<button id="goTop" class="nav-arrow" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Go to Top">&#8593;</button>
+<button id="goBottom" class="nav-arrow" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" title="Go to Bottom">&#8595;</button>
+
+<div class="container">
+
+    <div class="header-container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Logo" class="header-logo">
+        <h1>Merge Excel & CSV Files</h1>
+    </div>
+
+    <p>
+        Select multiple spreadsheet files (.xlsx, .xls, .xlsb, .xlsm, .csv).
+        Each file will be added to one combined file, separated by a row containing its filename.
+    </p>
+
+    <input
+        type="file"
+        id="files"
+        multiple
+        accept=".xls,.xlsx,.xlsb,.xlsm,.csv"
+    >
+
+    <div class="format-selection">
+        <label for="outputFormat">Output Format:</label>
+        <select id="outputFormat">
+            <option value="xlsx" selected>.xlsx (Excel Workbook)</option>
+            <option value="xlsb">.xlsb (Excel Binary Workbook)</option>
+            <option value="xlsm">.xlsm (Excel Macro-Enabled Workbook)</option>
+            <option value="xls">.xls (Excel 97-2003 Workbook)</option>
+            <option value="csv">.csv (Comma Separated Values)</option>
+        </select>
+    </div>
+
+    <button class="action-btn" onclick="mergeFiles()">
+        Merge & Download
+    </button>
+
+    <div id="status">
+        Select Excel or CSV files to begin.
+    </div>
+
+    <div class="example">
+        <strong>Output structure:</strong><br><br>
+
+        ─── filename1.xlsx ───<br>
+        Data rows...<br>
+        Data rows...<br><br>
+
+        ─── filename2.csv ───<br>
+        Data rows...<br>
+        Data rows...
+    </div>
+
+</div>
+
+<footer>
+    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" rel="noopener">Suyash Dwivedi</a> | Updated on: 1 September 2026
+</footer>
+
+<script>
+// Check local storage on page load and apply saved theme
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'night') {
+        document.body.classList.add('night-mode');
+    }
+});
+
+function toggleNightMode() {
+    document.body.classList.toggle('night-mode');
+    
+    // Save current preference to LocalStorage
+    if (document.body.classList.contains('night-mode')) {
+        localStorage.setItem('theme', 'night');
+    } else {
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+async function mergeFiles() {
+
+    const input = document.getElementById("files");
+    const status = document.getElementById("status");
+    const outputFormat = document.getElementById("outputFormat").value;
+
+    const files = input.files;
+
+    if (!files.length) {
+        alert("Please select at least one spreadsheet or CSV file.");
+        return;
+    }
+
+    status.textContent = "Processing files...\n";
+
+    let mergedData = [];
+
+    for (let i = 0; i < files.length; i++) {
+
+        const file = files[i];
+
+        status.textContent +=
+            `Reading ${i + 1}/${files.length}: ${file.name}\n`;
+
+        try {
+
+            const data = await file.arrayBuffer();
+
+            const workbook = XLSX.read(data, {
+                type: "array",
+                raw: false
+            });
+
+            mergedData.push([
+                `========== ${file.name} ==========`
+            ]);
+
+            for (const sheetName of workbook.SheetNames) {
+
+                const worksheet = workbook.Sheets[sheetName];
+
+                const sheetData = XLSX.utils.sheet_to_json(
+                    worksheet,
+                    {
+                        header: 1,
+                        defval: ""
+                    }
+                );
+
+                if (workbook.SheetNames.length > 1) {
+                    mergedData.push([
+                        `--- Sheet: ${sheetName} ---`
+                    ]);
+                }
+
+                mergedData.push(...sheetData);
+                mergedData.push([]);
+
+            }
+
+            mergedData.push([]);
+
+        }
+        catch (error) {
+
+            console.error(error);
+
+            status.textContent +=
+                `Error reading ${file.name}\n`;
+
+        }
+    }
+
+    status.textContent += "\nCreating merged file...";
+
+    const newWorkbook = XLSX.utils.book_new();
+    const newWorksheet = XLSX.utils.aoa_to_sheet(mergedData);
+
+    const maxCols = Math.max(
+        0,
+        ...mergedData.map(row => row ? row.length : 0)
+    );
+
+    newWorksheet["!cols"] = [];
+
+    for (let i = 0; i < maxCols; i++) {
+
+        let maxLength = 10;
+
+        mergedData.forEach(row => {
+
+            if (row && row[i] !== undefined && row[i] !== null) {
+
+                const length = String(row[i]).length;
+
+                if (length > maxLength) {
+                    maxLength = length;
+                }
+
+            }
+
+        });
+
+        newWorksheet["!cols"].push({
+            wch: Math.min(maxLength + 2, 50)
+        });
+
+    }
+
+    XLSX.utils.book_append_sheet(
+        newWorkbook,
+        newWorksheet,
+        "Merged Data"
+    );
+
+    const fileName = `Merged_Files.${outputFormat}`;
+    let writeOptions = { bookType: outputFormat, type: "binary" };
+
+    if (outputFormat === "csv") {
+        writeOptions.bookType = "csv";
+    }
+
+    XLSX.writeFile(
+        newWorkbook,
+        fileName,
+        writeOptions
+    );
+
+    status.textContent =
+        `Successfully merged ${files.length} files!\n` +
+        `Downloaded: ${fileName}`;
+
+}
+</script>
+
+</body>
+</html>
