@@ -155,21 +155,23 @@ function mRender(){const t=g('in').value.toUpperCase().replace(/[^A-Z0-9 ]/g,'')
 function mStop(){mRun++;torch(false);lock(false);tone(false);try{navigator.vibrate&&navigator.vibrate(0)}catch(e){}g('fl').classList.remove('on');document.querySelectorAll('#mout .cur,#mout .on').forEach(e=>e.classList.remove('cur','on'))}
 async function mPlay(){mStop();ctx();lock(true);const id=mRun,u=mU();
  for(const el of [...g('mout').children]){if(id!==mRun)return;if(el.dataset.sp){await sleep(4*u);continue}
-  el.classList.add('cur');const ss=[...el.querySelectorAll('i')],pat=[];
+  el.classList.add('cur');const ss=[...el.querySelectorAll('i')],pat=[],tc=!!(tkT&&g('trc').checked);
   ss.forEach((s,k)=>{pat.push((s.textContent===DSH?3:1)*u);if(k<ss.length-1)pat.push(u)});
-  try{g('vib').checked&&navigator.vibrate&&navigator.vibrate(pat)}catch(e){}
-  for(const s of ss){if(id!==mRun)return;const ms=(s.textContent===DSH?3:1)*u;
-   g('fl').classList.add('on');s.classList.add('on');tone(true);torch(true);
-   await sleep(ms);g('fl').classList.remove('on');s.classList.remove('on');tone(false);torch(false);await sleep(u)}
+  if(!tc)vibe(pat);
+  for(const s of ss){if(id!==mRun)return;const ms=(s.textContent===DSH?3:1)*u,t0=performance.now();
+   g('fl').classList.add('on');s.classList.add('on');tone(true);const tp=tc?torch(true):null;
+   if(tc){vibe(ms);if(tp)tp.then(()=>{const left=ms-(performance.now()-t0);if(left>20&&id===mRun)vibe(left)})}
+   await sleep(ms);g('fl').classList.remove('on');s.classList.remove('on');tone(false);if(tc)torch(false);await sleep(u)}
   await sleep(2*u);el.classList.remove('cur')}
  lock(false)}
 let tkS=null,tkT=null,wl=null;
 async function torchEnable(){try{const md=navigator.mediaDevices;if(!md||!md.getUserMedia)throw 0;
- tkS=await md.getUserMedia({video:{facingMode:{ideal:'environment'}}});tkT=tkS.getVideoTracks()[0];
+ tkS=await md.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:320},height:{ideal:240},frameRate:{ideal:10}}});tkT=tkS.getVideoTracks()[0];
  const cap=tkT.getCapabilities?tkT.getCapabilities():{};if(!cap.torch)throw 1;g('trn').textContent='ready (the camera light is used)';return true}
  catch(e){torchOff();g('trc').checked=false;g('trn').textContent='not available here (needs Chrome on Android, camera permission and a secure page)';return false}}
 function torchOff(){try{tkS&&tkS.getTracks().forEach(t=>t.stop())}catch(e){}tkS=tkT=null}
-function torch(on){try{tkT&&tkT.applyConstraints({advanced:[{torch:on}]}).catch(()=>{})}catch(e){}}
+function torch(on){try{return tkT?tkT.applyConstraints({advanced:[{torch:on}]}).catch(()=>{}):null}catch(e){return null}}
+function vibe(p){try{if(g('vib').checked&&navigator.vibrate){const ok=navigator.vibrate(p);g('vibn').textContent=ok?'':'(the browser refused the buzz request)'}}catch(e){}}
 async function lock(on){try{if(on&&navigator.wakeLock)wl=await navigator.wakeLock.request('screen');else if(wl){wl.release();wl=null}}catch(e){}}
 g('trc').onchange=async e=>{if(e.target.checked)await torchEnable();else{torchOff();g('trn').textContent=''}};
 g('tt').onclick=async()=>{if(!tkT&&!(await torchEnable()))return;g('trc').checked=true;torch(true);await sleep(600);torch(false)};
