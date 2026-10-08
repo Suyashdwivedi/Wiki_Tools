@@ -1,17 +1,17 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CodeSign: Text to ASL Fingerspelling</title>
-<meta name="description" content="CodeSign: type text and view simplified American Sign Language fingerspelling hand shapes letter by letter.">
+<meta name="description" content="CodeSign: type text and view American Sign Language fingerspelling hand shapes letter by letter.">
 <meta name="keywords" content="ASL, American Sign Language, fingerspelling, sign language, CodeSign, Wikimedia, Lazy Coders">
 <meta name="author" content="Suyash Dwivedi">
 <link rel="canonical" href="https://suyashdwivedi.github.io/Wiki_Tools/W/codesign.html">
 <meta property="og:title" content="CodeSign: Text to ASL Fingerspelling">
-<meta property="og:description" content="Type text and see simplified ASL fingerspelling hand shapes letter by letter.">
+<meta property="og:description" content="Type text and see ASL fingerspelling hand shapes letter by letter.">
 <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
 <meta property="og:url" content="https://suyashdwivedi.github.io/Wiki_Tools/W/codesign.html">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="CodeSign: Text to ASL Fingerspelling">
-<meta name="twitter:description" content="Type text and see simplified ASL fingerspelling hand shapes letter by letter.">
+<meta name="twitter:description" content="Type text and see ASL fingerspelling hand shapes letter by letter.">
 <meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
 <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
 <style>
@@ -32,115 +32,56 @@ button.p{background:var(--ac);color:#fff;border:0}
 #word{font-size:1.4rem;letter-spacing:.15em;margin:.4em 0}#word b{color:var(--ac);border-bottom:3px solid var(--ac)}
 #strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
 .t{flex:0 0 64px;text-align:center;font-size:.8rem;border:1px solid var(--bd);border-radius:10px;padding:2px}.t.on{border-color:var(--ac);background:var(--bg)}.t svg{width:100%;height:auto}
-.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;margin:0 auto;width:min(240px,70%);border:2px dashed var(--bd);border-radius:14px;color:var(--mut)}.ph b{font-size:3rem}.t .ph{width:100%;aspect-ratio:1}.t .ph b{font-size:1.4rem}.t .ph small{font-size:.6rem}.note{font-size:.85rem;color:var(--mut)}
+.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;margin:0 auto;width:min(240px,70%);border:2px dashed var(--bd);border-radius:14px;color:var(--mut)}.ph b{font-size:3rem}.t .ph{width:100%;aspect-ratio:1}.t .ph b{font-size:1.4rem}.t .ph small{font-size:.6rem}.mm{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px}.mc{text-align:center;padding:2px 4px;border-radius:8px}.mc.cur{background:var(--bg)}.mc b{display:block}.mc i{font-style:normal;font-size:1.1rem;color:var(--mut);margin:0 1px}.mc i.on{color:var(--ac)}
+#fl{width:84px;height:84px;border-radius:50%;background:var(--bd);margin:10px auto}#fl.on{background:var(--ac);box-shadow:0 0 36px var(--ac)}
+#tap{width:100%;padding:22px;font-size:1.1rem;touch-action:none;user-select:none}#tout{font-size:1.4rem;min-height:2em;letter-spacing:.1em;margin:8px 0}
+#ref{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.9rem;margin-top:8px}label{margin-right:12px;white-space:nowrap}
+button,select{min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+label.opt{display:flex;align-items:flex-start;gap:10px;margin:0;padding:8px 0;font-size:1.05rem;white-space:normal}label.opt input{width:22px;height:22px;margin:2px 0 0;flex:none}label.opt small{display:block}
+#mout{overflow-wrap:anywhere}
+@media (max-width:560px){main{padding:10px}h1{font-size:1.1rem}.card{padding:12px;border-radius:12px}.row>*{flex:1 1 40%}input[type=text]{flex:1 1 100%;font-size:1.2rem}
+#fl{width:96px;height:96px}#tap{padding:34px 12px;font-size:1.2rem}#big{font-size:2.4rem}.t{flex-basis:56px}#tout{font-size:1.6rem}}
+.site-header,.footer{max-width:640px;margin:0 auto;padding:16px 16px 0}.logo-row{display:flex;align-items:center;gap:12px}.logo-img{width:56px;height:56px;object-fit:contain;flex:none}
+.tagline{color:var(--mut);margin:.2em 0}.site-header h1{margin:.1em 0}
+.footer{padding:4px 16px 100px;text-align:center;color:var(--mut);font-size:.88rem}.footer a{color:var(--ac)}
+.scroll-button{position:fixed;right:max(14px,env(safe-area-inset-right,0px));width:44px;height:44px;padding:0;border-radius:50%;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:1.3rem;opacity:.85;box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:10}
+#go-to-top{bottom:calc(72px + env(safe-area-inset-bottom,0px))}#go-to-bottom{bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+@media (max-width:560px){.logo-img{width:44px;height:44px}.scroll-button{width:40px;height:40px;min-height:40px;opacity:.75}}
+.note{font-size:.85rem;color:var(--mut)}
 .o{fill:none;stroke:var(--ol);stroke-width:19;stroke-linecap:round;stroke-linejoin:round}
 .k{fill:none;stroke:var(--skin);stroke-width:15;stroke-linecap:round;stroke-linejoin:round}
 .pm{fill:var(--skin);stroke:var(--ol);stroke-width:3}.mv{fill:none;stroke:#e11d48;stroke-width:4;stroke-dasharray:7 6;stroke-linecap:round}
-
-/* Responsive Wiki's Lazy Coders header */
-.site-header{
-  width:100%;
-  box-sizing:border-box;
-  background:var(--card);
-  border-bottom:1px solid var(--bd);
-  padding:16px max(16px, calc((100vw - 960px)/2));
-}
-.logo-row{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  max-width:960px;
-  margin:0 auto;
-}
-.logo-img{
-  width:72px;
-  height:72px;
-  object-fit:contain;
-  flex:0 0 auto;
-}
-.header-text{min-width:0}
-.site-header h1{
-  margin:0;
-  font-size:clamp(1.25rem, 3vw, 1.85rem);
-  line-height:1.2;
-  overflow-wrap:anywhere;
-}
-.tagline{
-  margin:.35rem 0 0;
-  color:var(--mut);
-  font-size:clamp(.88rem, 2vw, 1rem);
-  line-height:1.4;
-}
-.footer{
-  max-width:640px;
-  margin:18px auto 0;
-  padding:16px;
-  box-sizing:border-box;
-  text-align:center;
-  color:var(--mut);
-  font-size:.9rem;
-}
-.footer a{color:var(--ac)}
-.scroll-button{
-  position:fixed;
-  right:max(14px, env(safe-area-inset-right, 0px));
-  width:42px;
-  height:42px;
-  padding:0;
-  border-radius:50%;
-  background:var(--ac);
-  color:#fff;
-  border:0;
-  box-shadow:0 3px 12px rgba(0,0,0,.18);
-  font-size:1.25rem;
-  line-height:42px;
-  text-align:center;
-  cursor:pointer;
-  z-index:1000;
-  opacity:.9;
-}
-#go-to-top{bottom:68px}
-#go-to-bottom{bottom:16px}
-.scroll-button:hover{opacity:1}
-@media (max-width:600px){
-  .site-header{padding:12px 14px}
-  .logo-row{gap:10px}
-  .logo-img{width:54px;height:54px}
-  main{padding:12px}
-  .card{padding:12px}
-  .row{flex-direction:column}
-  input[type=text], button, select{width:100%;box-sizing:border-box}
-  #stage svg{width:min(320px,92%)}
-  #stage img{width:min(280px,85%)}
-  .scroll-button{width:38px;height:38px;line-height:38px}
-  #go-to-top{bottom:62px}
-  #go-to-bottom{bottom:14px}
-}
-@media (max-width:380px){
-  .logo-img{width:46px;height:46px}
-  .site-header h1{font-size:1.12rem}
-  .tagline{font-size:.8rem}
-}
 </style></head><body>
 <header class="site-header">
   <div class="logo-row">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png"
-         alt="Wiki's Lazy Coders Logo" class="logo-img" />
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" class="logo-img" />
     <div class="header-text">
       <h1>CodeSign: Text to ASL Fingerspelling</h1>
       <p class="tagline">Type text and see the American Sign Language (ASL) hand shapes letter by letter.</p>
     </div>
   </div>
 </header>
-
 <main>
-<p class="s">Spells your text letter by letter in the American Sign Language alphabet (fingerspelling).</p>
 <div class="card"><div class="row"><input id="in" type="text" value="SUYASH" maxlength="30" aria-label="Text to sign">
 <button class="p" id="go">Show signs</button>
 <select id="sp" aria-label="Speed"><option value="1800">Slow</option><option value="1100" selected>Normal</option><option value="650">Fast</option></select></div></div>
 <div class="card" id="stage"><div id="word"></div><div id="hand"></div><div id="big"></div><div id="desc"></div></div>
 <div class="card"><div id="strip"></div>
 <p class="note">These are simplified drawings. Letters like M, N, S, T and E look alike, so read the written hint and check an ASL chart. J and Z are moving letters: follow the red dashed path. Photos show one signer; J and Z are moving letters. Many words also have their own ASL sign that differs from spelling; this tool only fingerspells.</p></div>
+<div class="card" id="morse"><b>Morse code</b> <span class="note">to feel, see or hear the text you typed above</span>
+<div class="row" style="margin:8px 0"><button class="p" id="mgo">Play Morse</button><button id="mst">Stop</button>
+<select id="wpm" aria-label="Morse speed"><option value="5">Slow</option><option value="8" selected>Normal</option><option value="12">Fast</option></select></div>
+<div class="opts">
+<label class="opt"><input type="checkbox" id="vib" checked><span>Vibrate: dot is a short buzz, dash is a long buzz <small id="vibn" class="note"></small></span></label>
+<label class="opt"><input type="checkbox" id="trc"><span>Torch light (phone flashlight blinks the code) <small id="trn" class="note"></small></span></label>
+<label class="opt"><input type="checkbox" id="snd" checked><span>Sound</span></label></div>
+<div class="row"><button id="tv">Test vibration</button><button id="tt">Test torch</button></div>
+<div id="fl" aria-hidden="true"></div><div id="mout" class="mm" aria-live="polite"></div>
+<hr style="border:0;border-top:1px solid var(--bd);margin:14px 0"><b>Tap Morse in</b>
+<p class="note">Hold the button: a short press is a dot, a long press is a dash. Pause to finish a letter, pause longer for a space. The Space bar works too.</p>
+<button id="tap" class="p">Press and hold here</button><div id="tout" aria-live="polite"></div><button id="tclr">Clear</button>
+<details style="margin-top:10px"><summary>Morse chart</summary><div id="ref"></div></details>
+<p class="note">Timing follows standard Morse: a dash is three dots, with set gaps between symbols, letters and words. Sound, vibration and torch depend on your device: vibration works on Android phones, the torch needs Chrome on Android with camera permission on a secure (https) page, and neither works on iPhones. If you build this for deafblind users, test it with them first.</p></div>
 <script>
 const F=[[72,70],[92,76],[112,70],[130,56]];
 const TH={side:[56,176,-4,52],across:[62,168,78,46],out:[58,172,-68,56],low:[62,184,80,40],lown:[62,184,80,30],front:[62,138,80,52],touch:[62,170,25,48],tt:[86,134,0,26],mid:[62,150,70,40],curv:[58,172,-35,44,-35]};
@@ -200,19 +141,63 @@ if(!steps.length){document.getElementById('desc').textContent='Type some letters
 let i=0;show(0);timer=setInterval(()=>{i++;if(i>=steps.length){clearInterval(timer);return}show(i)},+document.getElementById('sp').value)}
 document.getElementById('go').onclick=play;document.getElementById('in').onkeydown=e=>{if(e.key==='Enter')play()};
 document.getElementById('sp').onchange=play;play();
-</script></main>
 
+/* ---- Morse ---- */
+const MC={A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..',
+0:'-----',1:'.----',2:'..---',3:'...--',4:'....-',5:'.....',6:'-....',7:'--...',8:'---..',9:'----.'};
+const RV=Object.fromEntries(Object.entries(MC).map(([k,v])=>[v,k]));
+const g=i=>document.getElementById(i),DOT='\u25CF',DSH='\u25AC',sym=s=>s.replace(/\./g,DOT).replace(/-/g,DSH);
+let mRun=0,actx=null,osc=null;const sleep=ms=>new Promise(r=>setTimeout(r,ms)),mU=()=>1200/+g('wpm').value;
+function ctx(){try{if(!actx){const A=window.AudioContext||window.webkitAudioContext;if(A)actx=new A()}if(actx&&actx.resume)actx.resume()}catch(e){}return actx}
+function tone(on){try{if(osc){osc.stop();osc=null}if(!on||!g('snd').checked||!ctx())return;osc=actx.createOscillator();const gn=actx.createGain();osc.frequency.value=600;gn.gain.value=.15;osc.connect(gn);gn.connect(actx.destination);osc.start()}catch(e){}}
+function mRender(){const t=g('in').value.toUpperCase().replace(/[^A-Z0-9 ]/g,'').replace(/\s+/g,' ').trim(),b=g('mout');b.innerHTML='';
+ [...t].forEach(ch=>{const d=document.createElement('div');d.className='mc';if(ch===' '){d.dataset.sp=1;d.innerHTML='<b>&nbsp;</b><i>/</i>'}else d.innerHTML='<b>'+ch+'</b>'+[...MC[ch]].map(s=>'<i>'+sym(s)+'</i>').join('');b.appendChild(d)})}
+function mStop(){mRun++;torch(false);lock(false);tone(false);try{navigator.vibrate&&navigator.vibrate(0)}catch(e){}g('fl').classList.remove('on');document.querySelectorAll('#mout .cur,#mout .on').forEach(e=>e.classList.remove('cur','on'))}
+async function mPlay(){mStop();ctx();lock(true);const id=mRun,u=mU();
+ for(const el of [...g('mout').children]){if(id!==mRun)return;if(el.dataset.sp){await sleep(4*u);continue}
+  el.classList.add('cur');const ss=[...el.querySelectorAll('i')],pat=[];
+  ss.forEach((s,k)=>{pat.push((s.textContent===DSH?3:1)*u);if(k<ss.length-1)pat.push(u)});
+  try{g('vib').checked&&navigator.vibrate&&navigator.vibrate(pat)}catch(e){}
+  for(const s of ss){if(id!==mRun)return;const ms=(s.textContent===DSH?3:1)*u;
+   g('fl').classList.add('on');s.classList.add('on');tone(true);torch(true);
+   await sleep(ms);g('fl').classList.remove('on');s.classList.remove('on');tone(false);torch(false);await sleep(u)}
+  await sleep(2*u);el.classList.remove('cur')}
+ lock(false)}
+let tkS=null,tkT=null,wl=null;
+async function torchEnable(){try{const md=navigator.mediaDevices;if(!md||!md.getUserMedia)throw 0;
+ tkS=await md.getUserMedia({video:{facingMode:{ideal:'environment'}}});tkT=tkS.getVideoTracks()[0];
+ const cap=tkT.getCapabilities?tkT.getCapabilities():{};if(!cap.torch)throw 1;g('trn').textContent='ready (the camera light is used)';return true}
+ catch(e){torchOff();g('trc').checked=false;g('trn').textContent='not available here (needs Chrome on Android, camera permission and a secure page)';return false}}
+function torchOff(){try{tkS&&tkS.getTracks().forEach(t=>t.stop())}catch(e){}tkS=tkT=null}
+function torch(on){try{tkT&&tkT.applyConstraints({advanced:[{torch:on}]}).catch(()=>{})}catch(e){}}
+async function lock(on){try{if(on&&navigator.wakeLock)wl=await navigator.wakeLock.request('screen');else if(wl){wl.release();wl=null}}catch(e){}}
+g('trc').onchange=async e=>{if(e.target.checked)await torchEnable();else{torchOff();g('trn').textContent=''}};
+g('tt').onclick=async()=>{if(!tkT&&!(await torchEnable()))return;g('trc').checked=true;torch(true);await sleep(600);torch(false)};
+g('tv').onclick=()=>{try{if(navigator.vibrate)navigator.vibrate([mU(),mU(),3*mU()]);else g('vibn').textContent='not supported'}catch(e){}};
+if(!navigator.vibrate){g('vib').checked=false;g('vib').disabled=true;g('vibn').textContent='not supported on this device or browser (iPhones do not allow it)'}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)mStop()});
+let tB='',tO='',tD=0,tA=0,tC=0;
+const tShow=()=>{g('tout').textContent=tO+(tB?' ['+sym(tB)+']':'')};
+function tDn(){if(tD)return;tD=performance.now()||.001;clearTimeout(tA);clearTimeout(tC);tone(true)}
+function tUp(){if(!tD)return;const d=performance.now()-tD;tD=0;tone(false);tB+=d<2*mU()?'.':'-';tShow();
+ tA=setTimeout(()=>{if(tB){tO+=RV[tB]||'?';tB=''}tShow()},3*mU());tC=setTimeout(()=>{if(tO&&!tO.endsWith(' '))tO+=' ';tShow()},7*mU())}
+const tp=g('tap');tp.onpointerdown=e=>{e.preventDefault();tDn()};['onpointerup','onpointerleave','onpointercancel'].forEach(k=>tp[k]=tUp);
+tp.onkeydown=e=>{if(e.code==='Space'||e.key==='Enter'){e.preventDefault();if(!e.repeat)tDn()}};tp.onkeyup=e=>{if(e.code==='Space'||e.key==='Enter')tUp()};
+g('tclr').onclick=()=>{tB=tO='';tShow()};g('mgo').onclick=mPlay;g('mst').onclick=mStop;
+g('ref').innerHTML=Object.entries(MC).map(([k,v])=>'<span><b>'+k+'</b> '+sym(v)+'</span>').join('');
+g('in').addEventListener('input',mRender);g('go').addEventListener('click',mRender);mRender();
+</script></main>
 <footer class="footer">
   Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" rel="noopener">Suyash Dwivedi</a>
-  | Updated on: 3 October 2026
+  | Updated on: 8 October 2026
 </footer>
 
 <button id="go-to-top" class="scroll-button"
         onclick="window.scrollTo({top:0,behavior:'smooth'})"
-        title="Go to top" aria-label="Go to top">↑</button>
+        title="Go to top" aria-label="Go to top">&#8593;</button>
 <button id="go-to-bottom" class="scroll-button"
         onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})"
-        title="Go to bottom" aria-label="Go to bottom">↓</button>
+        title="Go to bottom" aria-label="Go to bottom">&#8595;</button>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
 <script>
