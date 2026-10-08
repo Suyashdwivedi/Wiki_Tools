@@ -38,7 +38,7 @@ button.p{background:var(--ac);color:#fff;border:0}
 #ref{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.9rem;margin-top:8px}label{margin-right:12px;white-space:nowrap}
 button,select{min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 label.opt{display:flex;align-items:flex-start;gap:10px;margin:0;padding:8px 0;font-size:1.05rem;white-space:normal}label.opt input{width:22px;height:22px;margin:2px 0 0;flex:none}label.opt small{display:block}
-#mout{overflow-wrap:anywhere}
+#mout{overflow-wrap:anywhere}input[type=range]{flex:1;min-height:32px}
 @media (max-width:560px){main{padding:10px}h1{font-size:1.1rem}.card{padding:12px;border-radius:12px}.row>*{flex:1 1 40%}input[type=text]{flex:1 1 100%;font-size:1.2rem}
 #fl{width:96px;height:96px}#tap{padding:34px 12px;font-size:1.2rem}#big{font-size:2.4rem}.t{flex-basis:56px}#tout{font-size:1.6rem}}
 .site-header,.footer{max-width:640px;margin:0 auto;padding:16px 16px 0}.logo-row{display:flex;align-items:center;gap:12px}.logo-img{width:56px;height:56px;object-fit:contain;flex:none}
@@ -74,8 +74,10 @@ label.opt{display:flex;align-items:flex-start;gap:10px;margin:0;padding:8px 0;fo
 <div class="opts">
 <label class="opt"><input type="checkbox" id="vib" checked><span>Vibrate: dot is a short buzz, dash is a long buzz <small id="vibn" class="note"></small></span></label>
 <label class="opt"><input type="checkbox" id="trc"><span>Torch light (phone flashlight blinks the code) <small id="trn" class="note"></small></span></label>
-<label class="opt"><input type="checkbox" id="snd" checked><span>Sound</span></label></div>
-<div class="row"><button id="tv">Test vibration</button><button id="tt">Test torch</button></div>
+<label class="opt"><input type="checkbox" id="snd" checked><span>Sound <small id="sndn" class="note"></small></span></label>
+<label class="opt"><span>Volume</span><input type="range" id="vol" min="10" max="100" value="70" aria-label="Volume"></label></div>
+<div class="row"><button id="tv">Test vibration</button><button id="tt">Test torch</button><button id="ts">Test sound</button><button id="tb">Test all together</button><button id="dc">Device check</button></div>
+<p id="dg" class="note" aria-live="polite"></p>
 <div id="fl" aria-hidden="true"></div><div id="mout" class="mm" aria-live="polite"></div>
 <hr style="border:0;border-top:1px solid var(--bd);margin:14px 0"><b>Tap Morse in</b>
 <p class="note">Hold the button: a short press is a dot, a long press is a dash. Pause to finish a letter, pause longer for a space. The Space bar works too.</p>
@@ -147,13 +149,13 @@ const MC={A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..
 0:'-----',1:'.----',2:'..---',3:'...--',4:'....-',5:'.....',6:'-....',7:'--...',8:'---..',9:'----.'};
 const RV=Object.fromEntries(Object.entries(MC).map(([k,v])=>[v,k]));
 const g=i=>document.getElementById(i),DOT='\u25CF',DSH='\u25AC',sym=s=>s.replace(/\./g,DOT).replace(/-/g,DSH);
-let mRun=0,actx=null,osc=null;const sleep=ms=>new Promise(r=>setTimeout(r,ms)),mU=()=>1200/+g('wpm').value;
-function ctx(){try{if(!actx){const A=window.AudioContext||window.webkitAudioContext;if(A)actx=new A()}if(actx&&actx.resume)actx.resume()}catch(e){}return actx}
-function tone(on){try{if(osc){osc.stop();osc=null}if(!on||!g('snd').checked||!ctx())return;osc=actx.createOscillator();const gn=actx.createGain();osc.frequency.value=600;gn.gain.value=.15;osc.connect(gn);gn.connect(actx.destination);osc.start()}catch(e){}}
+let mRun=0,actx=null,osc=null,gnode=null;const DG={vOk:0,vNo:0,tOk:0,tNo:0,err:''};const sleep=ms=>new Promise(r=>setTimeout(r,ms)),mU=()=>1200/+g('wpm').value;
+function ctx(){try{if(!actx){const A=window.AudioContext||window.webkitAudioContext;if(A){actx=new A();gnode=actx.createGain();gnode.gain.value=0;gnode.connect(actx.destination);osc=actx.createOscillator();osc.frequency.value=700;osc.connect(gnode);osc.start()}}if(actx&&actx.state!=='running')actx.resume()}catch(e){}return actx}
+function tone(on){try{if(!on&&!actx)return;if(on&&!g('snd').checked)return;const c=ctx();if(!c||!gnode)return;gnode.gain.cancelScheduledValues(c.currentTime);gnode.gain.setTargetAtTime(on?+g('vol').value/100*.8:0,c.currentTime,.005)}catch(e){}}
 function mRender(){const t=g('in').value.toUpperCase().replace(/[^A-Z0-9 ]/g,'').replace(/\s+/g,' ').trim(),b=g('mout');b.innerHTML='';
  [...t].forEach(ch=>{const d=document.createElement('div');d.className='mc';if(ch===' '){d.dataset.sp=1;d.innerHTML='<b>&nbsp;</b><i>/</i>'}else d.innerHTML='<b>'+ch+'</b>'+[...MC[ch]].map(s=>'<i>'+sym(s)+'</i>').join('');b.appendChild(d)})}
 function mStop(){mRun++;torch(false);lock(false);tone(false);try{navigator.vibrate&&navigator.vibrate(0)}catch(e){}g('fl').classList.remove('on');document.querySelectorAll('#mout .cur,#mout .on').forEach(e=>e.classList.remove('cur','on'))}
-async function mPlay(){mStop();ctx();lock(true);const id=mRun,u=mU();
+async function mPlay(){mStop();ctx();lock(true);DG.vOk=DG.vNo=DG.tOk=DG.tNo=0;DG.err='';const id=mRun,u=mU();
  for(const el of [...g('mout').children]){if(id!==mRun)return;if(el.dataset.sp){await sleep(4*u);continue}
   el.classList.add('cur');const ss=[...el.querySelectorAll('i')],pat=[],tc=!!(tkT&&g('trc').checked);
   ss.forEach((s,k)=>{pat.push((s.textContent===DSH?3:1)*u);if(k<ss.length-1)pat.push(u)});
@@ -163,21 +165,35 @@ async function mPlay(){mStop();ctx();lock(true);const id=mRun,u=mU();
    if(tc){vibe(ms);if(tp)tp.then(()=>{const left=ms-(performance.now()-t0);if(left>20&&id===mRun)vibe(left)})}
    await sleep(ms);g('fl').classList.remove('on');s.classList.remove('on');tone(false);if(tc)torch(false);await sleep(u)}
   await sleep(2*u);el.classList.remove('cur')}
- lock(false)}
+ lock(false);diag()}
 let tkS=null,tkT=null,wl=null;
 async function torchEnable(){try{const md=navigator.mediaDevices;if(!md||!md.getUserMedia)throw 0;
  tkS=await md.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:320},height:{ideal:240},frameRate:{ideal:10}}});tkT=tkS.getVideoTracks()[0];
  const cap=tkT.getCapabilities?tkT.getCapabilities():{};if(!cap.torch)throw 1;g('trn').textContent='ready (the camera light is used)';return true}
  catch(e){torchOff();g('trc').checked=false;g('trn').textContent='not available here (needs Chrome on Android, camera permission and a secure page)';return false}}
 function torchOff(){try{tkS&&tkS.getTracks().forEach(t=>t.stop())}catch(e){}tkS=tkT=null}
-function torch(on){try{return tkT?tkT.applyConstraints({advanced:[{torch:on}]}).catch(()=>{}):null}catch(e){return null}}
-function vibe(p){try{if(g('vib').checked&&navigator.vibrate){const ok=navigator.vibrate(p);g('vibn').textContent=ok?'':'(the browser refused the buzz request)'}}catch(e){}}
+function torch(on){try{return tkT?tkT.applyConstraints({advanced:[{torch:on}]}).then(()=>{DG.tOk++},e=>{DG.tNo++;DG.err=(e&&(e.name||e.message))||'error'}):null}catch(e){return null}}
+function vibe(p){try{if(g('vib').checked&&navigator.vibrate){const ok=navigator.vibrate(p);ok?DG.vOk++:DG.vNo++;g('vibn').textContent=ok?'':'(the browser refused the buzz request)'}}catch(e){}}
 async function lock(on){try{if(on&&navigator.wakeLock)wl=await navigator.wakeLock.request('screen');else if(wl){wl.release();wl=null}}catch(e){}}
 g('trc').onchange=async e=>{if(e.target.checked)await torchEnable();else{torchOff();g('trn').textContent=''}};
 g('tt').onclick=async()=>{if(!tkT&&!(await torchEnable()))return;g('trc').checked=true;torch(true);await sleep(600);torch(false)};
-g('tv').onclick=()=>{try{if(navigator.vibrate)navigator.vibrate([mU(),mU(),3*mU()]);else g('vibn').textContent='not supported'}catch(e){}};
+g('tv').onclick=()=>{try{if(!navigator.vibrate){g('vibn').textContent='(not supported by this browser)';return}
+ const ok=navigator.vibrate([mU(),mU(),3*mU()]);g('vibn').textContent=ok?'(request accepted: you should feel a short buzz, then a long one)':'(the browser refused the request)'}catch(e){g('vibn').textContent='(error: '+e.message+')'}};
+g('dc').onclick=async()=>{const ua=navigator.userAgent,br=/SamsungBrowser/.test(ua)?'Samsung Internet':/Firefox/.test(ua)?'Firefox':/Edg/.test(ua)?'Edge':/Chrome/.test(ua)?'Chrome':/Safari/.test(ua)?'Safari':'other',os=/Android/.test(ua)?'Android':/iPhone|iPad/.test(ua)?'iOS':'computer';
+ let fr=false;try{fr=window.top!==window}catch(e){fr=true}
+ let vr='no API';if(navigator.vibrate){try{vr=navigator.vibrate(50)?'accepted':'refused'}catch(e){vr='error'}}
+ const c=ctx();try{c&&await c.resume()}catch(e){}
+ g('dg').textContent='Device check: '+br+' on '+os+' | secure page: '+(window.isSecureContext?'yes':'no')+' | inside another page (iframe): '+(fr?'yes':'no')+' | vibration: '+vr+' | sound engine: '+(c?c.state:'none')+' | torch: '+(tkT?'ready':'not enabled')};
 if(!navigator.vibrate){g('vib').checked=false;g('vib').disabled=true;g('vibn').textContent='not supported on this device or browser (iPhones do not allow it)'}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)mStop()});
+['pointerdown','pointerup','click','keydown','touchend'].forEach(k=>document.addEventListener(k,()=>{if(g('snd').checked)ctx()},{passive:true}));
+function diag(){g('dg').textContent='Last run: buzz requests accepted '+DG.vOk+', refused '+DG.vNo+(tkT?' | torch changes done '+DG.tOk+', failed '+DG.tNo+(DG.err?' ('+DG.err+')':''):'')}
+g('ts').onclick=async()=>{const c=ctx();if(!c){g('sndn').textContent='(this browser has no sound support)';return}try{await c.resume()}catch(e){}tone(true);await sleep(450);tone(false);
+ g('sndn').textContent='(sound engine: '+c.state+(c.state==='running'?'. If you heard nothing, check the volume slider, the device volume and that the tab is not muted)':'. Click the page once and try again)')};
+g('tb').onclick=async()=>{ctx();if(g('trc').checked&&!tkT)await torchEnable();const u=mU(),id=++mRun,tc=!!(tkT&&g('trc').checked);DG.vOk=DG.vNo=DG.tOk=DG.tNo=0;DG.err='';
+ for(let k=0;k<3&&id===mRun;k++){const t0=performance.now();g('fl').classList.add('on');tone(true);const tp=tc?torch(true):null;vibe(u);
+  if(tp)tp.then(()=>{const l=u-(performance.now()-t0);if(l>20&&id===mRun)vibe(l)});await sleep(u);g('fl').classList.remove('on');tone(false);if(tc)torch(false);await sleep(u)}
+ await sleep(100);diag()};
 let tB='',tO='',tD=0,tA=0,tC=0;
 const tShow=()=>{g('tout').textContent=tO+(tB?' ['+sym(tB)+']':'')};
 function tDn(){if(tD)return;tD=performance.now()||.001;clearTimeout(tA);clearTimeout(tC);tone(true)}
