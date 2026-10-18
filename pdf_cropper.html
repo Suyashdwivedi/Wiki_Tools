@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PDF Cropper: Local PDF Cropper &amp; Merger</title>
+<meta name="description" content="Crop multiple PDF pages to a chosen aspect ratio and merge them into one PDF locally in your browser. Your PDF files are not uploaded.">
+<meta name="keywords" content="PDF cropper, PDF merger, crop PDF, aspect ratio, local PDF tool, browser PDF tool, Wikimedia, Lazy Coders">
+<meta name="author" content="Suyash Dwivedi">
+<meta property="og:title" content="PDF Cropper: Local PDF Cropper &amp; Merger">
+<meta property="og:description" content="Crop PDF pages to a chosen aspect ratio and export them as one PDF, locally in your browser.">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PDF Cropper: Local PDF Cropper &amp; Merger">
+<meta name="twitter:description" content="Crop PDF pages to a chosen aspect ratio and export them as one PDF, locally in your browser.">
+<meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+<link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png">
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#202124;background:#f4f6f8;--page-bg:#f4f6f8;--panel-bg:#fff;--text:#202124;--muted:#5f6368;--border:#dfe3e8;--field:#fff;--field-text:#202124}
+body.dark{--page-bg:#111827;--panel-bg:#1f2937;--text:#f3f4f6;--muted:#cbd5e1;--border:#374151;--field:#111827;--field-text:#f3f4f6;color:var(--text);background:var(--page-bg)}
+body{background:var(--page-bg);color:var(--text)}
+body.dark .panel{background:var(--panel-bg);border-color:var(--border)}
+body.dark select,body.dark input[type=number],body.dark input[type=file]{background:var(--field);color:var(--field-text);border-color:var(--border)}
+body.dark .secondary{background:#374151;color:#f9fafb}body.dark .footer{color:var(--muted);border-color:var(--border)}body.dark .note,body.dark .info{color:var(--muted)}body.dark .footer a{color:#93c5fd}
+*{box-sizing:border-box}body{margin:0;padding-bottom:12px}
+.site-header{background:#172554;color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:center;text-align:center;position:relative}
+.logo-row{display:flex;align-items:center;justify-content:center;text-align:center;gap:14px;max-width:1200px;width:100%;margin:auto;flex-wrap:wrap}
+.logo-img{width:64px;height:64px;object-fit:contain;background:#fff;border-radius:8px;padding:4px}
+.header-text{flex:1 1 100%;text-align:center}.header-text h1{margin:0 0 6px;font-size:1.45rem}.header-text p{margin:0;color:#dbeafe;line-height:1.4}
+.footer{max-width:1200px;margin:0 auto 24px;padding:18px 16px;color:var(--muted);font-size:.85rem;line-height:1.8;border-top:1px solid var(--border);text-align:center}
+.footer a{color:#1d4ed8}.visit-counts{margin-top:6px}
+.scroll-button{position:fixed;right:16px;z-index:20;width:42px;height:42px;padding:0;border-radius:50%;background:#1d4ed8;color:#fff;font-size:22px;box-shadow:0 2px 8px #0003}
+#go-to-top{bottom:68px}#go-to-bottom{bottom:16px}
+.header-tools{position:absolute;right:16px;top:14px;display:flex;gap:8px}.header-tools button{padding:8px 10px}
+#dropZone{border:2px dashed #94a3b8;border-radius:10px;padding:16px;text-align:center;margin:12px 0;color:var(--muted);background:transparent}#dropZone.dragover{border-color:#2563eb;background:#dbeafe;color:#1e3a8a}
+#fileList{display:grid;gap:7px;margin-top:10px}.file-row{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border);border-radius:8px;min-width:0}.file-row .file-name{flex:1;min-width:0;overflow-wrap:anywhere;font-size:.86rem}.file-row button{padding:5px 8px;font-size:.8rem}.file-row input{flex-shrink:0}
+main{max-width:1200px;margin:20px auto;padding:0 16px;display:grid;grid-template-columns:minmax(280px,350px) minmax(0,1fr);gap:18px}
+.panel{background:var(--panel-bg);border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:0 2px 8px #00000008}
+h2{font-size:1.05rem;margin:0 0 12px}label{display:block;font-weight:600;font-size:.9rem;margin:13px 0 6px}
+input[type=file],select,input[type=number],button{font:inherit}input[type=file]{width:100%}select,input[type=number]{width:100%;padding:9px;border:1px solid #c7cdd4;border-radius:7px;background:var(--field);color:var(--field-text)}
+button{border:0;border-radius:8px;padding:10px 12px;cursor:pointer;font-weight:650}
+.primary{background:#1d4ed8;color:white}.secondary{background:#e8edf3;color:#172033}.primary:disabled,.secondary:disabled{opacity:.45;cursor:not-allowed}
+.buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.buttons button{flex:1}
+.note{font-size:.86rem;line-height:1.45;color:var(--muted)}.status{font-size:.9rem;margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.preview-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.canvas-wrap{background:#202124;border-radius:8px;min-height:350px;display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto}
+#stage{position:relative;display:inline-block;line-height:0;max-width:100%;touch-action:none}
+#pageCanvas{display:block;max-width:100%;height:auto}
+#overlay{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none}
+.info{display:flex;justify-content:space-between;gap:12px;margin-top:10px;color:var(--muted);font-size:.86rem;flex-wrap:wrap}
+.check{display:flex;gap:8px;align-items:flex-start;font-weight:400;margin-top:12px}
+.check input{margin-top:4px}
+footer{max-width:1200px;margin:0 auto 24px;padding:0 16px;color:#5f6368;font-size:.85rem}
+@media(max-width:800px){main{grid-template-columns:1fr}.canvas-wrap{min-height:260px}}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-tools"><button id="themeToggle" class="secondary" type="button" aria-label="Toggle dark mode">Dark mode</button></div>
+  <div class="logo-row">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" class="logo-img">
+    <div class="header-text">
+      <h1>PDF Cropper: Local PDF Cropper &amp; Merger</h1>
+      <p class="tagline">Crop PDF pages to your chosen aspect ratio and combine them into one PDF. Your PDF files stay on your device.</p>
+    </div>
+  </div>
+</header>
+<main>
+<section class="panel">
+<h2>1. Select a PDF</h2>
+<input id="fileInput" type="file" accept="application/pdf,.pdf" multiple>
+<div id="dropZone" tabindex="0" role="button" aria-label="Drop PDF files here or click to select">Drag and drop PDF files here<br><small>or click to choose files above</small></div>
+<div id="fileList" aria-live="polite"></div>
+<label for="referenceFile">Reference PDF (use this file's crop area for the batch)</label>
+<select id="referenceFile" disabled><option value="">Select PDFs first</option></select>
+<div class="note">Select one or several PDFs (for example, 10 files). Each input PDF becomes its own cropped PDF (for example, 1.pdf → 1_cropped.pdf). To avoid multiple-download browser blocks, all output PDFs are delivered together in one ZIP file.</div>
+<div id="fileInfo" class="note">Choose a PDF from your computer to begin.</div>
+
+<h2 style="margin-top:22px">2. Set the crop ratio</h2>
+<label for="ratio">Aspect ratio</label>
+<select id="ratio">
+<option value="free">Free selection</option>
+<option value="original">Original page ratio</option>
+<option value="16:9">16:9 — landscape</option>
+<option value="9:16">9:16 — portrait</option>
+<option value="5:4">5:4</option>
+<option value="4:5">4:5</option>
+<option value="4:3">4:3 — landscape</option>
+<option value="3:4" selected>3:4 — portrait</option>
+<option value="3:2">3:2 — landscape</option>
+<option value="2:3">2:3 — portrait</option>
+<option value="1:1">Square</option>
+<option value="custom">Custom ratio</option>
+</select>
+<div id="customFields" style="display:none">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div><label for="ratioW">Width</label><input id="ratioW" type="number" min="1" value="3"></div>
+<div><label for="ratioH">Height</label><input id="ratioH" type="number" min="1" value="4"></div>
+</div>
+</div>
+<p class="note">On the preview, drag to draw the crop rectangle. The selected ratio is enforced while drawing. The same proportional crop is applied to every page.</p>
+
+<label for="pageNum">Preview page</label>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<input id="pageNum" type="number" min="1" value="1" aria-label="Page number">
+<button id="showPage" class="secondary" disabled>Show page</button>
+</div>
+<div class="buttons">
+<button id="fitPage" class="secondary" disabled>Fit crop to page</button>
+<button id="fitView" class="secondary" disabled>Fit page to view</button>
+</div>
+<div class="buttons">
+<button id="resetCrop" class="secondary" disabled>Reset selection</button>
+<button id="process" class="primary" disabled>Batch crop PDFs</button>
+</div>
+<label class="check"><input id="allPages" type="checkbox" checked><span>Apply this same proportional crop to every page in every selected PDF</span></label>
+<label class="check"><input id="keepPageSize" type="checkbox"><span>Keep original page dimensions (place cropped area on original-sized page)</span></label>
+<div id="status" class="status" role="status" aria-live="polite"></div>
+</section>
+
+<section class="panel">
+<div class="preview-head"><h2 style="margin:0">3. Draw crop area</h2><span id="pageLabel" class="note">No PDF loaded</span></div>
+<div class="canvas-wrap">
+<div id="stage"><canvas id="pageCanvas"></canvas><canvas id="overlay"></canvas></div>
+</div>
+<div class="info"><span id="cropInfo">Crop area: not selected</span><span id="dimensions"></span></div>
+<p class="note">Tip: choose a representative page first. The same proportional crop is applied to every page in each selected PDF. Each PDF is exported separately; the ZIP contains files such as 1_cropped.pdf and 2_cropped.pdf.</p>
+</section>
+</main>
+<footer class="footer">
+  <div><strong>Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" rel="noopener">Suyash Dwivedi</a></strong> · Updated 19 October 2026</div>
+  <div class="visit-counts">👁 Views: <span id="tc-views"></span> · 👤 Unique: <span id="tc-sessions"></span></div>
+  <p>Privacy: PDF contents are processed locally in this browser tab. PDF.js and pdf-lib load from public CDNs; your PDF files are not uploaded.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const fileInput=$('fileInput'), canvas=$('pageCanvas'), overlay=$('overlay'), ctx=canvas.getContext('2d'), octx=overlay.getContext('2d');
+let sourceBytes=null, pdfjsDoc=null, pdfLibDoc=null, currentPage=1, pageViewport=null, crop=null, drawing=false, start=null, renderScale=1, dragMode="draw", dragStart=null, originalCrop=null, selectedFiles=[], referenceIndex=0;
+const status = (msg, bad=false) => { $('status').textContent=msg; $('status').style.color=bad?'#b91c1c':'#166534'; };
+function playCompletionChime(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ac=new AC();const now=ac.currentTime;[880,1175].forEach((freq,i)=>{const osc=ac.createOscillator(),gain=ac.createGain();osc.type='sine';osc.frequency.value=freq;gain.gain.setValueAtTime(0.0001,now+i*.12);gain.gain.exponentialRampToValueAtTime(0.16,now+i*.12+.025);gain.gain.exponentialRampToValueAtTime(0.0001,now+i*.12+.22);osc.connect(gain);gain.connect(ac.destination);osc.start(now+i*.12);osc.stop(now+i*.12+.24)});setTimeout(()=>ac.close(),700)}catch(e){/* sound is optional; browser may require prior interaction */}}
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+function ratioValue(){
+ const v=$('ratio').value;
+ if(v==='free') return null;
+ if(v==='original') return pageViewport ? pageViewport.width/pageViewport.height : null;
+ if(v==='custom'){const w=+$('ratioW').value,h=+$('ratioH').value;return w>0&&h>0?w/h:null;}
+ const p=v.split(':').map(Number); return p[0]/p[1];
+}
+function syncOverlay(){
+ overlay.width=canvas.width; overlay.height=canvas.height;
+ overlay.style.width=canvas.style.width; overlay.style.height=canvas.style.height;
+ drawOverlay();
+}
+function drawOverlay(){
+ octx.clearRect(0,0,overlay.width,overlay.height);
+ if(!crop)return;
+ octx.fillStyle='rgba(0,0,0,.48)';octx.fillRect(0,0,overlay.width,overlay.height);
+ octx.clearRect(crop.x,crop.y,crop.w,crop.h);
+ octx.strokeStyle='#60a5fa';octx.lineWidth=Math.max(2,overlay.width/500);octx.setLineDash([8,5]);
+ octx.strokeRect(crop.x,crop.y,crop.w,crop.h);octx.setLineDash([]);
+ octx.fillStyle='#60a5fa';octx.font='bold 14px system-ui';octx.fillText('CROP',crop.x+6,Math.max(18,crop.y-7));
+ $('cropInfo').textContent=`Crop area: ${Math.round(crop.x/canvas.width*100)}%, ${Math.round(crop.y/canvas.height*100)}% — ${Math.round(crop.w/canvas.width*100)}% × ${Math.round(crop.h/canvas.height*100)}%`;
+}
+function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
+function pointerPos(e){const r=overlay.getBoundingClientRect();return {x:(e.clientX-r.left)*overlay.width/r.width,y:(e.clientY-r.top)*overlay.height/r.height}}
+function fitRect(a,b,ratio){
+ let dx=b.x-a.x,dy=b.y-a.y;
+ if(!ratio)return {x:Math.min(a.x,b.x),y:Math.min(a.y,b.y),w:Math.abs(dx),h:Math.abs(dy)};
+ const sx=Math.sign(dx)||1, sy=Math.sign(dy)||1;
+ let w=Math.abs(dx),h=Math.abs(dy);
+ if(w/h>ratio)w=h*ratio;else h=w/ratio;
+ let x=sx>0?a.x:a.x-w, y=sy>0?a.y:a.y-h;
+ if(x<0){w+=x;x=0;h=w/ratio}
+ if(y<0){h+=y;y=0;w=h*ratio}
+ if(x+w>overlay.width){w=overlay.width-x;h=w/ratio}
+ if(y+h>overlay.height){h=overlay.height-y;w=h*ratio}
+ return {x,y,w:Math.max(1,w),h:Math.max(1,h)};
+}
+function hitCropHandle(pos){
+ if(!crop)return null;
+ const radius=18, handles={nw:[crop.x,crop.y],ne:[crop.x+crop.w,crop.y],sw:[crop.x,crop.y+crop.h],se:[crop.x+crop.w,crop.y+crop.h]};
+ for(const [name,pt] of Object.entries(handles))if(Math.hypot(pos.x-pt[0],pos.y-pt[1])<radius)return name;
+ if(pos.x>=crop.x&&pos.x<=crop.x+crop.w&&pos.y>=crop.y&&pos.y<=crop.y+crop.h)return 'move';
+ return null;
+}
+overlay.addEventListener('pointerdown',e=>{
+ if(!pdfjsDoc)return;overlay.setPointerCapture(e.pointerId);drawing=true;start=pointerPos(e);dragStart=start;
+ const hit=hitCropHandle(start);dragMode=hit||'draw';originalCrop=crop?{...crop}:null;
+ if(dragMode==='draw')crop={x:start.x,y:start.y,w:1,h:1};drawOverlay();
+});
+overlay.addEventListener('pointermove',e=>{
+ if(!drawing)return;const pos=pointerPos(e);
+ if(dragMode==='move'&&originalCrop){crop={...originalCrop,x:clamp(originalCrop.x+pos.x-dragStart.x,0,overlay.width-originalCrop.w),y:clamp(originalCrop.y+pos.y-dragStart.y,0,overlay.height-originalCrop.h)};}
+ else if(['nw','ne','sw','se'].includes(dragMode)&&originalCrop){
+  let a,b;
+  if(dragMode==='nw'){a={x:originalCrop.x+originalCrop.w,y:originalCrop.y+originalCrop.h};b=pos}
+  if(dragMode==='ne'){a={x:originalCrop.x,y:originalCrop.y+originalCrop.h};b=pos}
+  if(dragMode==='sw'){a={x:originalCrop.x+originalCrop.w,y:originalCrop.y};b=pos}
+  if(dragMode==='se'){a={x:originalCrop.x,y:originalCrop.y};b=pos}
+  crop=fitRect(a,b,ratioValue());
+ } else crop=fitRect(start,pos,ratioValue());
+ drawOverlay();
+});
+overlay.addEventListener('pointerup',e=>{if(!drawing)return;drawing=false;if(!crop||crop.w<5||crop.h<5){crop=null;status('Please draw a larger crop rectangle.',true)}else status('Crop selection ready. Drag inside the rectangle to move it, or drag a corner to resize.');drawOverlay()});
+overlay.addEventListener('pointercancel',()=>{drawing=false});
+
+async function renderPage(n){
+ if(!pdfjsDoc)return;
+ n=clamp(Math.floor(n)||1,1,pdfjsDoc.numPages);currentPage=n;$('pageNum').value=n;
+ const page=await pdfjsDoc.getPage(n);
+ const base=page.getViewport({scale:1});
+ const maxW=Math.min(900,document.querySelector('.canvas-wrap').clientWidth-28);
+ renderScale=Math.min(1.5,maxW/base.width);
+ pageViewport=page.getViewport({scale:renderScale});
+ canvas.width=Math.floor(pageViewport.width);canvas.height=Math.floor(pageViewport.height);
+ canvas.style.width=canvas.width+'px';canvas.style.height=canvas.height+'px';
+ overlay.style.width=canvas.width+'px';overlay.style.height=canvas.height+'px';
+ overlay.width=canvas.width;overlay.height=canvas.height;
+ await page.render({canvasContext:ctx,viewport:pageViewport}).promise;
+ $('pageLabel').textContent=`Page ${n} of ${pdfjsDoc.numPages}`;
+ $('dimensions').textContent=`${Math.round(base.width)} × ${Math.round(base.height)} pt`;
+ if(crop)drawOverlay();
+}
+function refreshFileUI(){
+ const list=$('fileList'),ref=$('referenceFile');list.innerHTML='';ref.innerHTML='';
+ selectedFiles.forEach((f,i)=>{
+  const row=document.createElement('div');row.className='file-row';
+  const radio=document.createElement('input');radio.type='radio';radio.name='referenceRadio';radio.checked=i===referenceIndex;radio.title='Use this PDF as reference';radio.addEventListener('change',()=>loadReference(i));
+  const name=document.createElement('div');name.className='file-name';name.textContent=`${i+1}. ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)`;
+  const remove=document.createElement('button');remove.type='button';remove.className='secondary';remove.textContent='Remove';remove.addEventListener('click',()=>{selectedFiles.splice(i,1);if(!selectedFiles.length){pdfjsDoc=null;crop=null;sourceBytes=null;pdfLibDoc=null;fileInput.value='';$('fileInfo').textContent='Choose a PDF from your computer to begin.';$('process').disabled=true;$('showPage').disabled=true;$('resetCrop').disabled=true;$('fitPage').disabled=true;$('fitView').disabled=true;$('pageLabel').textContent='No PDF loaded';ctx.clearRect(0,0,canvas.width,canvas.height);octx.clearRect(0,0,overlay.width,overlay.height);}else{if(referenceIndex>=selectedFiles.length)referenceIndex=selectedFiles.length-1;else if(i<referenceIndex)referenceIndex--;loadReference(referenceIndex);}refreshFileUI();});
+  row.append(radio,name,remove);list.append(row);
+  const opt=document.createElement('option');opt.value=String(i);opt.textContent=`${i+1}. ${f.name}`;if(i===referenceIndex)opt.selected=true;ref.append(opt);
+ });
+ ref.disabled=!selectedFiles.length;
+ $('fileInfo').textContent=selectedFiles.length?`${selectedFiles.length} PDF file(s) selected. Each input PDF will produce its own _cropped.pdf output.`:'Choose a PDF from your computer to begin.';
+}
+async function addFiles(files){
+ const incoming=[...files].filter(f=>f.type==='application/pdf'||f.name.toLowerCase().endsWith('.pdf'));
+ if(!incoming.length){status('Please add PDF files only.',true);return}
+ const known=new Set(selectedFiles.map(f=>`${f.name}|${f.size}|${f.lastModified}`));
+ for(const f of incoming){const key=`${f.name}|${f.size}|${f.lastModified}`;if(!known.has(key)){selectedFiles.push(f);known.add(key)}}
+ referenceIndex=0;refreshFileUI();await loadReference(referenceIndex);
+}
+async function loadReference(index){
+ if(!selectedFiles.length)return;
+ referenceIndex=clamp(index,0,selectedFiles.length-1);refreshFileUI();const file=selectedFiles[referenceIndex];
+ try{
+  status(`Loading reference PDF: ${file.name}…`);crop=null;sourceBytes=await file.arrayBuffer();
+  pdfjsDoc=await pdfjsLib.getDocument({data:new Uint8Array(sourceBytes.slice(0))}).promise;
+  pdfLibDoc=await PDFLib.PDFDocument.load(sourceBytes,{ignoreEncryption:false});
+  $('pageNum').max=pdfjsDoc.numPages;$('pageNum').value=1;$('showPage').disabled=false;$('resetCrop').disabled=false;$('process').disabled=false;$('fitPage').disabled=false;$('fitView').disabled=false;
+  await renderPage(1);status(`Reference: ${file.name} — ${pdfjsDoc.numPages} page(s). Choose the page number below, then set the crop area.`);
+ }catch(e){status(`Could not open reference PDF: ${file.name}. It may be damaged or password-protected.\n${e.message}`,true)}
+}
+fileInput.addEventListener('change',async()=>{await addFiles(fileInput.files)});
+$('referenceFile').addEventListener('change',e=>loadReference(Number(e.target.value)));
+const dropZone=$('dropZone');
+dropZone.addEventListener('click',()=>fileInput.click());
+dropZone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fileInput.click()}});
+for(const ev of ['dragenter','dragover'])dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add('dragover')});
+for(const ev of ['dragleave','drop'])dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove('dragover')});
+dropZone.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+$('themeToggle').addEventListener('click',()=>{const dark=document.body.classList.toggle('dark');$('themeToggle').textContent=dark?'Light mode':'Dark mode';$('themeToggle').setAttribute('aria-pressed',String(dark));});
+$('showPage').addEventListener('click',()=>renderPage($('pageNum').value).catch(e=>status(e.message,true)));
+$('pageNum').addEventListener('keydown',e=>{if(e.key==='Enter')renderPage($('pageNum').value).catch(err=>status(err.message,true))});
+$('resetCrop').addEventListener('click',()=>{crop=null;drawOverlay();status('Crop selection cleared.')});
+$('fitPage').addEventListener('click',()=>{if(!pdfjsDoc)return;crop={x:0,y:0,w:overlay.width,h:overlay.height};const r=ratioValue();if(r){let w=crop.w,h=crop.h;if(w/h>r)w=h*r;else h=w/r;crop={x:(overlay.width-w)/2,y:(overlay.height-h)/2,w,h};}drawOverlay();status('Crop area fitted to the page preview.');});
+$('fitView').addEventListener('click',()=>{if(!pdfjsDoc)return;renderPage(currentPage).then(()=>status('Page fitted to the available preview area.')).catch(e=>status(e.message,true));});
+$('ratio').addEventListener('change',()=>{
+ $('customFields').style.display=$('ratio').value==='custom'?'block':'none';
+ if(crop && $('ratio').value!=='free'){
+  const r=ratioValue();let w=crop.w,h=crop.h;
+  if(w/h>r)w=h*r;else h=w/r;
+  crop={...crop,w,h};drawOverlay();
+ }
+});
+$('ratioW').addEventListener('input',()=>{if(crop&&ratioValue()){$('ratio').dispatchEvent(new Event('change'))}});
+$('ratioH').addEventListener('input',()=>{if(crop&&ratioValue()){$('ratio').dispatchEvent(new Event('change'))}});
+
+$('process').addEventListener('click',async()=>{
+ const files=[...selectedFiles];
+ if(!files.length||!crop){status('Select one or more PDFs and draw a crop rectangle first.',true);return}
+ if(!window.JSZip){status('The ZIP library did not load. Check your internet connection and reload this page.',true);return}
+ const btn=$('process');btn.disabled=true;
+ try{
+  const zip=new JSZip();
+  const rx=crop.x/canvas.width, ry=crop.y/canvas.height, rw=crop.w/canvas.width, rh=crop.h/canvas.height;
+  let processedPages=0, completedFiles=0;
+  const usedNames=new Set();
+  for(let fi=0;fi<files.length;fi++){
+   const f=files[fi];
+   status(`Processing PDF ${fi+1} of ${files.length}: ${f.name}…`);
+   const bytes=await f.arrayBuffer();
+   const src=await PDFLib.PDFDocument.load(bytes);
+   const out=await PDFLib.PDFDocument.create();
+   const sourcePages=src.getPages();
+   const selectedIndices=$('allPages').checked?sourcePages.map((_,i)=>i):[Math.min(currentPage-1,sourcePages.length-1)];
+   const copied=await out.copyPages(src,selectedIndices);
+   for(let j=0;j<copied.length;j++){
+    const p=copied[j],size=p.getSize();
+    let x=rx*size.width,w=rw*size.width,h=rh*size.height;
+    let y=size.height-(ry*size.height)-h;
+    x=clamp(x,0,size.width);y=clamp(y,0,size.height);
+    w=Math.min(w,size.width-x);h=Math.min(h,size.height-y);
+    if(w<=0||h<=0)throw new Error(`Invalid crop dimensions on page ${selectedIndices[j]+1} of ${f.name}.`);
+    if($('keepPageSize').checked){p.setCropBox(x,y,w,h)}
+    else {p.setMediaBox(x,y,w,h);p.setCropBox(x,y,w,h)}
+    out.addPage(p);processedPages++;
+   }
+   const resultBytes=await out.save();
+   let base=f.name.replace(/\.pdf$/i,'')||`document_${fi+1}`;
+   let outputName=`${base}_cropped.pdf`,counter=2;
+   while(usedNames.has(outputName.toLowerCase())){outputName=`${base}_cropped_${counter++}.pdf`}
+   usedNames.add(outputName.toLowerCase());
+   zip.file(outputName,resultBytes);
+   completedFiles++;
+   status(`Finished ${completedFiles} of ${files.length} PDF(s)…`);
+   await new Promise(r=>setTimeout(r,0));
+  }
+  status('Preparing ZIP containing individual cropped PDFs…');
+  const zipBlob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:3}});
+  const url=URL.createObjectURL(zipBlob),a=document.createElement('a');a.href=url;
+  a.download=files.length===1?`${files[0].name.replace(/\.pdf$/i,'')||'document'}_cropped.zip`:`cropped_pdfs_${files.length}_files.zip`;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+  status(`Finished successfully: ${completedFiles} separate cropped PDF(s), containing ${processedPages} page(s), saved together in a ZIP file. Each PDF has its own output file; they are not merged together.`);playCompletionChime();
+ }catch(e){status('Could not process the selected PDFs. A file may be encrypted, damaged, or use unsupported features.\n'+e.message,true)}
+ finally{btn.disabled=false}
+});
+window.addEventListener('resize',()=>{if(pdfjsDoc)renderPage(currentPage).catch(()=>{})});
+})();
+</script>
+<script src="https://toolcounter.toolforge.org/embed.js.php?tool=PDF_Cropper&amp;page=index"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GC8PGC89NB');
+</script>
+<script src="https://cdn.counter.dev/script.js" data-id="cc7a036d-a904-4d76-bcac-37ea4196c014" data-utcoffset="6"></script>
+</body>
+</html>
