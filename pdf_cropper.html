@@ -114,7 +114,7 @@ footer{max-width:1200px;margin:0 auto 24px;padding:0 16px;color:#5f6368;font-siz
 <button id="process" class="primary" disabled>Batch crop PDFs</button>
 </div>
 <label class="check"><input id="allPages" type="checkbox" checked><span>Apply this same proportional crop to every page in every selected PDF</span></label>
-<label class="check"><input id="keepPageSize" type="checkbox"><span>Keep original page dimensions (place cropped area on original-sized page)</span></label>
+<label class="check"><input id="keepPageSize" type="checkbox" checked><span>Keep original page dimensions (place cropped area on original-sized page)</span></label>
 <div id="status" class="status" role="status" aria-live="polite"></div>
 </section>
 
@@ -132,6 +132,8 @@ footer{max-width:1200px;margin:0 auto 24px;padding:0 16px;color:#5f6368;font-siz
   <div class="visit-counts">👁 Views: <span id="tc-views"></span> · 👤 Unique: <span id="tc-sessions"></span></div>
   <p>Privacy: PDF contents are processed locally in this browser tab. PDF.js and pdf-lib load from public CDNs; your PDF files are not uploaded.</p>
 </footer>
+<button id="go-to-top" class="scroll-button" type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Go to top" aria-label="Go to top">&#8593;</button>
+<button id="go-to-bottom" class="scroll-button" type="button" onclick="window.scrollTo({top:document.documentElement.scrollHeight,behavior:'smooth'})" title="Go to bottom" aria-label="Go to bottom">&#8595;</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
@@ -266,7 +268,17 @@ dropZone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preve
 for(const ev of ['dragenter','dragover'])dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add('dragover')});
 for(const ev of ['dragleave','drop'])dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove('dragover')});
 dropZone.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
-$('themeToggle').addEventListener('click',()=>{const dark=document.body.classList.toggle('dark');$('themeToggle').textContent=dark?'Light mode':'Dark mode';$('themeToggle').setAttribute('aria-pressed',String(dark));});
+// Restore the user's theme preference across browser sessions.
+const savedTheme = (()=>{try{return localStorage.getItem('pdfCropperTheme')}catch(e){return null}})();
+if(savedTheme==='dark') document.body.classList.add('dark');
+$('themeToggle').textContent=document.body.classList.contains('dark')?'Light mode':'Dark mode';
+$('themeToggle').setAttribute('aria-pressed',String(document.body.classList.contains('dark')));
+$('themeToggle').addEventListener('click',()=>{
+ const dark=document.body.classList.toggle('dark');
+ $('themeToggle').textContent=dark?'Light mode':'Dark mode';
+ $('themeToggle').setAttribute('aria-pressed',String(dark));
+ try{localStorage.setItem('pdfCropperTheme',dark?'dark':'light')}catch(e){/* storage may be disabled */}
+});
 $('showPage').addEventListener('click',()=>renderPage($('pageNum').value).catch(e=>status(e.message,true)));
 $('pageNum').addEventListener('keydown',e=>{if(e.key==='Enter')renderPage($('pageNum').value).catch(err=>status(err.message,true))});
 $('resetCrop').addEventListener('click',()=>{crop=null;drawOverlay();status('Crop selection cleared.')});
