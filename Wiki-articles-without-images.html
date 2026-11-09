@@ -18,8 +18,16 @@
   <meta property="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
   <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
   <title>Wikipedia articles without images finder</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-  
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GC8PGC89NB');
+</script>
+<script src="https://cdn.counter.dev/script.js" data-id="cc7a036d-a904-4d76-bcac-37ea4196c014" data-utcoffset="6"></script>
+
 <style>
     :root {
       --bg:       #0f1117;
@@ -52,7 +60,7 @@
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Source Sans 3', sans-serif;
+      font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;
       background: var(--bg); color: var(--text);
       min-height: 100vh; position: relative;
       transition: background .25s, color .25s;
@@ -83,14 +91,13 @@
     .wrapper { max-width: 1100px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
     header { padding: 36px 0 28px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
     .logo-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-    .logo-img { width: 54px; height: 54px; object-fit: contain; flex-shrink: 0; }
+    .logo-img { width: 80px; height: 80px; object-fit: contain; flex-shrink: 0; }
     h1 {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Bricolage Grotesque', 'Atkinson Hyperlegible', sans-serif;
       font-size: clamp(20px, 4vw, 33px);
       color: var(--text); line-height: 1.2;
     }
     .tagline { color: var(--muted); font-size: 14px; margin-top: 5px; }
-    /* Notice */
     .notice {
       display: flex; gap: 12px; align-items: flex-start;
       background: var(--warn-bg); border: 1px solid var(--warn-bdr);
@@ -100,7 +107,6 @@
     }
     .notice .ni { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
     .notice a { color: var(--accent2); }
-    /* Panel */
     .panel {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 24px; margin-bottom: 20px;
@@ -220,6 +226,94 @@
     .scroll-button:hover { border-color: var(--accent); color: var(--accent); }
     #go-to-top    { bottom: 72px; }
     #go-to-bottom { bottom: 22px; }
+
+    /* Cross-wiki coverage */
+    .cross-wiki-row {
+      display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap;
+      margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+    }
+    .cross-wiki-label { font-size: 13px; color: var(--muted); white-space: nowrap; padding-top: 4px; }
+
+    /* Toggle switch pill */
+    .switch-wrap { display: flex; align-items: center; gap: 9px; cursor: pointer; user-select: none; }
+    .switch-wrap input { display: none; }
+    .switch-track {
+      width: 38px; height: 22px; border-radius: 11px;
+      background: var(--border); position: relative; flex-shrink: 0;
+      transition: background .2s;
+    }
+    .switch-track::after {
+      content: ''; position: absolute;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; top: 3px; left: 3px;
+      transition: transform .2s; box-shadow: 0 1px 4px rgba(0,0,0,.3);
+    }
+    input#crossWikiCheck:checked + .switch-track { background: var(--accent); }
+    input#crossWikiCheck:checked + .switch-track::after { transform: translateX(16px); }
+    .switch-label { font-size: 13px; color: var(--muted); transition: color .2s; }
+    input#crossWikiCheck:checked ~ .switch-label { color: var(--text); }
+
+    /* Chips area */
+    .cross-wiki-chips-area { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
+    .cross-wiki-langs {
+      display: flex; gap: 6px; flex-wrap: wrap;
+      opacity: .3; pointer-events: none; transition: opacity .2s;
+    }
+    .cross-wiki-langs.enabled { opacity: 1; pointer-events: all; }
+    .lang-chip-toggle {
+      padding: 4px 11px; border-radius: 14px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all .15s; font-family: 'JetBrains Mono', monospace;
+      letter-spacing: .03em;
+    }
+    .lang-chip-toggle.selected { background: rgba(91,141,238,.18); border-color: var(--accent); color: var(--accent); }
+    .lang-chip-toggle:disabled { opacity: .3 !important; cursor: not-allowed; pointer-events: none; }
+    .cross-wiki-note { font-size: 11px; color: var(--muted); font-style: italic; }
+
+    /* Coverage badges in table */
+    .cov-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 20px; border-radius: 5px;
+      font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+      text-decoration: none; transition: opacity .15s;
+    }
+    .cov-yes { background: rgba(76,175,130,.18); color: var(--success); border: 1px solid rgba(76,175,130,.35); }
+    .cov-yes:hover { opacity: .72; }
+    .cov-no  { background: rgba(224,91,91,.10);  color: var(--danger);  border: 1px solid rgba(224,91,91,.28); cursor: default; }
+    .cov-cell { display: flex; justify-content: center; }
+    th.cov-th { white-space: nowrap; text-align: center; font-size: 10px; }
+    td.cov-td { text-align: center; padding: 8px 8px; }
+
+    body { font-size: 16px; line-height: 1.5; }
+    h1 { font-weight: 700; letter-spacing: -.015em; }
+    .panel-title { text-transform: none; letter-spacing: .02em; font-size: 13px; font-weight: 700; }
+    th { text-transform: none; letter-spacing: .02em; font-size: 12px; }
+    :focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+    .combo { position: relative; }
+    .combo input { cursor: text; }
+    .combo ul { position: absolute; z-index: 60; left: 0; right: 0; top: calc(100% + 4px); max-height: 330px; overflow-y: auto;
+      list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: 0 14px 34px rgba(0,0,0,.35); }
+    .combo li { padding: 9px 14px; cursor: pointer; display: flex; gap: 10px; justify-content: space-between; align-items: baseline; }
+    .combo li:hover, .combo li.on { background: rgba(91,141,238,.16); }
+    .combo li.none { color: var(--muted); cursor: default; }
+    .combo .code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .combo .af { color: var(--success); font-size: 11px; margin-left: 6px; }
+    .lang-tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 8px; font-size: 12px; color: var(--muted); }
+    .mini-btn { padding: 4px 12px; border-radius: 14px; border: 1px solid var(--border); background: transparent;
+      color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; }
+    .mini-btn[aria-pressed="true"] { background: rgba(76,175,130,.16); border-color: var(--success); color: var(--success); }
+    .lang-meta { font-size: 13px; margin-top: 8px; color: var(--muted); min-height: 20px; }
+    .lang-meta b { color: var(--text); }
+    .lang-meta.bad { color: var(--danger); }
+    .code-row { display: flex; gap: 8px; margin-top: 10px; }
+    .code-row input { flex: 1; min-width: 0; cursor: text; }
+    .code-row .btn { padding: 9px 16px; white-space: nowrap; }
+    .verify-row { display: flex; gap: 12px 28px; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+    input#verifyImg:checked + .switch-track, input#includeSub:checked + .switch-track { background: var(--accent); }
+    input#verifyImg:checked + .switch-track::after, input#includeSub:checked + .switch-track::after { transform: translateX(16px); }
+    input#verifyImg:checked ~ .switch-label, input#includeSub:checked ~ .switch-label { color: var(--text); }
   </style>
 </head>
 <body>
@@ -256,329 +350,214 @@
     <div class="panel-title">Query Settings</div>
     <div class="controls">
 
+      <!-- ══════════════════════════════════════════════
+           LANGUAGE SELECT — native names, grouped
+      ══════════════════════════════════════════════ -->
       <div>
-        <label for="lang">Wikipedia Language Project</label>
+        <label for="langInput">Wikipedia language</label>
+        <div class="combo">
+          <input type="text" id="langInput" role="combobox" aria-expanded="false" aria-controls="langList" autocomplete="off" spellcheck="false"
+                 placeholder="Search by name or type any code, then press Enter" />
+          <input type="hidden" id="lang" value="hi" />
+          <ul id="langList" role="listbox" hidden></ul>
+        </div>
+        <div class="lang-tools">
+          <button type="button" class="mini-btn" id="africaBtn" aria-pressed="false">Africa only</button>
+          <span>Language not in the list? Use the code box below.</span>
+        </div>
+        <div class="code-row">
+          <input type="text" id="customCode" maxlength="14" autocomplete="off" spellcheck="false" aria-label="Custom language code" placeholder="Enter a language code, e.g. kcg or zh-min-nan" />
+          <button type="button" class="btn btn-secondary" id="useCodeBtn">Use code</button>
+        </div>
+        <div class="lang-meta" id="langMeta" aria-live="polite"></div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           CATEGORY SELECT — fixed QIDs, grouped
+      ══════════════════════════════════════════════ -->
+      <div>
+        <label for="category">Article Category (Wikidata P31 type)</label>
         <div class="select-wrap">
-         <select id="lang">
+          <select id="category">
 
-  <!-- Major World Languages -->
-  <optgroup label="🌐 Major Languages">
-    <option value="en">English (en)</option>
-    <option value="simple">Simple English (simple)</option>
-    <option value="fr">French/Français (fr)</option>
-    <option value="de">German/Deutsch (de)</option>
-    <option value="es">Spanish/Español (es)</option>
-    <option value="pt">Portuguese/Português (pt)</option>
-    <option value="ru">Russian/Русский (ru)</option>
-    <option value="zh">Chinese/中文 (zh)</option>
-    <option value="ja">Japanese/日本語 (ja)</option>
-    <option value="it">Italian/Italiano (it)</option>
-    <option value="pl">Polish/Polski (pl)</option>
-    <option value="nl">Dutch/Nederlands (nl)</option>
-    <option value="ar">Arabic/العربية (ar)</option>
-    <option value="fa">Persian/فارسی (fa)</option>
-    <option value="tr">Turkish/Türkçe (tr)</option>
-    <option value="sv">Swedish/Svenska (sv)</option>
-    <option value="uk">Ukrainian/Українська (uk)</option>
-    <option value="he">Hebrew/עברית (he)</option>
-    <option value="ca">Catalan/Català (ca)</option>
-    <option value="ko">Korean/한국어 (ko)</option>
-  </optgroup>
+            <!-- People -->
+            <optgroup label="👤 People">
+              <option value="Q5">Human / Person</option>
+              <option value="Q482980">Author / Writer</option>
+              <option value="Q901">Scientist</option>
+              <option value="Q2562308">Woman Scientist</option>
+              <option value="Q36180">Poet</option>
+              <option value="Q33999">Actor</option>
+              <option value="Q639669">Musician</option>
+              <option value="Q40348">Lawyer</option>
+              <option value="Q82955">Politician</option>
+              <option value="Q193391">Diplomat</option>
+              <option value="Q11631">Astronaut</option>
+              <option value="Q189290">Military Officer</option>
+              <option value="Q1930187">Journalist</option>
+              <option value="Q2374149">Activist / Social Reformer</option>
+              <option value="Q15976105">Freedom Fighter</option>
+              <option value="Q12362622">Female Politician</option>
+              <option value="Q2066131">Athlete / Sportsperson</option>
+              <option value="Q4964182">Philosopher</option>
+              <option value="Q2526255">Film Director</option>
+              <option value="Q177220">Singer</option>
+              <option value="Q1028181">Painter / Artist</option>
+              <option value="Q3665646">Dancer</option>
+              <option value="Q14089670">Fashion Designer</option>
+              <option value="Q712378">Religious Leader</option>
+              <option value="Q372436">Feminist / Women's Rights Activist</option>
+            </optgroup>
 
-  <!-- South Asia -->
-  <optgroup label="🪔 South Asia">
-    <option value="hi">Hindi/हिन्दी (hi)</option>
-    <option value="ur">Urdu/اردو (ur)</option>
-    <option value="bn">Bengali/বাংলা (bn)</option>
-    <option value="pa">Punjabi/ਪੰਜਾਬੀ (pa)</option>
-    <option value="ta">Tamil/தமிழ் (ta)</option>
-    <option value="te">Telugu/తెలుగు (te)</option>
-    <option value="ml">Malayalam/മലയാളം (ml)</option>
-    <option value="mr">Marathi/मराठी (mr)</option>
-    <option value="gu">Gujarati/ગુજરાતી (gu)</option>
-    <option value="kn">Kannada/ಕನ್ನಡ (kn)</option>
-    <option value="bho">Bhojpuri/भोजपुरी (bho)</option>
-    <option value="mai">Maithili/मैथिली (mai)</option>
-    <option value="awa">Awadhi/अवधी (awa)</option>
-    <option value="new">Newari/नेपाल भाषा (new)</option>
-    <option value="ne">Nepali/नेपाली (ne)</option>
-    <option value="sa">Sanskrit/संस्कृतम् (sa)</option>
-    <option value="si">Sinhala/සිංහල (si)</option>
-    <option value="sd">Sindhi/سنڌي (sd)</option>
-    <option value="as">Assamese/অসমীয়া (as)</option>
-    <option value="or">Odia/ଓଡ଼ିଆ (or)</option>
-    <option value="dz">Dzongkha/རྫོང་ཁ (dz)</option>
-    <option value="ps">Pashto/پښتو (ps)</option>
-  </optgroup>
+            <!-- Places -->
+            <optgroup label="🌍 Places">
+              <option value="Q3624078">Sovereign State / Country</option>
+              <option value="Q515">City</option>
+              <option value="Q34763">Village</option>
+              <option value="Q532">Village (alternate)</option>
+              <option value="Q484170">Municipality</option>
+              <option value="Q1549591">Big City / Metropolis</option>
+              <option value="Q5119">Capital City</option>
+              <option value="Q133215">State / Province</option>
+              <option value="Q185145">District</option>
+              <option value="Q1967419">Tehsil / Subdivision</option>
+              <option value="Q28575">County</option>
+            </optgroup>
 
-  <!-- Southeast Asia -->
-  <optgroup label="🌴 Southeast Asia">
-    <option value="id">Indonesian/Bahasa Indonesia (id)</option>
-    <option value="ms">Malay/Bahasa Melayu (ms)</option>
-    <option value="th">Thai/ภาษาไทย (th)</option>
-    <option value="vi">Vietnamese/Tiếng Việt (vi)</option>
-    <option value="my">Burmese/မြန်မာဘာသာ (my)</option>
-    <option value="km">Khmer/ភាសាខ្មែរ (km)</option>
-    <option value="lo">Lao/ລາວ (lo)</option>
-    <option value="tl">Tagalog/Tagalog (tl)</option>
-    <option value="ceb">Cebuano/Sinugboanon (ceb)</option>
-    <option value="ilo">Ilocano/Ilokano (ilo)</option>
-    <option value="war">Waray/Winaray (war)</option>
-    <option value="jv">Javanese/Basa Jawa (jv)</option>
-    <option value="su">Sundanese/Basa Sunda (su)</option>
-    <option value="min">Minangkabau/Baso Minangkabau (min)</option>
-    <option value="ace">Acehnese/Bahsa Acèh (ace)</option>
-    <option value="ban">Balinese/Basa Bali (ban)</option>
-    <option value="bjn">Banjar/Bahasa Banjar (bjn)</option>
-  </optgroup>
+            <!-- Nature & Geography -->
+            <optgroup label="🏔️ Nature &amp; Geography">
+              <option value="Q8502">Mountain</option>
+              <option value="Q4022">River</option>
+              <option value="Q23397">Lake</option>
+              <option value="Q34038">Waterfall</option>
+              <option value="Q46">National Park</option>
+              <option value="Q179049">Wildlife Sanctuary</option>
+              <option value="Q1967038">Biosphere Reserve</option>
+              <option value="Q35509">Cave</option>
+              <option value="Q23442">Island</option>
+              <option value="Q1322809">Gulf / Bay</option>
+              <option value="Q39816">Valley</option>
+              <option value="Q93352">Coast / Beach</option>
+              <option value="Q5107">Continent</option>
+              <option value="Q16521">Taxon / Species</option>
+              <option value="Q756">Plant</option>
+              <option value="Q7377">Mammal</option>
+              <option value="Q5113">Bird</option>
+              <option value="Q12323">Dam</option>
+              <option value="Q131681">Reservoir</option>
+              <option value="Q39614">Cemetery / Graveyard</option>
+            </optgroup>
 
-  <!-- Africa -->
-  <optgroup label="🌍 Africa — East & Horn">
-    <option value="sw">Swahili/Kiswahili (sw)</option>
-    <option value="am">Amharic/አማርኛ (am)</option>
-    <option value="so">Somali/Soomaali (so)</option>
-    <option value="ti">Tigrinya/ትግርኛ (ti)</option>
-    <option value="om">Oromo/Oromoo (om)</option>
-    <option value="rw">Kinyarwanda/Kinyarwanda (rw)</option>
-    <option value="lg">Luganda/Luganda (lg)</option>
-    <option value="sn">Shona/chiShona (sn)</option>
-    <option value="hke">Kihunde (hke)</option>
-  </optgroup>
+            <!-- Culture & Community -->
+            <optgroup label="🎭 Culture &amp; Community">
+              <option value="Q41710">Ethnic Group</option>
+              <option value="Q33829">Tribe / Tribal Community</option>
+              <option value="Q17633526">Indigenous Community</option>
+              <option value="Q132241">Festival</option>
+              <option value="Q179380">Religious Festival</option>
+              <option value="Q27968055">Tribal Festival</option>
+              <option value="Q4504495">Folk Festival</option>
+              <option value="Q2736527">Music Festival</option>
+              <option value="Q1344">Opera</option>
+              <option value="Q483394">Genre (Music / Art)</option>
+              <option value="Q9842">Primary School</option>
+              <option value="Q9826">High School</option>
+              <option value="Q3918">University</option>
+              <option value="Q7075">Library</option>
+              <option value="Q166118">Caste / Social Group</option>
+              <option value="Q8261">Novel</option>
+              <option value="Q571">Book</option>
+              <option value="Q7725634">Literary Work</option>
+              <option value="Q15632617">Fictional Character</option>
+            </optgroup>
 
-  <optgroup label="🌍 Africa — West">
-    <option value="yo">Yoruba/Yorùbá (yo)</option>
-    <option value="ha">Hausa/Hausa (ha)</option>
-    <option value="ig">Igbo/Igbo (ig)</option>
-    <option value="wo">Wolof/Wolof (wo)</option>
-    <option value="ee">Ewe/Eʋegbe (ee)</option>
-    <option value="bm">Bambara/Bamanankan (bm)</option>
-    <option value="ff">Fula/Fulfulde (ff)</option>
-    <option value="tw">Twi/Twi (tw)</option>
-    <option value="kab">Kabyle/Taqbaylit (kab)</option>
-    <option value="igl">Igala (igl)</option>
-    <option value="dag">Dagbani (dag)</option>
-    <option value="gur">Gurene (gur)</option>
-    <option value="dga">Dagaare (dga)</option>
-    <option value="kus">Kusaal (kus)</option>
-    <option value="kcg">Tyap (kcg)</option>
-    
-  </optgroup>
+            <!-- Religion & Heritage -->
+            <optgroup label="🛕 Religion &amp; Heritage">
+              <option value="Q16970">Church Building</option>
+              <option value="Q44539">Temple</option>
+              <option value="Q32815">Mosque</option>
+              <option value="Q697295">Gurudwara</option>
+              <option value="Q179700">Monastery</option>
+              <option value="Q697637">Shrine</option>
+              <option value="Q5003624">Memorial</option>
+              <option value="Q839954">Archaeological Site</option>
+              <option value="Q570116">Tourist Attraction</option>
+              <option value="Q9259">World Heritage Site (UNESCO)</option>
+              <option value="Q1185117">Heritage Site</option>
+              <option value="Q4989906">Monument</option>
+              <option value="Q12280">Bridge</option>
+              <option value="Q41176">Building</option>
+              <option value="Q16560">Palace</option>
+              <option value="Q57821">Fort / Fortress</option>
+              <option value="Q860861">Sculpture</option>
+            </optgroup>
 
-  <optgroup label="🌍 Africa — South & Central">
-    <option value="af">Afrikaans/Afrikaans (af)</option>
-    <option value="zu">Zulu/isiZulu (zu)</option>
-    <option value="xh">Xhosa/isiXhosa (xh)</option>
-    <option value="st">Sesotho/Sesotho (st)</option>
-    <option value="tn">Setswana/Setswana (tn)</option>
-    <option value="ny">Chichewa/Chichewa (ny)</option>
-    <option value="ln">Lingala/Lingála (ln)</option>
-    <option value="mg">Malagasy/Malagasy (mg)</option>
-    <option value="kg">Kongo/Kikongo (kg)</option>
-  </optgroup>
+            <!-- Science & Knowledge -->
+            <optgroup label="🔬 Science &amp; Knowledge">
+              <option value="Q5633421">Scientific Journal</option>
+              <option value="Q191067">Wikipedia Article</option>
+              <option value="Q7191">Nobel Prize</option>
+              <option value="Q4830453">Business / Enterprise</option>
+              <option value="Q7187">Gene</option>
+              <option value="Q11173">Chemical Compound</option>
+              <option value="Q3966">Computer Hardware</option>
+              <option value="Q7397">Software</option>
+              <option value="Q2996394">Biological Process</option>
+              <option value="Q431">Astronomical Object</option>
+              <option value="Q523">Star</option>
+              <option value="Q634">Planet</option>
+            </optgroup>
 
-  <!-- Russia & Eurasia — Regional Languages -->
-  <optgroup label="🇷🇺 Russia & Eurasia — Regional">
-    <option value="tt">Tatar/Татарча (tt)</option>
-    <option value="ba">Bashkir/Башҡортса (ba)</option>
-    <option value="cv">Chuvash/Чӑвашла (cv)</option>
-    <option value="ce">Chechen/Нохчийн (ce)</option>
-    <option value="os">Ossetian/Ирон (os)</option>
-    <option value="sah">Sakha/Саха тыла (sah)</option>
-    <option value="mhr">Meadow Mari/Олык марий (mhr)</option>
-    <option value="kv">Komi/Коми кыв (kv)</option>
-    <option value="udm">Udmurt/Удмурт кыл (udm)</option>
-    <option value="av">Avar/Авар мацӏ (av)</option>
-    <option value="lez">Lezgian/Лезги чӏал (lez)</option>
-    <option value="inh">Ingush/ГӀалгӀай мотт (inh)</option>
-    <option value="myv">Erzya/Эрзянь кель (myv)</option>
-    <option value="bxr">Buryat/Буряад хэлэн (bxr)</option>
-    <option value="xmf">Mingrelian/მარგალური (xmf)</option>
-  </optgroup>
+            <!-- Events -->
+            <optgroup label="📅 Events">
+              <option value="Q1656682">Event</option>
+              <option value="Q18608583">Recurring Sporting Event</option>
+              <option value="Q27020041">Sports Season</option>
+              <option value="Q49773">Sports Competition</option>
+              <option value="Q235557">Battle</option>
+              <option value="Q198">War / Conflict</option>
+              <option value="Q40231">Election</option>
+              <option value="Q15275719">Revolt / Uprising</option>
+              <option value="Q3839081">Social Movement</option>
+            </optgroup>
 
-</select>
+            <!-- Infrastructure & Transport -->
+            <optgroup label="🏗️ Infrastructure &amp; Transport">
+              <option value="Q55488">Railway Station</option>
+              <option value="Q1248784">Airport</option>
+              <option value="Q16917">Hospital</option>
+              <option value="Q43229">Organization</option>
+              <option value="Q891723">Public Company</option>
+              <option value="Q786014">Administrative Unit</option>
+              <option value="Q27686">Hotel</option>
+              <option value="Q571481">Stadium</option>
+              <option value="Q33506">Museum</option>
+              <option value="Q207694">Art Museum</option>
+              <option value="Q1785071">Lighthouse</option>
+              <option value="Q44782">Port / Harbour</option>
+              <option value="Q79007">Street / Road</option>
+              <option value="Q1078765">Metro Station</option>
+              <option value="Q1107656">Botanical Garden</option>
+              <option value="Q22698">Park</option>
+            </optgroup>
+
+            <!-- Arts & Entertainment -->
+            <optgroup label="🎬 Arts &amp; Entertainment">
+              <option value="Q11424">Film / Movie</option>
+              <option value="Q5398426">Television Series</option>
+              <option value="Q7889">Video Game</option>
+              <option value="Q105420">Artwork</option>
+              <option value="Q838948">Work of Art</option>
+              <option value="Q134556">Single (Music)</option>
+              <option value="Q482994">Album</option>
+              <option value="Q11707">Restaurant</option>
+              <option value="Q1914636">Activity / Tradition</option>
+            </optgroup>
+
+          </select>
         </div>
       </div>
 
-      <div>
-  <label for="category">Article Category (Wikidata P31 type)</label>
-  <div class="select-wrap">
-    <select id="category">
-  <!-- People -->
-  <optgroup label="👤 People">
-    <option value="Q5">Human / Person</option>
-    <option value="Q482980">Author / Writer</option>
-    <option value="Q901">Scientist</option>
-    <option value="Q2562308">Woman Scientist</option>
-    <option value="Q36180">Poet</option>
-    <option value="Q33999">Actor</option>
-    <option value="Q639669">Musician</option>
-    <option value="Q40348">Lawyer</option>
-    <option value="Q82955">Politician</option>
-    <option value="Q193391">Diplomat</option>
-    <option value="Q11631">Astronaut</option>
-    <option value="Q189290">Military Officer</option>
-    <option value="Q1930187">Journalist</option>
-    <option value="Q2374149">Activist / Social Reformer</option>
-    <option value="Q15976105">Freedom Fighter</option>
-    <option value="Q12362622">Female Politician</option>
-    <option value="Q2066131">Athlete / Sportsperson</option>
-    <option value="Q4964182">Philosopher</option>
-    <option value="Q2526255">Film Director</option>
-    <option value="Q177220">Singer</option>
-    <option value="Q1028181">Painter / Artist</option>
-    <option value="Q3665646">Dancer</option>
-    <option value="Q14089670">Fashion Designer</option>
-    <option value="Q712378">Religious Leader</option>
-    <option value="Q372436">Feminist / Women's Rights Activist</option>
-  </optgroup>
-
-  <!-- Places -->
-  <optgroup label="🌍 Places">
-    <option value="Q3624078">Sovereign State / Country</option>
-    <option value="Q515">City</option>
-    <option value="Q34763">Village</option>
-    <option value="Q532">Village (alternate)</option>
-    <option value="Q484170">Municipality</option>
-    <option value="Q1549591">Big City / Metropolis</option>
-    <option value="Q5119">Capital City</option>
-    <option value="Q133215">State / Province</option>
-    <option value="Q185145">District</option>
-    <option value="Q1967419">Tehsil / Subdivision</option>
-    <option value="Q28575">County</option>
-  </optgroup>
-
-  <!-- Nature & Geography -->
-  <optgroup label="🏔️ Nature & Geography">
-    <option value="Q8502">Mountain</option>
-    <option value="Q4022">River</option>
-    <option value="Q23397">Lake</option>
-    <option value="Q34038">Waterfall</option>
-    <option value="Q46">National Park</option>
-    <option value="Q179049">Wildlife Sanctuary</option>
-    <option value="Q1967038">Biosphere Reserve</option>
-    <option value="Q35509">Cave</option>
-    <option value="Q23442">Island</option>
-    <option value="Q1322809">Gulf / Bay</option>
-    <option value="Q39816">Valley</option>
-    <option value="Q93352">Coast / Beach</option>
-    <option value="Q5107">Continent</option>
-    <option value="Q16521">Taxon / Species</option>
-    <option value="Q756">Plant</option>
-    <option value="Q7377">Mammal</option>
-    <option value="Q5113">Bird</option>
-    <option value="Q131681">Reservoir / Dam Lake</option>
-    <option value="Q12323">Dam</option>
-    <option value="Q39614">Cemetery / Graveyard</option>
-  </optgroup>
-
-  <!-- Culture & Community -->
-  <optgroup label="🎭 Culture & Community">
-    <option value="Q41710">Ethnic Group</option>
-    <option value="Q33829">Tribe / Tribal Community</option>   <!-- ✅ fixed: was Q33506 -->
-    <option value="Q17633526">Indigenous Community</option>
-    <option value="Q132241">Festival</option>
-    <option value="Q179380">Religious Festival</option>
-    <option value="Q27968055">Tribal Festival</option>
-    <option value="Q4504495">Folk Festival</option>
-    <option value="Q2736527">Music Festival</option>
-    <option value="Q1344">Opera</option>
-    <option value="Q483394">Genre (Music / Art)</option>
-    <option value="Q9842">Primary School</option>
-    <option value="Q9826">High School</option>
-    <option value="Q3918">University</option>
-    <option value="Q166118">Caste / Social Group</option>
-    <option value="Q8261">Novel</option>
-    <option value="Q571">Book</option>
-    <option value="Q7725634">Literary Work</option>
-    <option value="Q15632617">Fictional Character</option>
-    <option value="Q7075">Library</option>                    <!-- ✅ new -->
-  </optgroup>
-
-  <!-- Religion & Heritage -->
-  <optgroup label="🛕 Religion & Heritage">
-    <option value="Q16970">Church Building</option>
-    <option value="Q44539">Temple</option>
-    <option value="Q32815">Mosque</option>
-    <option value="Q697295">Gurudwara</option>
-    <option value="Q179700">Monastery</option>
-    <option value="Q697637">Shrine</option>                   <!-- ✅ fixed: was Q33506 -->
-    <option value="Q5003624">Memorial</option>                <!-- ✅ fixed: was Q33506 -->
-    <option value="Q839954">Archaeological Site</option>
-    <option value="Q570116">Tourist Attraction</option>
-    <option value="Q9259">World Heritage Site (UNESCO)</option>
-    <option value="Q1185117">Heritage Site</option>
-    <option value="Q4989906">Monument</option>
-    <option value="Q12280">Bridge</option>
-    <option value="Q41176">Building</option>
-    <option value="Q16560">Palace</option>                    <!-- ✅ new -->
-    <option value="Q57821">Fort / Fortress</option>          <!-- ✅ new -->
-    <option value="Q860861">Sculpture</option>               <!-- ✅ new -->
-  </optgroup>
-
-  <!-- Science & Knowledge -->
-  <optgroup label="🔬 Science & Knowledge">
-    <option value="Q5633421">Scientific Journal</option>
-    <option value="Q191067">Wikipedia Article</option>
-    <option value="Q7191">Nobel Prize</option>
-    <option value="Q4830453">Business / Enterprise</option>
-    <option value="Q7187">Gene</option>
-    <option value="Q11173">Chemical Compound</option>
-    <option value="Q3966">Computer Hardware</option>
-    <option value="Q7397">Software</option>
-    <option value="Q2996394">Biological Process</option>
-    <option value="Q431">Astronomical Object</option>
-    <option value="Q523">Star</option>
-    <option value="Q634">Planet</option>
-  </optgroup>
-
-  <!-- Events -->
-  <optgroup label="📅 Events">
-    <option value="Q1656682">Event</option>
-    <option value="Q18608583">Recurring Sporting Event</option>
-    <option value="Q27020041">Sports Season</option>
-    <option value="Q49773">Sports Competition</option>
-    <option value="Q235557">Battle</option>
-    <option value="Q198">War / Conflict</option>
-    <option value="Q40231">Election</option>
-    <option value="Q15275719">Revolt / Uprising</option>
-    <option value="Q3839081">Social Movement</option>
-  </optgroup>
-
-  <!-- Infrastructure & Transport -->
-  <optgroup label="🏗️ Infrastructure & Transport">
-    <option value="Q55488">Railway Station</option>
-    <option value="Q1248784">Airport</option>
-    <option value="Q16917">Hospital</option>
-    <option value="Q43229">Organization</option>
-    <option value="Q891723">Public Company</option>
-    <option value="Q786014">Administrative Unit</option>
-    <option value="Q27686">Hotel</option>
-    <option value="Q571481">Stadium</option>
-    <option value="Q33506">Museum</option>                    <!-- ✅ fixed: correct label for Q33506 -->
-    <option value="Q207694">Art Museum</option>
-    <option value="Q1785071">Lighthouse</option>
-    <option value="Q44782">Port / Harbour</option>
-    <option value="Q79007">Street / Road</option>
-    <option value="Q1078765">Metro Station</option>
-    <option value="Q1107656">Botanical Garden</option>        <!-- ✅ new -->
-    <option value="Q22698">Park</option>                     <!-- ✅ new -->
-  </optgroup>
-
-  <!-- Arts & Entertainment -->
-  <optgroup label="🎬 Arts & Entertainment">
-    <option value="Q11424">Film / Movie</option>
-    <option value="Q5398426">Television Series</option>
-    <option value="Q7889">Video Game</option>
-    <option value="Q105420">Artwork</option>
-    <option value="Q838948">Work of Art</option>
-    <option value="Q134556">Single (Music)</option>
-    <option value="Q482994">Album</option>
-    <option value="Q11707">Restaurant</option>
-    <option value="Q1914636">Activity / Tradition</option>
-  </optgroup>
-</select>
-  </div>
-</div>
       <div>
         <label for="batchSize">Batch Size (results per load)</label>
         <div class="select-wrap">
@@ -595,6 +574,7 @@
         <label for="labelLang">Label Language Fallback</label>
         <div class="select-wrap">
           <select id="labelLang">
+            <option value="auto" selected>Auto (wiki language, then English)</option>
             <option value="hi,en">Hindi → English</option>
             <option value="ar,en">Arabic → English</option>
             <option value="en">English only</option>
@@ -606,11 +586,18 @@
             <option value="ta,en">Tamil → English</option>
             <option value="te,en">Telugu → English</option>
             <option value="mr,en">Marathi → English</option>
+            <option value="sw,en">Swahili → English</option>
+            <option value="yo,en">Yoruba → English</option>
+            <option value="am,en">Amharic → English</option>
+            <option value="id,en">Indonesian → English</option>
+            <option value="vi,en">Vietnamese → English</option>
+            <option value="ru,en">Russian → English</option>
+            <option value="tt,en">Tatar → English</option>
           </select>
         </div>
       </div>
 
-    </div>
+    </div><!-- /.controls -->
 
     <div class="filter-row">
       <span class="filter-label">Filter Mode:</span>
@@ -618,6 +605,46 @@
         <button class="toggle-btn active" data-mode="without">🚫 Without Images (P18 missing)</button>
         <button class="toggle-btn" data-mode="with">🖼️ With Images (P18 set)</button>
         <button class="toggle-btn" data-mode="all">📋 All Articles</button>
+      </div>
+    </div>
+
+    <div class="verify-row">
+      <label class="switch-wrap">
+        <input type="checkbox" id="verifyImg" checked />
+        <span class="switch-track"></span>
+        <span class="switch-label">Hide articles that already show an image on Wikipedia <em style="font-size:11px;opacity:.65">(checks the real article, including infobox images; "Without images" mode only)</em></span>
+      </label>
+      <label class="switch-wrap">
+        <input type="checkbox" id="includeSub" />
+        <span class="switch-track"></span>
+        <span class="switch-label">Include subtypes of the category <em style="font-size:11px;opacity:.65">(slower, may time out on big categories)</em></span>
+      </label>
+    </div>
+
+    <!-- Cross-wiki coverage check -->
+    <div class="cross-wiki-row">
+      <span class="cross-wiki-label">🌐 Cross-wiki:</span>
+      <label class="switch-wrap">
+        <input type="checkbox" id="crossWikiCheck" />
+        <span class="switch-track"></span>
+        <span class="switch-label">Show article presence in other wikis <em style="font-size:11px;opacity:.65">(not image availability)</em></span>
+      </label>
+      <div class="cross-wiki-chips-area">
+        <div class="cross-wiki-langs" id="crossWikiLangs">
+          <button class="lang-chip-toggle selected" data-lang="en">en</button>
+          <button class="lang-chip-toggle selected" data-lang="fr">fr</button>
+          <button class="lang-chip-toggle selected" data-lang="de">de</button>
+          <button class="lang-chip-toggle selected" data-lang="es">es</button>
+          <button class="lang-chip-toggle selected" data-lang="pt">pt</button>
+          <button class="lang-chip-toggle" data-lang="ar">ar</button>
+          <button class="lang-chip-toggle" data-lang="zh">zh</button>
+          <button class="lang-chip-toggle" data-lang="ja">ja</button>
+          <button class="lang-chip-toggle" data-lang="ru">ru</button>
+          <button class="lang-chip-toggle" data-lang="it">it</button>
+          <button class="lang-chip-toggle" data-lang="nl">nl</button>
+          <button class="lang-chip-toggle" data-lang="sv">sv</button>
+        </div>
+        <span class="cross-wiki-note">✓ = article exists on that wiki (image may or may not be present) &nbsp;|&nbsp; ✗ = no article found &nbsp;|&nbsp; Adds OPTIONAL clauses — may slow query on large batches</span>
       </div>
     </div>
 
@@ -670,32 +697,28 @@
     <div class="pagination-row">
       <button class="btn btn-secondary" id="nextBtn2" onclick="runQuery(false)" disabled>→ Load Next Batch</button>
       <button class="btn btn-secondary" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to Top</button>
+      <button class="btn btn-secondary" onclick="downloadCSV()">⇩ Download CSV</button>
       <div class="page-info" id="pageInfo">Batch 1 · 0 items loaded</div>
     </div>
   </div>
 
-</div>
+</div><!-- /.wrapper -->
 
 <div class="footer">
-  Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 12 Oct 2026
+  Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Updated on: 10 Nov 2026
+ 👁 Views: <span id="tc-views"></span>
+👤 Unique: <span id="tc-sessions"></span>
+<script src="https://toolcounter.toolforge.org/embed.js.php?tool=wikinoimg&page=index"></script>
 </div>
 
 <button id="go-to-top"    class="scroll-button" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Go to top">↑</button>
 <button id="go-to-bottom" class="scroll-button" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})" title="Go to bottom">↓</button>
 
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-GC8PGC89NB');
-</script>
-<script src="https://cdn.counter.dev/script.js" data-id="cc7a036d-a904-4d76-bcac-37ea4196c014" data-utcoffset="6"></script>
-
 <script>
   let currentOffset = 0, currentBatch = 0, totalLoaded = 0, currentMode = 'without';
+  let activeCrossLangs = [];
 
-  // Night mode
+  // ── Night mode ────────────────────────────────────────────────
   function toggleNightMode() {
     const light = document.body.classList.toggle('light');
     document.getElementById('night-mode-button').textContent = light ? '🌞' : '🌙';
@@ -706,7 +729,7 @@
     document.getElementById('night-mode-button').textContent = '🌞';
   }
 
-  // Filter toggle
+  // ── Filter mode toggle ────────────────────────────────────────
   document.querySelectorAll('.toggle-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
@@ -715,101 +738,213 @@
     });
   });
 
-  function buildSPARQL(lang, cat, ll, bs, offset) {
+  // ── Cross-wiki toggle (enable/disable chips) ──────────────────
+  const cwCheck = document.getElementById('crossWikiCheck');
+  const cwLangs = document.getElementById('crossWikiLangs');
+
+  cwCheck.addEventListener('change', () => {
+    if (cwCheck.checked) {
+      cwLangs.classList.add('enabled');
+    } else {
+      cwLangs.classList.remove('enabled');
+    }
+  });
+
+  // ── Lang chip click-to-toggle ─────────────────────────────────
+  cwLangs.addEventListener('click', e => {
+    const chip = e.target.closest('.lang-chip-toggle');
+    if (!chip || chip.disabled) return;
+    chip.classList.toggle('selected');
+  });
+
+  // ── Disable the chip matching the selected wiki lang ──────────
+  function syncDisabledChip(selectedLang) {
+    cwLangs.querySelectorAll('.lang-chip-toggle').forEach(chip => {
+      if (chip.dataset.lang === selectedLang) {
+        chip.classList.remove('selected');
+        chip.disabled = true;
+        chip.title = 'Same as selected wiki — skipped';
+      } else {
+        chip.disabled = false;
+        chip.title = '';
+      }
+    });
+  }
+
+  // ── Lang select change: sync chip + label fallback ────────────
+  document.getElementById('lang').addEventListener('change', function () {
+    syncDisabledChip(this.value);
+  });
+
+  // Run once on load to set initial state
+  syncDisabledChip(document.getElementById('lang').value);
+
+  // ── Get active cross-wiki langs ───────────────────────────────
+  function getSelectedCrossLangs() {
+    if (!cwCheck.checked) return [];
+    const currentLang = document.getElementById('lang').value;
+    return [...cwLangs.querySelectorAll('.lang-chip-toggle.selected')]
+      .map(c => c.dataset.lang)
+      .filter(l => l !== currentLang);
+  }
+
+  // ── Build SPARQL ──────────────────────────────────────────────
+  function buildSPARQL(lang, cat, ll, bs, offset, crossLangs) {
     const wikiUrl = `https://${lang}.wikipedia.org/`;
     let imageFilter = '';
     if      (currentMode === 'without') imageFilter = `\n  FILTER NOT EXISTS { ?item wdt:P18 ?image. }`;
     else if (currentMode === 'with')    imageFilter = `\n  ?item wdt:P18 ?image.`;
-    return `SELECT ?item ?itemLabel ?article WHERE {
+
+    const crossVars     = crossLangs.map(l => `?art_${l}`).join(' ');
+    const crossOptional = crossLangs.map(l =>
+      `  OPTIONAL { ?art_${l} schema:about ?item ; schema:isPartOf <https://${l}.wikipedia.org/> . }`
+    ).join('\n');
+
+    return `SELECT ?item ?itemLabel ?article ${crossVars} WHERE {
   ?article schema:about ?item ;
            schema:isPartOf <${wikiUrl}> .
 
-  ?item wdt:P31 wd:${cat} .${imageFilter}
+  ?item ${document.getElementById('includeSub').checked ? 'wdt:P31/wdt:P279*' : 'wdt:P31'} wd:${cat} .${imageFilter}
 
+${crossOptional}
   SERVICE wikibase:label { bd:serviceParam wikibase:language "${ll}". }
 }
 LIMIT ${bs}
 OFFSET ${offset}`;
   }
 
+  // ── Rebuild table header columns ──────────────────────────────
+  function rebuildTableHeader(crossLangs) {
+    const tr = document.querySelector('#resultsTable thead tr');
+    // Keep first 3 cols: #, Label, Wikipedia Article
+    while (tr.children.length > 3) tr.removeChild(tr.lastChild);
+    // Append cross-wiki columns
+    crossLangs.forEach(l => {
+      const th = document.createElement('th');
+      th.className = 'cov-th';
+      th.textContent = l.toUpperCase();
+      th.title = `Article presence on ${l}.wikipedia.org (✓ = article exists, ✗ = no article — does NOT indicate image availability)`;
+      tr.appendChild(th);
+    });
+    // Append Wikidata column last
+    const wdTh = document.createElement('th');
+    wdTh.textContent = 'Wikidata Item';
+    tr.appendChild(wdTh);
+  }
+
+  // ── Run query ─────────────────────────────────────────────────
   async function runQuery(fresh) {
     const lang = document.getElementById('lang').value;
     const cat  = document.getElementById('category').value;
-    const ll   = document.getElementById('labelLang').value;
+    let ll = document.getElementById('labelLang').value;
+    if (ll === 'auto') { const lc = document.getElementById('lang').value; ll = (lc === 'simple' ? 'en' : lc + ',en'); }
     const bs   = parseInt(document.getElementById('batchSize').value, 10);
+    const cross = getSelectedCrossLangs();
+    if (window.langInfoOk === false) { showError('No Wikipedia found for this language code. Check the code or pick one from the list.'); return; }
 
     if (fresh) {
       currentOffset = currentBatch = totalLoaded = 0;
+      activeCrossLangs = cross;
       document.getElementById('resultsBody').innerHTML = '';
+      rebuildTableHeader(cross);
     }
 
-    const sparql = buildSPARQL(lang, cat, ll, bs, currentOffset);
+    const sparql = buildSPARQL(lang, cat, ll, bs, currentOffset, activeCrossLangs);
     document.getElementById('sparqlBox').textContent = sparql;
     setLoading(true); hideError();
 
     try {
       const resp = await fetch(
         `https://query.wikidata.org/sparql?query=${encodeURIComponent(sparql)}&format=json`,
-        { headers: { 'Accept': 'application/sparql-results+json' } }
+        { headers: { 'Accept': 'application/sparql-results+json' }, signal: AbortSignal.timeout(65000) }
       );
       if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
       const data = await resp.json();
-      const rows = data.results.bindings;
+      const rawRows = data.results.bindings;
+      let rows = rawRows;
 
       currentBatch++;
-      renderRows(rows, currentOffset, fresh);
+      rows = await filterWithImages(rows, lang);
+      renderRows(rows, currentOffset, fresh, activeCrossLangs);
       totalLoaded   += rows.length;
       currentOffset += bs;
 
       document.getElementById('chipBatch').textContent  = `Batch ${currentBatch}`;
-      document.getElementById('chipCount').textContent  = `${rows.length} items`;
+      document.getElementById('chipCount').textContent  = `${rows.length} items${window.hiddenCount ? ' (' + window.hiddenCount + ' hidden, image found on Wikipedia)' : ''}`;
       document.getElementById('chipOffset').textContent = `Total loaded: ${totalLoaded}`;
       document.getElementById('pageInfo').textContent   = `Batch ${currentBatch} · ${totalLoaded} items loaded`;
 
-      const hasMore = rows.length === bs;
+      const hasMore = rawRows.length === bs;
       ['nextBtn','nextBtn2'].forEach(id => document.getElementById(id).disabled = !hasMore);
 
       document.getElementById('resultsPanel').style.display = 'block';
-      document.getElementById('emptyState').style.display   = rows.length === 0 ? 'block' : 'none';
-      document.getElementById('resultsTable').style.display = rows.length > 0  ? 'table' : 'none';
+      document.getElementById('emptyState').style.display   = totalLoaded === 0 ? 'block' : 'none';
+      document.getElementById('resultsTable').style.display = totalLoaded > 0 ? 'table' : 'none';
 
     } catch(err) {
-      showError(err.message);
+      showError(friendlyError(err));
     } finally {
       setLoading(false);
     }
   }
 
-  function renderRows(rows, startOffset, fresh) {
+  // ── Render rows ───────────────────────────────────────────────
+  function renderRows(rows, startOffset, fresh, crossLangs) {
     const tbody = document.getElementById('resultsBody');
     if (fresh) tbody.innerHTML = '';
+
     rows.forEach((row, i) => {
       const label   = row.itemLabel?.value ?? '(no label)';
       const article = row.article?.value   ?? '';
       const item    = row.item?.value      ?? '';
       const qid     = item.replace('http://www.wikidata.org/entity/', '');
-      const rowNum  = startOffset + i + 1;
+      const rowNum  = tbody.children.length + 1;
+
+      // Main article cell
       let artCell = '<span style="color:var(--muted)">—</span>';
       if (article) {
         let title = article;
         try { title = decodeURIComponent(article.split('/wiki/')[1] || article); } catch(e){}
         artCell = `<a class="item-link" href="${esc(article)}" target="_blank">${esc(title)}</a>`;
       }
+
+      // Cross-wiki cells — ✓ (clickable) or ✗ (not found)
+      const crossCells = crossLangs.map(l => {
+        const url = row[`art_${l}`]?.value ?? '';
+        if (url) {
+          let ttl = url;
+          try { ttl = decodeURIComponent(url.split('/wiki/')[1] || url); } catch(e){}
+          return `<td class="cov-td"><div class="cov-cell">
+            <a class="cov-badge cov-yes" href="${esc(url)}" target="_blank" title="Article exists on ${l}wiki — click to open (image may or may not be present)&#10;${esc(ttl)}">✓</a>
+          </div></td>`;
+        }
+        return `<td class="cov-td"><div class="cov-cell">
+          <span class="cov-badge cov-no" title="No article on ${l}wiki">✗</span>
+        </div></td>`;
+      }).join('');
+
+      // Wikidata cell
+      const wdCell = qid
+        ? `<a class="wd-link" href="${esc(item)}" target="_blank">${esc(qid)}</a>`
+        : '—';
+
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${rowNum}</td><td>${esc(label)}</td><td>${artCell}</td>
-        <td>${qid ? `<a class="wd-link" href="${esc(item)}" target="_blank">${esc(qid)}</a>` : '—'}</td>`;
+      tr.innerHTML = `<td>${rowNum}</td><td>${esc(label)}</td><td>${artCell}</td>${crossCells}<td>${wdCell}</td>`;
       tbody.appendChild(tr);
     });
   }
 
+  // ── Utilities ─────────────────────────────────────────────────
   function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
   function resetQuery() {
     currentOffset = currentBatch = totalLoaded = 0;
+    activeCrossLangs = [];
     document.getElementById('resultsBody').innerHTML = '';
     document.getElementById('resultsPanel').style.display = 'none';
     ['nextBtn','nextBtn2'].forEach(id => document.getElementById(id).disabled = true);
+    rebuildTableHeader([]);
     hideError();
   }
   function setLoading(on) {
@@ -820,16 +955,168 @@ OFFSET ${offset}`;
     const b = document.getElementById('errorBox');
     b.textContent = '⚠ ' + msg; b.classList.add('show');
   }
+  async function filterWithImages(rows, lang) {
+    window.hiddenCount = 0;
+    if (currentMode !== 'without' || !document.getElementById('verifyImg').checked || !rows.length) return rows;
+    const titleOf = r => { try { return decodeURIComponent(((r.article && r.article.value) || '').split('/wiki/')[1] || '').replace(/_/g, ' '); } catch (e) { return ''; } };
+    const titles = [...new Set(rows.map(titleOf).filter(Boolean))];
+    const chunks = []; for (let i = 0; i < titles.length; i += 50) chunks.push(titles.slice(i, i + 50));
+    const withImg = new Set();
+    try {
+      await Promise.all(chunks.map(async c => {
+        const u = `https://${lang}.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=name&titles=${encodeURIComponent(c.join('|'))}&format=json&formatversion=2&origin=*`;
+        const r = await fetch(u); if (!r.ok) throw new Error('verify');
+        const j = await r.json();
+        ((j.query && j.query.pages) || []).forEach(pg => { if (pg.pageimage) withImg.add(pg.title); });
+      }));
+    } catch (e) {
+      showError('Could not check images on Wikipedia, so these are Wikidata (P18) results only.');
+      return rows;
+    }
+    const kept = rows.filter(r => !withImg.has(titleOf(r)));
+    window.hiddenCount = rows.length - kept.length;
+    return kept;
+  }
+  function friendlyError(err) {
+    const m = String(err && err.message || err);
+    if (err && (err.name === 'TimeoutError' || err.name === 'AbortError')) return 'The query took too long. Try a smaller batch size, a narrower category, or turn off cross-wiki columns.';
+    if (m.includes('429')) return 'Wikidata is rate limiting requests. Wait a minute and try again.';
+    if (/HTTP 5\d\d/.test(m)) return 'Wikidata could not finish this query (it may be too large). Try a smaller batch or a narrower category.';
+    return m;
+  }
   function hideError() { document.getElementById('errorBox').classList.remove('show'); }
   function toggleSparql() {
     const box = document.getElementById('sparqlBox');
     box.style.display = box.style.display === 'block' ? 'none' : 'block';
   }
-  document.getElementById('lang').addEventListener('change', function() {
-    const ll = document.getElementById('labelLang');
-    const f  = [...ll.options].find(o => o.value.startsWith(this.value + ','));
-    if (f) ll.value = f.value;
+</script>
+<script>
+(function () {
+  const FALLBACK = 'en:English|simple:Simple English|fr:French|de:German|es:Spanish|pt:Portuguese|ru:Russian|zh:Chinese|ja:Japanese|it:Italian|pl:Polish|nl:Dutch|ar:Arabic|fa:Persian|tr:Turkish|sv:Swedish|uk:Ukrainian|he:Hebrew|ca:Catalan|ko:Korean|hi:Hindi|ur:Urdu|bn:Bengali|pa:Punjabi|ta:Tamil|te:Telugu|ml:Malayalam|mr:Marathi|gu:Gujarati|kn:Kannada|bho:Bhojpuri|mai:Maithili|awa:Awadhi|new:Newari|ne:Nepali|sa:Sanskrit|si:Sinhala|sd:Sindhi|as:Assamese|or:Odia|dz:Dzongkha|ps:Pashto|id:Indonesian|ms:Malay|th:Thai|vi:Vietnamese|my:Burmese|km:Khmer|lo:Lao|tl:Tagalog|ceb:Cebuano|ilo:Ilocano|war:Waray|jv:Javanese|su:Sundanese|min:Minangkabau|ace:Acehnese|ban:Balinese|bjn:Banjar|sw:Swahili|am:Amharic|so:Somali|ti:Tigrinya|om:Oromo|rw:Kinyarwanda|lg:Luganda|sn:Shona|hke:Kihunde|yo:Yoruba|ha:Hausa|ig:Igbo|wo:Wolof|ee:Ewe|bm:Bambara|ff:Fula|tw:Twi|kab:Kabyle|igl:Igala|dag:Dagbani|gur:Gurene|dga:Dagaare|kus:Kusaal|kcg:Tyap|af:Afrikaans|zu:Zulu|xh:Xhosa|st:Sesotho|tn:Setswana|ny:Chichewa|ln:Lingala|mg:Malagasy|kg:Kongo|ak:Akan|ary:Moroccan Arabic|arz:Egyptian Arabic|din:Dinka|fon:Fon|ki:Kikuyu|kbp:Kabiye|nso:Northern Sotho|pcm:Nigerian Pidgin|rn:Kirundi|sg:Sango|shi:Tachelhit|ss:Swati|ts:Tsonga|tum:Tumbuka|ve:Venda|tzm:Central Atlas Tamazight|tt:Tatar|ba:Bashkir|cv:Chuvash|ce:Chechen|os:Ossetian|sah:Sakha|mhr:Meadow Mari|kv:Komi|udm:Udmurt|av:Avar|lez:Lezgian|inh:Ingush|myv:Erzya|bxr:Buryat|xmf:Mingrelian|uz:Uzbek';
+  const AF = new Set('sw am so ti om rw lg sn hke yo ha ig wo ee bm ff tw kab igl dag gur dga kus kcg af zu xh st tn ny ln mg kg ak ary arz din fon ki kbp nso pcm rn sg shi ss ts tum ve tzm'.split(' '));
+  const L = new Map();
+  FALLBACK.split('|').forEach(p => { const i = p.indexOf(':'); L.set(p.slice(0, i), { n: p.slice(i + 1), nat: '' }); });
+
+  const inp = document.getElementById('langInput'), hid = document.getElementById('lang');
+  const list = document.getElementById('langList'), meta = document.getElementById('langMeta');
+  const afBtn = document.getElementById('africaBtn');
+  const e = t => String(t).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+  let africaOnly = false, on = -1, shown = [], seq = 0;
+  window.langInfoOk = true;
+
+  const label = c => { const l = L.get(c); return l ? (l.nat && l.nat !== l.n ? `${l.n} / ${l.nat}` : l.n) + ` (${c})` : c; };
+
+  function render(q) {
+    q = (q || '').trim().toLowerCase();
+    shown = [...L.entries()]
+      .filter(([c, l]) => (!africaOnly || AF.has(c)) && (!q || c.startsWith(q) || l.n.toLowerCase().includes(q) || (l.nat || '').toLowerCase().includes(q)))
+      .sort((a, b) => a[1].n.localeCompare(b[1].n, 'en'))
+      .map(([c]) => ({ c }));
+    if (/^[a-z]{2,3}(-[a-z]{2,8})*$/.test(q) && !L.has(q)) shown.unshift({ c: q, custom: true });
+    on = shown.length ? 0 : -1;
+    list.innerHTML = shown.length ? shown.map((x, i) => x.custom
+      ? `<li data-i="${i}" class="${i === on ? 'on' : ''}">Check code <b>${e(x.c)}</b><span class="code">${e(x.c)}.wikipedia.org</span></li>`
+      : `<li data-i="${i}" class="${i === on ? 'on' : ''}"><span>${e(label(x.c).replace(/ \([^)]*\)$/, ''))}${AF.has(x.c) ? '<span class="af">Africa</span>' : ''}</span><span class="code">${e(x.c)}</span></li>`).join('')
+      : '<li class="none">No match. Type a language code and press Enter to check it.</li>';
+    list.hidden = false; inp.setAttribute('aria-expanded', 'true');
+  }
+  function close() { list.hidden = true; inp.setAttribute('aria-expanded', 'false'); }
+  function mark() { [...list.children].forEach((li, i) => { li.classList.toggle('on', i === on); if (i === on) li.scrollIntoView({ block: 'nearest' }); }); }
+
+  async function checkLang(c) {
+    const my = ++seq; window.langInfoOk = true; meta.className = 'lang-meta'; meta.textContent = `Checking ${c}.wikipedia.org ...`;
+    try {
+      const r = await fetch(`https://${encodeURIComponent(c)}.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=general%7Cstatistics&format=json&origin=*`);
+      if (!r.ok) throw new Error('bad');
+      const j = await r.json(); if (my !== seq) return;
+      const st = j.query.statistics;
+      if (!L.has(c)) { let n = c; try { n = new Intl.DisplayNames(['en'], { type: 'language' }).of(c) || c; } catch (_) {} L.set(c, { n, nat: '' }); inp.value = label(c); }
+      const nm = (L.get(c) || {}).n || c;
+      meta.innerHTML = `<b>${e(nm)} Wikipedia</b> (${e(c)}): ${st.articles.toLocaleString()} articles, ${st.activeusers.toLocaleString()} active editors`;
+    } catch (_) {
+      if (my !== seq) return;
+      window.langInfoOk = false; meta.className = 'lang-meta bad';
+      meta.textContent = `Could not load ${c}.wikipedia.org. Check the code and your connection. Some codes exist only on the Wikimedia Incubator.`;
+    }
+  }
+  function setLang(c) {
+    c = c.trim().toLowerCase(); if (!c) return;
+    hid.value = c; inp.value = label(c); close();
+    try { localStorage.setItem('wikinoimg-lang', c); } catch (_) {}
+    hid.dispatchEvent(new Event('change'));
+    checkLang(c);
+  }
+
+  inp.addEventListener('focus', () => { inp.select(); render(''); });
+  inp.addEventListener('input', () => render(inp.value));
+  inp.addEventListener('keydown', ev => {
+    if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') { ev.preventDefault(); if (list.hidden) render(inp.value); else { on = Math.max(0, Math.min(shown.length - 1, on + (ev.key === 'ArrowDown' ? 1 : -1))); mark(); } }
+    else if (ev.key === 'Enter') { ev.preventDefault(); const x = shown[on]; if (!list.hidden && x) setLang(x.c); else setLang(inp.value.replace(/\s*\(.*$/, '')); }
+    else if (ev.key === 'Escape') { close(); inp.value = label(hid.value); }
   });
+  list.addEventListener('mousedown', ev => { const li = ev.target.closest('li[data-i]'); if (li) { ev.preventDefault(); setLang(shown[+li.dataset.i].c); } });
+  inp.addEventListener('blur', () => { close(); inp.value = label(hid.value); });
+  afBtn.addEventListener('click', () => { africaOnly = !africaOnly; afBtn.setAttribute('aria-pressed', africaOnly); inp.focus(); render(''); });
+
+  // Pull every Wikipedia (with native names) from the Wikimedia site matrix; the built-in list above is the fallback.
+  async function loadMatrix() {
+    let d = null; try { d = JSON.parse(localStorage.getItem('wikinoimg-sm') || 'null'); } catch (_) {}
+    if (!d || Date.now() - d.t > 6048e5) {
+      try {
+        const j = await (await fetch('https://meta.wikimedia.org/w/api.php?action=sitematrix&smtype=language&format=json&origin=*')).json();
+        const rows = [];
+        Object.values(j.sitematrix).forEach(v => {
+          if (!v || typeof v !== 'object' || !Array.isArray(v.site)) return;
+          const w = v.site.find(x => x.code === 'wiki' && !('closed' in x) && !('private' in x));
+          if (w) rows.push([new URL(w.url).hostname.split('.')[0], v.localname || v.name, v.name]);
+        });
+        if (!rows.length) return;
+        d = { t: Date.now(), rows }; try { localStorage.setItem('wikinoimg-sm', JSON.stringify(d)); } catch (_) {}
+      } catch (_) { return; }
+    }
+    d.rows.forEach(([c, n, nat]) => { const o = L.get(c); L.set(c, { n: (o && o.n) || n || c, nat: nat || '' }); });
+    inp.value = label(hid.value);
+  }
+
+  window.downloadCSV = function () {
+    const rows = [...document.querySelectorAll('#resultsTable tr')].map(tr => [...tr.children].map(td => '"' + td.textContent.trim().replace(/"/g, '""') + '"').join(','));
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['\ufeff' + rows.join('\n')], { type: 'text/csv;charset=utf-8' }));
+    a.download = `wikinoimg-${hid.value}-${document.getElementById('category').value}.csv`; a.click(); URL.revokeObjectURL(a.href);
+  };
+
+  const cc = document.getElementById('customCode');
+  const useCode = () => { const v = cc.value.trim().toLowerCase(); if (!/^[a-z]{2,3}(-[a-z]{2,8})*$/.test(v)) { meta.className = 'lang-meta bad'; meta.textContent = 'Enter a valid code such as hi, kcg or zh-min-nan.'; return; } setLang(v); cc.value = ''; };
+  document.getElementById('useCodeBtn').addEventListener('click', useCode);
+  cc.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); useCode(); } });
+
+  const KEY = 'wikinoimg-settings';
+  const chips = () => [...document.querySelectorAll('#crossWikiLangs .lang-chip-toggle')];
+  function saveAll() {
+    const o = {
+      category: document.getElementById('category').value, batchSize: document.getElementById('batchSize').value,
+      labelLang: document.getElementById('labelLang').value, mode: currentMode,
+      cross: document.getElementById('crossWikiCheck').checked, verifyImg: document.getElementById('verifyImg').checked, includeSub: document.getElementById('includeSub').checked,
+      chips: chips().filter(c => c.classList.contains('selected')).map(c => c.dataset.lang)
+    };
+    try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (_) {}
+  }
+  (function restoreAll() {
+    let o = {}; try { o = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (_) {}
+    ['category', 'batchSize', 'labelLang'].forEach(id => { const el = document.getElementById(id); if (o[id] && [...el.options].some(x => x.value === o[id])) el.value = o[id]; });
+    if (o.mode) { const b = document.querySelector(`.toggle-btn[data-mode="${o.mode}"]`); if (b) b.click(); }
+    if (Array.isArray(o.chips)) chips().forEach(c => c.classList.toggle('selected', o.chips.includes(c.dataset.lang)));
+    ['verifyImg', 'includeSub'].forEach(id => { if (id in o) document.getElementById(id).checked = !!o[id]; });
+    if (o.cross) { const cb = document.getElementById('crossWikiCheck'); cb.checked = true; cb.dispatchEvent(new Event('change')); }
+  })();
+  document.addEventListener('change', () => setTimeout(saveAll));
+  document.addEventListener('click', () => setTimeout(saveAll));
+
+  let saved = 'hi'; try { saved = localStorage.getItem('wikinoimg-lang') || 'hi'; } catch (_) {}
+  inp.value = label(saved); hid.value = saved; hid.dispatchEvent(new Event('change')); checkLang(saved);
+  loadMatrix();
+})();
 </script>
 </body>
 </html>
+
