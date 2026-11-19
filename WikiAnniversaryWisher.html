@@ -164,7 +164,7 @@
     <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" alt="Wiki's Lazy Coders Logo" style="height: 75px; float: left; margin-right: 15px; width: auto;">
     <div>
         <h1>Wish Wiki Anniversary</h1>
-        <h3>(Multi-user mode, according to SUL)</h3>
+        <h3>(Multi-user mode, according to SUL / Earliest Account Date)</h3>
     </div>
     <p id="inspiration">
         I am amazed and inspired by how Wikimedians dedicate their volunteer time to strengthen and sustain this open-source movement. This is my small effort to acknowledge their contributions, bring a smile to their faces, and make them feel truly appreciated.
@@ -184,7 +184,7 @@
 </main>
 	
 <footer>
-    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Project: <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank">Wiki's Lazy Coders</a> | Updated on: <strong>21 May 2026</strong>
+    Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank">Suyash Dwivedi</a> | Project: <a href="https://meta.wikimedia.org/wiki/Wikis_Lazy_Coders" target="_blank">Wiki's Lazy Coders</a> | Updated on: <strong>19 November 2026</strong>
     👁 Views: <span id="tc-views"></span>
 👤 Unique: <span id="tc-sessions"></span>
 <script src="https://toolcounter.toolforge.org/embed.js.php?tool=YOUR_TOOL&page=index"></script>
@@ -227,6 +227,29 @@
         }
         
         return anniversary;
+    }
+
+    // Find earliest registration across ALL merged wikis (including pre-SUL accounts)
+    function getEarliestRegistration(user) {
+        let earliestDate = user.registration ? new Date(user.registration) : null;
+        let earliestWiki = 'SUL';
+
+        if (user.merged && user.merged.length > 0) {
+            for (const entry of user.merged) {
+                if (!entry.registration) continue;
+                const d = new Date(entry.registration);
+                if (isNaN(d.getTime())) continue;
+                if (!earliestDate || d < earliestDate) {
+                    earliestDate = d;
+                    earliestWiki = entry.wiki;
+                }
+            }
+        }
+
+        return {
+            date: earliestDate ? earliestDate.toISOString() : user.registration,
+            wiki: earliestWiki
+        };
     }
 
     function loadNightModePreference() {
@@ -334,7 +357,15 @@
                 if (data.query && data.query.globaluserinfo && data.query.globaluserinfo.missing) {
                     return { name: username, error: true, message: "User does not exist globally" };
                 }
-                return data.query.globaluserinfo || { name: username, error: true, message: "API data missing" };
+                const userInfo = data.query.globaluserinfo;
+                if (!userInfo) {
+                    return { name: username, error: true, message: "API data missing" };
+                }
+                const earliest = getEarliestRegistration(userInfo);
+                userInfo.earliestRegistration     = earliest.date;
+                userInfo.earliestRegistrationWiki = earliest.wiki;
+                userInfo.sulRegistration          = userInfo.registration;
+                return userInfo;
             } catch (e) {
                 console.error(`Error fetching data for ${username}:`, e);
                 return { name: username, error: true, message: "Network or API call failed" };
@@ -349,8 +380,8 @@
         const container = document.getElementById('userDetails');
         container.innerHTML = '';
 
-        const eligibleUsers = users.filter(user => !user.error && isAnniversaryEligible(user.registration));
-        const ineligibleUsers = users.filter(user => !user.error && !isAnniversaryEligible(user.registration));
+        const eligibleUsers = users.filter(user => !user.error && isAnniversaryEligible(user.earliestRegistration));
+        const ineligibleUsers = users.filter(user => !user.error && !isAnniversaryEligible(user.earliestRegistration));
         const errorUsers = users.filter(user => user.error);
 
         const sortedUsers = [...eligibleUsers, ...ineligibleUsers, ...errorUsers];
@@ -401,7 +432,7 @@
             serialCell.setAttribute('data-sort', serialNumber - 1); 
             row.appendChild(serialCell);
 
-            const { daysToNext, yearsCompleted, isToday, daysSinceLast } = calculateAnniversaryData(user.registration);
+            const { daysToNext, yearsCompleted, isToday, daysSinceLast } = calculateAnniversaryData(user.earliestRegistration);
             const anniversaryScore = isToday ? 3 : (daysToNext > 0 && daysToNext <= 10) ? 2 : (daysSinceLast > 0 && daysSinceLast <= 30) ? 1 : 0;
 
             // Username linked
@@ -419,13 +450,20 @@
             usernameCell.appendChild(userLink);
             row.appendChild(usernameCell);
 
-            // Registration Date
+            // Registration Date (Earliest across merged wikis / Pre-SUL)
             const regDateCell = document.createElement('td');
-            const registrationDate = user.registration ? new Date(user.registration) : null;
+            const registrationDate = user.earliestRegistration ? new Date(user.earliestRegistration) : null;
+            const sulDate = user.sulRegistration ? new Date(user.sulRegistration) : null;
+            const preSUL = registrationDate && sulDate && registrationDate.getTime() < sulDate.getTime();
+            const fmtDate = d => `${String(d.getDate()).padStart(2, '0')}/${d.toLocaleDateString('en-US', { month: 'long' })}/${d.getFullYear()}`;
             regDateCell.setAttribute('data-sort', registrationDate ? registrationDate.getTime() : 0);
-            regDateCell.textContent = registrationDate
-                ? `${String(registrationDate.getDate()).padStart(2, '0')}/${registrationDate.toLocaleDateString('en-US', { month: 'long' })}/${registrationDate.getFullYear()}`
-                : 'N/A';
+            if (registrationDate) {
+                regDateCell.innerHTML = fmtDate(registrationDate) + (preSUL
+                    ? `<br><small style="color:#888;font-size:0.8em;">📌 Earliest on <em>${user.earliestRegistrationWiki}</em> (SUL: ${fmtDate(sulDate)})</small>`
+                    : '');
+            } else {
+                regDateCell.textContent = 'N/A';
+            }
             row.appendChild(regDateCell);
 
             // Total Edit Count
@@ -494,7 +532,7 @@
 
             // Wish Anniversary button
             const wishCell = document.createElement('td');
-            if (isAnniversaryEligible(user.registration)) {
+            if (isAnniversaryEligible(user.earliestRegistration)) {
                 const wishBtn = document.createElement('button');
                 wishBtn.textContent = "🎉 Copy & Open Talk";
                 wishBtn.onclick = (event) => wishAnniversary(user, event);
@@ -573,9 +611,9 @@
     }
 
     function addToCalendar(user) {
-        if (!user || !user.registration) return;
+        if (!user || !user.earliestRegistration) return;
         
-        const regDate = new Date(user.registration);
+        const regDate = new Date(user.earliestRegistration);
         const today = new Date();
         
         // Get next anniversary
@@ -604,7 +642,7 @@
     
     // Function to handle persistent button coloring
     async function wishAnniversary(user, event) {
-        if (!user || !user.name || !user.registration) return;
+        if (!user || !user.name || !user.earliestRegistration) return;
 
         const currentButton = event.currentTarget; // Get the clicked button element
 
@@ -645,15 +683,19 @@
     }
 
     function generateAnniversaryMessage(user) {
-        if (!user.registration) return "";
+        if (!user.earliestRegistration) return "";
 
-        const { daysToNext, yearsCompleted, isToday, daysSinceLast } = calculateAnniversaryData(user.registration);
+        const { daysToNext, yearsCompleted, isToday, daysSinceLast } = calculateAnniversaryData(user.earliestRegistration);
         
         // Don't generate message if less than 1 year completed
         if (yearsCompleted < 1) return "";
         
         const edits = user.editcount || 0;
         const totalEditsFormatted = edits.toLocaleString();
+        const regNote = (user.earliestRegistrationWiki === 'SUL' ||
+                         user.earliestRegistration === user.sulRegistration)
+                        ? 'as per SUL'
+                        : `first account on ${user.earliestRegistrationWiki}`;
 
         const imageWikitext = `[[File:Rose and Carnation Flower Bouquet 02.png|150px|right|Happy Wiki Anniversary]]`;
         const toolLine = `''Use this [https://wiki-anniversary.toolforge.org/ '''Tool'''] to send wiki anniversary wishes to other amazing Wikimedians.''`;
@@ -669,7 +711,7 @@ ${imageWikitext}
 
 Dear [[User:${user.name}|${user.name}]],
 
-Wishing you a very happy wiki anniversary today, celebrating '''${yearsCompleted} years''' of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!
+Wishing you a very happy wiki anniversary today, celebrating '''${yearsCompleted} years''' (${regNote}) of invaluable contributions! Your dedication and hard work, reflected in over '''${totalEditsFormatted}''' edits, are a testament to your commitment to the community. Thank you for all you do!
 
 ${toolLine}
 
@@ -681,7 +723,7 @@ ${imageWikitext}
 
 Dear [[User:${user.name}|${user.name}]],
 
-Your wiki anniversary is just around the corner, in '''${daysToNext} days!''' What a wonderful milestone of '''${yearsCompleted + 1} years''' on Wiki. Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!
+Your wiki anniversary is just around the corner, in '''${daysToNext} days!''' What a wonderful milestone of '''${yearsCompleted + 1} years''' on Wiki (${regNote}). Your incredible contributions, with over '''${totalEditsFormatted}''' edits, have truly made a difference. Here's to another amazing year of collaboration and knowledge sharing!
 
 ${toolLine}
 
@@ -694,7 +736,7 @@ ${imageWikitext}
 
 Dear [[User:${user.name}|${user.name}]],
 
-Your wiki anniversary was '''${daysBelated} days''' ago, marking '''${yearsCompleted} years''' of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!
+Your wiki anniversary was '''${daysBelated} days''' ago, marking '''${yearsCompleted} years''' (${regNote}) of dedicated service! I wanted to extend a heartfelt thanks for your amazing contributions. With over '''${totalEditsFormatted}''' edits, your dedication is an inspiration to the community. Wishing you all the best for the year ahead!
 
 ${toolLine}
 
