@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Food of Asia: Missing Wiki Articles Finder — Wiki's Lazy Coders</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png" />
+
+  <!-- Google Analytics gtag -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GC8PGC89NB"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-GC8PGC89NB');
+  </script>
+
+  <!-- Counter.dev Analytics -->
+  <script
+    src="https://cdn.counter.dev/script.js"
+    data-id="cc7a036d-a904-4d76-bcac-37ea4196c014"
+    data-utcoffset="6"
+  ></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,400&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* Theme CSS Variables & Safe-Area Support */
+    :root {
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      --bg: #f6f7fb;
+      --card: #fff;
+      --tx: #1b1f2a;
+      --mut: #667;
+      --ac: #2563eb;
+      --skin: #f1c9a5;
+      --ol: #a8764c;
+      --bd: #dde1ea;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #12141b;
+        --card: #1b1f2a;
+        --tx: #eef0f6;
+        --mut: #9aa3b5;
+        --ac: #6ea0ff;
+        --bd: #2c3242;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #12141b;
+      --card: #1b1f2a;
+      --tx: #eef0f6;
+      --mut: #9aa3b5;
+      --ac: #6ea0ff;
+      --bd: #2c3242;
+    }
+
+    html {
+      scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 5.5rem);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--tx);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      margin: 0;
+    }
+
+    .editorial-title {
+      font-family: 'Newsreader', Georgia, serif;
+      letter-spacing: -0.02em;
+    }
+
+    .theme-card {
+      background-color: var(--card);
+      border-color: var(--bd);
+      color: var(--tx);
+    }
+
+    .theme-subtle {
+      background-color: color-mix(in srgb, var(--bg) 72%, var(--card) 28%);
+      border-color: var(--bd);
+    }
+
+    .theme-muted {
+      color: var(--mut);
+    }
+
+    .theme-accent-bg {
+      background-color: var(--ac);
+      color: #ffffff;
+    }
+
+    .theme-accent-text {
+      color: var(--ac);
+    }
+
+    .theme-accent-border {
+      border-color: color-mix(in srgb, var(--ac) 35%, var(--bd) 65%);
+    }
+
+    .logo-img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      border-radius: 10px;
+      background-color: color-mix(in srgb, var(--skin) 30%, var(--card) 70%);
+      border: 1px solid var(--ol);
+      padding: 4px;
+      flex-shrink: 0;
+    }
+
+    .table-wrap::-webkit-scrollbar {
+      height: 8px;
+      width: 8px;
+    }
+
+    .table-wrap::-webkit-scrollbar-track {
+      background: var(--bg);
+      border-radius: 9999px;
+    }
+
+    .table-wrap::-webkit-scrollbar-thumb {
+      background: var(--bd);
+      border-radius: 9999px;
+    }
+
+    .sort-arrow {
+      display: inline-block;
+      transition: transform 0.16s ease, opacity 0.16s ease;
+    }
+  </style>
+</head>
+<body id="topOfPage" class="min-h-screen flex flex-col">
+
+  <!-- Sticky Header -->
+  <header class="sticky top-0 z-30 border-b theme-card backdrop-blur-md bg-opacity-95">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+        <!-- Brand & Theme Title -->
+        <div class="flex items-start sm:items-center gap-3">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/5/53/Wiki_s_Lazy_Coders_logo_small_transparent.png"
+            alt="Wiki's Lazy Coders Logo"
+            class="logo-img"
+          />
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full border theme-subtle theme-accent-text">
+                Wiki's Lazy Coders &bull; Food of Asia Theme
+              </span>
+              <span class="text-[11px] theme-muted">
+                Traditional Dishes, Regional Cuisines &amp; Culinary Heritage
+              </span>
+            </div>
+            <h1 class="editorial-title text-xl sm:text-2xl lg:text-[1.7rem] font-semibold leading-tight mt-0.5">
+              Food of Asia: Missing Wiki Articles Finder
+            </h1>
+          </div>
+        </div>
+
+        <!-- View Mode & Theme Controls -->
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
+          <div class="inline-flex rounded-xl p-1 border theme-subtle" role="group" aria-label="View mode">
+            <button
+              id="btnTableView"
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all theme-accent-bg shadow-2xs"
+              aria-pressed="true"
+            >
+              Table View
+            </button>
+            <button
+              id="btnCardView"
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all theme-muted hover:opacity-100"
+              aria-pressed="false"
+            >
+              Card View
+            </button>
+          </div>
+
+          <button
+            id="btnThemeToggle"
+            type="button"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium border theme-subtle hover:opacity-90 transition-opacity"
+            aria-label="Toggle light or dark theme"
+          >
+            <span id="themeIcon" aria-hidden="true">&#9790;</span>
+            <span id="themeLabel">Dark Mode</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Status / Notification Banner -->
+    <div
+      id="statusBanner"
+      role="status"
+      aria-live="polite"
+      class="hidden items-center justify-between gap-3 px-4 py-3 rounded-2xl border text-xs sm:text-sm font-medium theme-card theme-accent-border"
+    >
+      <div class="flex items-center gap-2.5">
+        <span id="statusBadge" class="inline-block w-2.5 h-2.5 rounded-full" style="background: var(--ac);"></span>
+        <span id="statusText"></span>
+      </div>
+      <button
+        id="btnDismissBanner"
+        type="button"
+        class="px-2.5 py-1 rounded-lg border theme-subtle text-xs hover:opacity-80"
+      >
+        Dismiss
+      </button>
+    </div>
+
+    <!-- SPARQL Language Gap Query & Sampling Controls -->
+    <section aria-label="Target language and query controls" class="rounded-2xl border p-4 sm:p-6 theme-card space-y-5">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b pb-4" style="border-color: var(--bd);">
+        <div>
+          <h2 class="text-sm sm:text-base font-semibold">
+            Target Wikipedia Gap Lookup (<code class="px-1.5 py-0.5 rounded text-xs border theme-subtle">en.wikipedia.org</code> present &amp; <code id="codeLangPreview" class="px-1.5 py-0.5 rounded text-xs border theme-subtle">awa.wikipedia.org</code> absent)
+          </h2>
+          <p class="text-xs sm:text-sm theme-muted mt-0.5">
+            Covers dishes, ingredients, spices, beverages, cooking techniques, street food, desserts, and regional culinary traditions across Asia.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 text-xs theme-muted">
+          <span id="dataSourceBadge" class="px-2.5 py-1 rounded-full border theme-subtle font-medium">
+            Bundled Dataset Ready
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
+        <!-- Target Wikipedia Language Code -->
+        <div class="lg:col-span-3">
+          <label for="langCodeInput" class="block text-xs font-semibold uppercase tracking-wider theme-muted mb-1.5">
+            Target Wiki Language Code
+          </label>
+          <input
+            id="langCodeInput"
+            type="text"
+            value="awa"
+            maxlength="16"
+            placeholder="e.g., awa, hi, bho, ne, mr, gu, ta, te, bn"
+            class="w-full px-3.5 py-2.5 rounded-xl border theme-subtle text-sm font-mono focus:outline-none"
+            style="border-color: var(--bd);"
+          />
+          <div class="flex flex-wrap gap-1 mt-1.5">
+            <button type="button" data-quick-lang="awa" class="quick-lang text-[11px] px-2 py-0.5 rounded-md border theme-subtle hover:opacity-80">awa</button>
+            <button type="button" data-quick-lang="hi" class="quick-lang text-[11px] px-2 py-0.5 rounded-md border theme-subtle hover:opacity-80">hi</button>
+            <button type="button" data-quick-lang="bho" class="quick-lang text-[11px] px-2 py-0.5 rounded-md border theme-subtle hover:opacity-80">bho</button>
+            <button type="button" data-quick-lang="ne" class="quick-lang text-[11px] px-2 py-0.5 rounded-md border theme-subtle hover:opacity-80">ne</button>
+            <button type="button" data-quick-lang="bn" class="quick-lang text-[11px] px-2 py-0.5 rounded-md border theme-subtle hover:opacity-80">bn</button>
+            <button type="button" data-quick-lang="ta" class="quick-lang text-[11px] px-2 py-0.5 rounded-md border theme-subtle hover:opacity-80">ta</button>
+          </div>
+        </div>
+
+        <!-- Page Count / Limit -->
+        <div class="lg:col-span-3">
+          <label for="pageLimitSelect" class="block text-xs font-semibold uppercase tracking-wider theme-muted mb-1.5">
+            Pages / Results Limit
+          </label>
+          <select
+            id="pageLimitSelect"
+            class="w-full px-3.5 py-2.5 rounded-xl border theme-subtle text-sm focus:outline-none"
+            style="border-color: var(--bd);"
+          >
+            <option value="50">50 pages</option>
+            <option value="100" selected>100 pages</option>
+            <option value="200">200 pages</option>
+            <option value="500">500 pages</option>
+          </select>
+          <p class="text-[11px] theme-muted mt-1.5">Controls result cap &amp; sample size</p>
+        </div>
+
+        <!-- Randomize / Sample Mode -->
+        <div class="lg:col-span-3">
+          <span class="block text-xs font-semibold uppercase tracking-wider theme-muted mb-1.5">
+            Randomize / Sample Mode
+          </span>
+          <div class="flex items-center gap-2">
+            <button
+              id="btnRandomizeToggle"
+              type="button"
+              class="flex-1 px-3 py-2.5 rounded-xl border theme-subtle text-xs sm:text-sm font-medium transition-all"
+              aria-pressed="false"
+            >
+              Random Order: OFF
+            </button>
+            <button
+              id="btnShuffleNow"
+              type="button"
+              class="px-3 py-2.5 rounded-xl border theme-subtle text-xs sm:text-sm font-medium hover:opacity-85 transition-opacity"
+              title="Shuffle / pick a fresh random sample now"
+            >
+              Shuffle
+            </button>
+          </div>
+          <p id="seedInfo" class="text-[11px] theme-muted mt-1.5">Deterministic order</p>
+        </div>
+
+        <!-- Run SPARQL / Fallback Buttons -->
+        <div class="lg:col-span-3 flex flex-col sm:flex-row lg:flex-col gap-2">
+          <button
+            id="btnRunSparql"
+            type="button"
+            class="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold theme-accent-bg hover:opacity-95 transition-opacity shadow-sm"
+          >
+            Fetch Live Wikidata SPARQL
+          </button>
+          <button
+            id="btnUseBundled"
+            type="button"
+            class="w-full px-3 py-2 rounded-xl text-xs font-medium border theme-subtle hover:opacity-85 transition-opacity"
+          >
+            Load Bundled Asian Foods (query 1)
+          </button>
+        </div>
+      </div>
+
+      <!-- Expandable SPARQL Query Inspector -->
+      <details id="sparqlDetails" class="rounded-xl border theme-subtle p-3 sm:p-4">
+        <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wider theme-muted select-none">
+          Inspect Generated Wikidata SPARQL Query
+        </summary>
+        <pre id="sparqlQueryCode" class="mt-3 p-3 rounded-lg border theme-card text-xs font-mono overflow-x-auto leading-relaxed"></pre>
+      </details>
+    </section>
+
+    <!-- Summary Metrics -->
+    <section aria-label="Dataset summary statistics" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="rounded-2xl border p-4 sm:p-5 theme-card">
+        <p class="text-xs font-semibold uppercase tracking-wider theme-muted">Loaded Rows</p>
+        <p id="statLoadedRows" class="mt-1.5 text-2xl sm:text-3xl font-bold tabular-nums">0</p>
+        <p class="mt-1 text-xs theme-muted">EN present &bull; <span id="statMissingLangCode">awa</span> absent</p>
+      </div>
+
+      <div class="rounded-2xl border p-4 sm:p-5 theme-card">
+        <p class="text-xs font-semibold uppercase tracking-wider theme-muted">Unique Food Items</p>
+        <p id="statUniqueItems" class="mt-1.5 text-2xl sm:text-3xl font-bold tabular-nums">0</p>
+        <p class="mt-1 text-xs theme-muted">Distinct Wikidata entities</p>
+      </div>
+
+      <div class="rounded-2xl border p-4 sm:p-5 theme-card">
+        <p class="text-xs font-semibold uppercase tracking-wider theme-muted">Asian Countries</p>
+        <p id="statCountries" class="mt-1.5 text-2xl sm:text-3xl font-bold tabular-nums">0</p>
+        <p class="mt-1 text-xs theme-muted">Origins in current set</p>
+      </div>
+
+      <div class="rounded-2xl border p-4 sm:p-5 theme-card">
+        <p class="text-xs font-semibold uppercase tracking-wider theme-accent-text">Filtered Results</p>
+        <p id="statFiltered" class="mt-1.5 text-2xl sm:text-3xl font-bold tabular-nums theme-accent-text">0</p>
+        <p id="statFilteredSub" class="mt-1 text-xs theme-muted">Matching current filters</p>
+      </div>
+    </section>
+
+    <!-- Search, Country, Culinary Category, Grouping & Export Controls -->
+    <section aria-label="Search, filter, grouping, and export toolbar" class="rounded-2xl border p-4 sm:p-6 theme-card space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
+        <!-- Search -->
+        <div class="lg:col-span-4">
+          <label for="searchInput" class="block text-xs font-semibold uppercase tracking-wider theme-muted mb-1.5">
+            Search Title, Country, Category, or Q-ID
+          </label>
+          <div class="relative">
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="e.g., lassi, turmeric, biryani, Q827654..."
+              class="w-full pl-9 pr-8 py-2.5 rounded-xl border theme-subtle text-sm focus:outline-none"
+              style="border-color: var(--bd);"
+            />
+            <svg class="w-4 h-4 theme-muted absolute left-3 top-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
+            </svg>
+            <button
+              id="btnClearSearch"
+              type="button"
+              class="hidden absolute right-2.5 top-2.5 text-xs theme-muted hover:opacity-80 px-1"
+              aria-label="Clear search query"
+            >
+              &#10005;
+            </button>
+          </div>
+        </div>
+
+        <!-- Country Filter -->
+        <div class="lg:col-span-3">
+          <label for="countrySelect" class="block text-xs font-semibold uppercase tracking-wider theme-muted mb-1.5">
+            Country / Origin
+          </label>
+          <select
+            id="countrySelect"
+            class="w-full px-3.5 py-2.5 rounded-xl border theme-subtle text-sm focus:outline-none"
+            style="border-color: var(--bd);"
+          >
+            <option value="__ALL__">All Countries</option>
+          </select>
+        </div>
+
+        <!-- Culinary Category Filter -->
+        <div class="lg:col-span-3">
+          <label for="categorySelect" class="block text-xs font-semibold uppercase tracking-wider theme-muted mb-1.5">
+            Culinary Category
+          </label>
+          <select
+            id="categorySelect"
+            class="w-full px-3.5 py-2.5 rounded-xl border theme-subtle text-sm focus:outline-none"
+            style="border-color: var(--bd);"
+          >
+            <option value="__ALL__">All Food of Asia Topics</option>
+            <option value="Traditional Dishes">Traditional Dishes</option>
+            <option value="Ingredients & Spices">Ingredients &amp; Spices</option>
+            <option value="Beverages">Beverages</option>
+            <option value="Cooking Techniques">Cooking Techniques</option>
+            <option value="Street Food">Street Food</option>
+            <option value="Desserts & Sweets">Desserts &amp; Sweets</option>
+            <option value="Regional Cuisines & Traditions">Regional Cuisines &amp; Traditions</option>
+          </select>
+        </div>
+
+        <!-- Grouping Toggle -->
+        <div class="lg:col-span-2">
+          <span class="block text-xs font-semibold uppercase tracking-wider theme-muted mb-1.5">
+            Row Grouping
+          </span>
+          <div class="inline-flex w-full rounded-xl p-1 border theme-subtle" role="group" aria-label="Grouping mode">
+            <button
+              id="btnAllRows"
+              type="button"
+              class="flex-1 px-2 py-1.5 rounded-lg text-xs font-medium theme-accent-bg"
+              aria-pressed="true"
+            >
+              All Rows
+            </button>
+            <button
+              id="btnGrouped"
+              type="button"
+              class="flex-1 px-2 py-1.5 rounded-lg text-xs font-medium theme-muted"
+              aria-pressed="false"
+            >
+              Unique
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export & Reset Row -->
+      <div class="pt-3 border-t flex flex-wrap items-center justify-between gap-2.5" style="border-color: var(--bd);">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider theme-muted mr-1">Export Filtered:</span>
+          <button
+            id="btnCopyWikitext"
+            type="button"
+            class="px-3 py-1.5 rounded-xl text-xs font-semibold theme-accent-bg hover:opacity-90 transition-opacity"
+          >
+            Copy Wikitext Table
+          </button>
+          <button
+            id="btnCopyMarkdown"
+            type="button"
+            class="px-3 py-1.5 rounded-xl text-xs font-medium border theme-subtle hover:opacity-85 transition-opacity"
+          >
+            Copy Markdown
+          </button>
+          <button
+            id="btnDownloadCsv"
+            type="button"
+            class="px-3 py-1.5 rounded-xl text-xs font-medium border theme-subtle hover:opacity-85 transition-opacity"
+          >
+            Download CSV
+          </button>
+          <button
+            id="btnCopySparql"
+            type="button"
+            class="px-3 py-1.5 rounded-xl text-xs font-medium border theme-subtle hover:opacity-85 transition-opacity"
+          >
+            Copy SPARQL
+          </button>
+        </div>
+
+        <button
+          id="btnResetFilters"
+          type="button"
+          class="text-xs font-medium underline underline-offset-2 theme-accent-text hover:opacity-80"
+        >
+          Reset Filters &amp; Preferences
+        </button>
+      </div>
+    </section>
+
+    <!-- Table View -->
+    <section id="tableSection" aria-label="Missing articles table" class="rounded-2xl border theme-card overflow-hidden">
+      <div class="px-4 sm:px-6 py-3 border-b theme-subtle flex flex-wrap items-center justify-between gap-2 text-xs theme-muted">
+        <span id="activeSummaryText">Showing results</span>
+        <span>Click headers to sort &bull; Shortcuts: <kbd class="px-1.5 py-0.5 rounded border theme-card">Home</kbd> / <kbd class="px-1.5 py-0.5 rounded border theme-card">End</kbd> or <kbd class="px-1.5 py-0.5 rounded border theme-card">Alt+↑/↓</kbd></span>
+      </div>
+
+      <div class="table-wrap overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[820px]">
+          <thead>
+            <tr class="border-b theme-subtle text-xs font-semibold uppercase tracking-wider theme-muted">
+              <th scope="col" class="py-3.5 px-4 sm:px-5 w-12 text-center">#</th>
+              <th scope="col" class="py-3.5 px-4 sm:px-5">
+                <button type="button" data-sort="label" class="sort-btn inline-flex items-center gap-1 font-semibold uppercase tracking-wider">
+                  <span>Article (EN Wiki)</span>
+                  <span class="sort-arrow theme-accent-text" data-arrow="label">&#8597;</span>
+                </button>
+              </th>
+              <th scope="col" class="py-3.5 px-4 sm:px-5">
+                <button type="button" data-sort="country" class="sort-btn inline-flex items-center gap-1 font-semibold uppercase tracking-wider">
+                  <span>Country</span>
+                  <span class="sort-arrow theme-accent-text" data-arrow="country">&#8597;</span>
+                </button>
+              </th>
+              <th scope="col" class="py-3.5 px-4 sm:px-5">
+                <button type="button" data-sort="category" class="sort-btn inline-flex items-center gap-1 font-semibold uppercase tracking-wider">
+                  <span>Culinary Topic</span>
+                  <span class="sort-arrow theme-accent-text" data-arrow="category">&#8597;</span>
+                </button>
+              </th>
+              <th scope="col" class="py-3.5 px-4 sm:px-5">
+                <button type="button" data-sort="qid" class="sort-btn inline-flex items-center gap-1 font-semibold uppercase tracking-wider">
+                  <span>Wikidata</span>
+                  <span class="sort-arrow theme-accent-text" data-arrow="qid">&#8597;</span>
+                </button>
+              </th>
+              <th scope="col" class="py-3.5 px-4 sm:px-5 text-right">
+                <span id="targetWikiColHeader">Target Wiki (awa)</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="resultsTableBody" class="divide-y text-sm" style="border-color: var(--bd);"></tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden py-14 px-6 text-center space-y-3">
+        <p class="text-base font-semibold">No matching Food of Asia items found</p>
+        <p class="text-xs sm:text-sm theme-muted max-w-md mx-auto">
+          Try adjusting your search query, country filter, culinary category, or fetch a fresh live SPARQL batch.
+        </p>
+        <button
+          id="btnEmptyReset"
+          type="button"
+          class="px-4 py-2 rounded-xl text-xs sm:text-sm font-medium theme-accent-bg"
+        >
+          Clear Filters
+        </button>
+      </div>
+    </section>
+
+    <!-- Card View -->
+    <section id="cardsSection" aria-label="Missing articles cards" class="hidden">
+      <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
+
+  </main>
+
+  <!-- Floating Go to Top & Go to Bottom Scroll Controls -->
+  <div
+    id="scrollNavControls"
+    class="fixed right-4 bottom-5 z-40 flex flex-col gap-2"
+    aria-label="Scroll navigation buttons"
+  >
+    <button
+      id="btnGoTop"
+      type="button"
+      class="w-11 h-11 rounded-full border theme-card shadow-lg flex items-center justify-center text-sm font-bold hover:scale-105 active:scale-95 transition-transform"
+      title="Go to Top (Home / Alt+Up)"
+      aria-label="Go to top of page"
+    >
+      &#8593;
+    </button>
+    <button
+      id="btnGoBottom"
+      type="button"
+      class="w-11 h-11 rounded-full border theme-card shadow-lg flex items-center justify-center text-sm font-bold hover:scale-105 active:scale-95 transition-transform"
+      title="Go to Bottom (End / Alt+Down)"
+      aria-label="Go to bottom of page"
+    >
+      &#8595;
+    </button>
+  </div>
+
+  <!-- Required Footer -->
+  <footer id="bottomOfPage" class="footer border-t mt-10 theme-card" style="border-color: var(--bd);">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+      <div>
+        Created by <a href="https://meta.wikimedia.org/wiki/User:Suyash.dwivedi" target="_blank" rel="noopener" class="underline theme-accent-text">Suyash Dwivedi</a>
+        | Updated on: 8 October 2026
+      </div>
+      <div class="flex items-center gap-3">
+        <button
+          id="btnToggleCredits"
+          type="button"
+          class="text-xs underline underline-offset-2 theme-muted hover:opacity-80"
+          aria-expanded="false"
+          aria-controls="translationCreditsBox"
+        >
+          Translation credits
+        </button>
+      </div>
+    </div>
+    <div id="translationCreditsBox" class="hidden border-t px-4 sm:px-6 lg:px-8 py-3 text-xs theme-muted theme-subtle" style="border-color: var(--bd);">
+      <div class="max-w-7xl mx-auto">
+        <strong>Translation &amp; Attribution Notes:</strong> Interface copy in English; target Wikipedia article checks dynamically query Wikimedia sitelinks for your entered language code (such as <code class="font-mono">awa</code>, <code class="font-mono">hi</code>, <code class="font-mono">bho</code>, <code class="font-mono">ne</code>, <code class="font-mono">bn</code>, <code class="font-mono">ta</code>). Always verify secondary culinary and encyclopedic sources when translating or creating Wikipedia articles.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bundled Source Dataset from query (1).html -->
+  <template id="bundledQueryTemplate">
+    <table><thead><tr><th>item</th><th>itemLabel</th><th>countryLabel</th><th>enArticle</th></tr></thead><tbody><tr><td>http://www.wikidata.org/entity/Q527616</td><td>bettarazuke</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Bettarazuke</td></tr><tr><td>http://www.wikidata.org/entity/Q2631692</td><td>Pasta di mandorle PAT</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Almond_paste</td></tr><tr><td>http://www.wikidata.org/entity/Q564560</td><td>Phu Thê Cake</td><td>Vietnam</td><td>https://en.wikipedia.org/wiki/B%C3%A1nh_phu_th%C3%AA</td></tr><tr><td>http://www.wikidata.org/entity/Q2722375</td><td>basundi</td><td>India</td><td>https://en.wikipedia.org/wiki/Basundi</td></tr><tr><td>http://www.wikidata.org/entity/Q586307</td><td>lokma</td><td>Iraq</td><td>https://en.wikipedia.org/wiki/Lokma</td></tr><tr><td>http://www.wikidata.org/entity/Q553905</td><td>wonton</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Wonton</td></tr><tr><td>http://www.wikidata.org/entity/Q387235</td><td>asazuke</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Asazuke</td></tr><tr><td>http://www.wikidata.org/entity/Q343864</td><td>Imam Bayıldı</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/%C4%B0mam_bay%C4%B1ld%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q586307</td><td>lokma</td><td>Syria</td><td>https://en.wikipedia.org/wiki/Lokma</td></tr><tr><td>http://www.wikidata.org/entity/Q599548</td><td>manjū</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Manj%C5%AB</td></tr><tr><td>http://www.wikidata.org/entity/Q827654</td><td>lassi</td><td>India</td><td>https://en.wikipedia.org/wiki/Lassi</td></tr><tr><td>http://www.wikidata.org/entity/Q192892</td><td>ayran</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Ayran</td></tr><tr><td>http://www.wikidata.org/entity/Q622547</td><td>century egg</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Century_egg</td></tr><tr><td>http://www.wikidata.org/entity/Q120096</td><td>Tempeh</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Tempeh</td></tr><tr><td>http://www.wikidata.org/entity/Q116327</td><td>akashiyaki</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Akashiyaki</td></tr><tr><td>http://www.wikidata.org/entity/Q6427832</td><td>Kolot</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Kolot</td></tr><tr><td>http://www.wikidata.org/entity/Q404973</td><td>Peking duck</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Peking_duck</td></tr><tr><td>http://www.wikidata.org/entity/Q1057649</td><td>tandoori chicken</td><td>India</td><td>https://en.wikipedia.org/wiki/Tandoori_chicken</td></tr><tr><td>http://www.wikidata.org/entity/Q99879443</td><td>Green Onion Chex</td><td>South Korea</td><td>https://en.wikipedia.org/wiki/Chex_Green_Onion</td></tr><tr><td>http://www.wikidata.org/entity/Q712748</td><td>Poon choi</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Poon_choi</td></tr><tr><td>http://www.wikidata.org/entity/Q464545</td><td>Chinmi</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Chinmi</td></tr><tr><td>http://www.wikidata.org/entity/Q817282</td><td>beni shōga</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Beni_sh%C5%8Dga</td></tr><tr><td>http://www.wikidata.org/entity/Q213105</td><td>biangbiang noodles</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Biangbiang_noodles</td></tr><tr><td>http://www.wikidata.org/entity/Q703286</td><td>champon</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Champon</td></tr><tr><td>http://www.wikidata.org/entity/Q839206</td><td>General Tso's chicken</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/General_Tso%27s_chicken</td></tr><tr><td>http://www.wikidata.org/entity/Q9017170</td><td>alkaline noodles</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Alkaline_noodles</td></tr><tr><td>http://www.wikidata.org/entity/Q97101726</td><td>Meatball noodles</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Mie_bakso</td></tr><tr><td>http://www.wikidata.org/entity/Q159290</td><td>kue lapis</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_lapis</td></tr><tr><td>http://www.wikidata.org/entity/Q167692</td><td>monjayaki</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Monjayaki</td></tr><tr><td>http://www.wikidata.org/entity/Q209253</td><td>satay</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Satay</td></tr><tr><td>http://www.wikidata.org/entity/Q564271</td><td>bánh bao</td><td>Vietnam</td><td>https://en.wikipedia.org/wiki/B%C3%A1nh_bao</td></tr><tr><td>http://www.wikidata.org/entity/Q203176</td><td>gyūdon</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Gy%C5%ABdon</td></tr><tr><td>http://www.wikidata.org/entity/Q597921</td><td>brem</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Brem</td></tr><tr><td>http://www.wikidata.org/entity/Q7202578</td><td>Gabacai</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Guoba_cuisine</td></tr><tr><td>http://www.wikidata.org/entity/Q586307</td><td>lokma</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Lokma</td></tr><tr><td>http://www.wikidata.org/entity/Q713869</td><td>grass jelly</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Grass_jelly</td></tr><tr><td>http://www.wikidata.org/entity/Q713879</td><td>youtiao</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Youtiao</td></tr><tr><td>http://www.wikidata.org/entity/Q834563</td><td>Jiuniang</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Jiuniang</td></tr><tr><td>http://www.wikidata.org/entity/Q818674</td><td>meze</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Meze</td></tr><tr><td>http://www.wikidata.org/entity/Q564567</td><td>bánh chưng</td><td>Vietnam</td><td>https://en.wikipedia.org/wiki/B%C3%A1nh_ch%C6%B0ng</td></tr><tr><td>http://www.wikidata.org/entity/Q643225</td><td>rempeyek</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Rempeyek</td></tr><tr><td>http://www.wikidata.org/entity/Q171983</td><td>dhokla</td><td>India</td><td>https://en.wikipedia.org/wiki/Dhokla</td></tr><tr><td>http://www.wikidata.org/entity/Q453174</td><td>Onsen tamago</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Onsen_tamago</td></tr><tr><td>http://www.wikidata.org/entity/Q542790</td><td>hujiao bing</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Hujiao_bing</td></tr><tr><td>http://www.wikidata.org/entity/Q783828</td><td>tenkasu</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Tenkasu</td></tr><tr><td>http://www.wikidata.org/entity/Q720230</td><td>rojak</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Rojak</td></tr><tr><td>http://www.wikidata.org/entity/Q713892</td><td>yong tau foo</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Yong_tau_foo</td></tr><tr><td>http://www.wikidata.org/entity/Q192874</td><td>noodle</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Noodles</td></tr><tr><td>http://www.wikidata.org/entity/Q839910</td><td>pişmaniye</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Pi%C5%9Fmaniye</td></tr><tr><td>http://www.wikidata.org/entity/Q192892</td><td>ayran</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Ayran</td></tr><tr><td>http://www.wikidata.org/entity/Q7548429</td><td>snow skin mooncake</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Snow_skin_mooncake</td></tr><tr><td>http://www.wikidata.org/entity/Q13632478</td><td>Zhimazao</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Kaikouxiao</td></tr><tr><td>http://www.wikidata.org/entity/Q1076874</td><td>fried rice</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Fried_rice</td></tr><tr><td>http://www.wikidata.org/entity/Q1142841</td><td>tonkatsu</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Tonkatsu</td></tr><tr><td>http://www.wikidata.org/entity/Q1135831</td><td>Rogan josh</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Rogan_josh</td></tr><tr><td>http://www.wikidata.org/entity/Q2096886</td><td>Serundeng</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Serundeng</td></tr><tr><td>http://www.wikidata.org/entity/Q28224410</td><td>籺(hé)</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Et_(Chinese_pastry)</td></tr><tr><td>http://www.wikidata.org/entity/Q1031787</td><td>gözleme</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/G%C3%B6zleme</td></tr><tr><td>http://www.wikidata.org/entity/Q17023518</td><td>tsoureki</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Tsoureki</td></tr><tr><td>http://www.wikidata.org/entity/Q980840</td><td>gudeg</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Gudeg</td></tr><tr><td>http://www.wikidata.org/entity/Q11326596</td><td>honey toast</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Honey_toast</td></tr><tr><td>http://www.wikidata.org/entity/Q5257857</td><td>kolak</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kolak_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q1185324</td><td>Sanuki udon</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Sanuki_udon</td></tr><tr><td>http://www.wikidata.org/entity/Q7897138</td><td>Unnakai</td><td>India</td><td>https://en.wikipedia.org/wiki/Unnakai</td></tr><tr><td>http://www.wikidata.org/entity/Q2919934</td><td>Sou</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Sou_(pastry)</td></tr><tr><td>http://www.wikidata.org/entity/Q1367718</td><td>gu lou juk</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Sweet_and_sour_pork</td></tr><tr><td>http://www.wikidata.org/entity/Q11259099</td><td>ikinaridango</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Ikinari_Dango</td></tr><tr><td>http://www.wikidata.org/entity/Q860170</td><td>yin yang fried rice</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Yin_yang_fried_rice</td></tr><tr><td>http://www.wikidata.org/entity/Q16307825</td><td>Roti sai mai</td><td>Thailand</td><td>https://en.wikipedia.org/wiki/Roti_sai_mai</td></tr><tr><td>http://www.wikidata.org/entity/Q1061856</td><td>shabu-shabu</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Shabu-shabu</td></tr><tr><td>http://www.wikidata.org/entity/Q847652</td><td>shuizhu</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Shuizhu</td></tr><tr><td>http://www.wikidata.org/entity/Q5262528</td><td>Getuk</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Gethuk</td></tr><tr><td>http://www.wikidata.org/entity/Q920940</td><td>dosa</td><td>India</td><td>https://en.wikipedia.org/wiki/Dosa_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q1061604</td><td>chana masala</td><td>India</td><td>https://en.wikipedia.org/wiki/Chana_masala</td></tr><tr><td>http://www.wikidata.org/entity/Q1305079</td><td>ghormeh sabzi</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Ghormeh_sabzi</td></tr><tr><td>http://www.wikidata.org/entity/Q1432724</td><td>sujuk</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Sujuk</td></tr><tr><td>http://www.wikidata.org/entity/Q1204605</td><td>char siu</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Char_siu</td></tr><tr><td>http://www.wikidata.org/entity/Q862557</td><td>osechi</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Osechi</td></tr><tr><td>http://www.wikidata.org/entity/Q1195290</td><td>Korokke</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Korokke</td></tr><tr><td>http://www.wikidata.org/entity/Q867426</td><td>Cendol</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Cendol</td></tr><tr><td>http://www.wikidata.org/entity/Q1049425</td><td>kısır</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/K%C4%B1s%C4%B1r</td></tr><tr><td>http://www.wikidata.org/entity/Q1684997</td><td>lemang</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Lemang</td></tr><tr><td>http://www.wikidata.org/entity/Q924689</td><td>soto ayam</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Soto_ayam</td></tr><tr><td>http://www.wikidata.org/entity/Q7228884</td><td>Pootharekulu</td><td>India</td><td>https://en.wikipedia.org/wiki/Pootharekulu</td></tr><tr><td>http://www.wikidata.org/entity/Q2456855</td><td>Idiyappam</td><td>India</td><td>https://en.wikipedia.org/wiki/Idiyappam</td></tr><tr><td>http://www.wikidata.org/entity/Q905527</td><td>takoyaki</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Takoyaki</td></tr><tr><td>http://www.wikidata.org/entity/Q1246721</td><td>Tarama</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Taramasalata</td></tr><tr><td>http://www.wikidata.org/entity/Q1352897</td><td>unadon</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Unadon</td></tr><tr><td>http://www.wikidata.org/entity/Q1720857</td><td>Kabsa</td><td>Saudi Arabia</td><td>https://en.wikipedia.org/wiki/Kabsa</td></tr><tr><td>http://www.wikidata.org/entity/Q22689325</td><td>Kahi</td><td>Iraq</td><td>https://en.wikipedia.org/wiki/Kahi_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q1136876</td><td>Okinawa soba</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Okinawa_soba</td></tr><tr><td>http://www.wikidata.org/entity/Q877957</td><td>shahe fen</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Shahe_fen</td></tr><tr><td>http://www.wikidata.org/entity/Q7498930</td><td>shirokuma</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Shirokuma</td></tr><tr><td>http://www.wikidata.org/entity/Q2425845</td><td>sate kambing</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Sate_kambing</td></tr><tr><td>http://www.wikidata.org/entity/Q893318</td><td>Borani</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Borani</td></tr><tr><td>http://www.wikidata.org/entity/Q1068574</td><td>chawanmushi</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Chawanmushi</td></tr><tr><td>http://www.wikidata.org/entity/Q13013252</td><td>Khanom tan</td><td>Thailand</td><td>https://en.wikipedia.org/wiki/Khanom_tan</td></tr><tr><td>http://www.wikidata.org/entity/Q951525</td><td>Avial</td><td>India</td><td>https://en.wikipedia.org/wiki/Avial</td></tr><tr><td>http://www.wikidata.org/entity/Q848957</td><td>coto makassar</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Coto_makassar</td></tr><tr><td>http://www.wikidata.org/entity/Q11280104</td><td>momiji manjū</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Momiji_manj%C5%AB</td></tr><tr><td>http://www.wikidata.org/entity/Q958759</td><td>bamiyeh</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Bamiyeh</td></tr><tr><td>http://www.wikidata.org/entity/Q1205609</td><td>Hayashi rice</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Hayashi_rice</td></tr><tr><td>http://www.wikidata.org/entity/Q1293258</td><td>bakmi</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Bakmi</td></tr><tr><td>http://www.wikidata.org/entity/Q2056399</td><td>pastırma</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Pastirma</td></tr><tr><td>http://www.wikidata.org/entity/Q3676186</td><td>kuymak</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Kuymak</td></tr><tr><td>http://www.wikidata.org/entity/Q2601766</td><td>yufka bread</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Yufka</td></tr><tr><td>http://www.wikidata.org/entity/Q28224446</td><td>Osmanthus cake</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Osmanthus_cake</td></tr><tr><td>http://www.wikidata.org/entity/Q6429813</td><td>Konro Soup</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Konro</td></tr><tr><td>http://www.wikidata.org/entity/Q4833482</td><td>kumru</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Kumru_(sandwich)</td></tr><tr><td>http://www.wikidata.org/entity/Q4189322</td><td>gulai</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Gulai</td></tr><tr><td>http://www.wikidata.org/entity/Q4222435</td><td>Kitakata ramen</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Kitakata_ramen</td></tr><tr><td>http://www.wikidata.org/entity/Q5317729</td><td>gajar ka halwa</td><td>India</td><td>https://en.wikipedia.org/wiki/Gajar_ka_halwa</td></tr><tr><td>http://www.wikidata.org/entity/Q6744505</td><td>Etli ekmek</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Etli_ekmek</td></tr><tr><td>http://www.wikidata.org/entity/Q30587715</td><td>Bubur cha cha</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Bubur_cha_cha</td></tr><tr><td>http://www.wikidata.org/entity/Q2918079</td><td>falooda</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Falooda</td></tr><tr><td>http://www.wikidata.org/entity/Q134475160</td><td>Kore mochi</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Kore_mochi</td></tr><tr><td>http://www.wikidata.org/entity/Q2669274</td><td>tandoor bread</td><td>Iraq</td><td>https://en.wikipedia.org/wiki/Tandoor_bread</td></tr><tr><td>http://www.wikidata.org/entity/Q2505233</td><td>egg foo young</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Egg_foo_young</td></tr><tr><td>http://www.wikidata.org/entity/Q5674824</td><td>Seer Torshi</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Seer_torshi</td></tr><tr><td>http://www.wikidata.org/entity/Q6343718</td><td>Kabab Barg</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Kabab_barg</td></tr><tr><td>http://www.wikidata.org/entity/Q6473713</td><td>lai fun</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Lai_fun</td></tr><tr><td>http://www.wikidata.org/entity/Q6469877</td><td>hanımgöbeği</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Lady%27s_navel</td></tr><tr><td>http://www.wikidata.org/entity/Q1920415</td><td>menemen</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Menemen_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q2890574</td><td>Karashizuke</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Karashizuke</td></tr><tr><td>http://www.wikidata.org/entity/Q4736109</td><td>Kinema</td><td>Nepal</td><td>https://en.wikipedia.org/wiki/Kinema</td></tr><tr><td>http://www.wikidata.org/entity/Q4388197</td><td>Ikayaki</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Ikayaki</td></tr><tr><td>http://www.wikidata.org/entity/Q5034394</td><td>Chháu-á-kóe</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Chh%C3%A1u-%C3%A1-k%C3%B3e</td></tr><tr><td>http://www.wikidata.org/entity/Q5046165</td><td>Morioka reimen</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Morioka_reimen</td></tr><tr><td>http://www.wikidata.org/entity/Q1683716</td><td>lontong</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Lontong</td></tr><tr><td>http://www.wikidata.org/entity/Q5434634</td><td>Far far</td><td>India</td><td>https://en.wikipedia.org/wiki/Far_far</td></tr><tr><td>http://www.wikidata.org/entity/Q1561248</td><td>lamian</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Lamian</td></tr><tr><td>http://www.wikidata.org/entity/Q1721014</td><td>red curry</td><td>Thailand</td><td>https://en.wikipedia.org/wiki/Red_curry</td></tr><tr><td>http://www.wikidata.org/entity/Q5257848</td><td>boiled noodles</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Mee_rebus</td></tr><tr><td>http://www.wikidata.org/entity/Q5139863</td><td>coconut rice</td><td>India</td><td>https://en.wikipedia.org/wiki/Coconut_rice</td></tr><tr><td>http://www.wikidata.org/entity/Q1501043</td><td>güllaç</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/G%C3%BClla%C3%A7</td></tr><tr><td>http://www.wikidata.org/entity/Q4807004</td><td>asinan</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Asinan</td></tr><tr><td>http://www.wikidata.org/entity/Q30587715</td><td>Bubur cha cha</td><td>Malaysia</td><td>https://en.wikipedia.org/wiki/Bubur_cha_cha</td></tr><tr><td>http://www.wikidata.org/entity/Q4200659</td><td>Pempek</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Pempek</td></tr><tr><td>http://www.wikidata.org/entity/Q4811596</td><td>bazlama</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Bazlama</td></tr><tr><td>http://www.wikidata.org/entity/Q2901605</td><td>fermented bean curd</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Fermented_bean_curd</td></tr><tr><td>http://www.wikidata.org/entity/Q2901547</td><td>shumai</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Shumai</td></tr><tr><td>http://www.wikidata.org/entity/Q4200763</td><td>rawon</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Rawon</td></tr><tr><td>http://www.wikidata.org/entity/Q4997935</td><td>Buntil</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Buntil</td></tr><tr><td>http://www.wikidata.org/entity/Q6398629</td><td>Keşkül</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Ke%C5%9Fk%C3%BCl</td></tr><tr><td>http://www.wikidata.org/entity/Q4208154</td><td>mie aceh</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Mie_aceh</td></tr><tr><td>http://www.wikidata.org/entity/Q2023763</td><td>Jin deui</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Jian_dui</td></tr><tr><td>http://www.wikidata.org/entity/Q3391174</td><td>Katemak</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Katemak</td></tr><tr><td>http://www.wikidata.org/entity/Q4703104</td><td>Se'i</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Se%27i</td></tr><tr><td>http://www.wikidata.org/entity/Q3595351</td><td>Sadya</td><td>India</td><td>https://en.wikipedia.org/wiki/Sadya</td></tr><tr><td>http://www.wikidata.org/entity/Q4822264</td><td>şehriye</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/%C5%9Eehriye</td></tr><tr><td>http://www.wikidata.org/entity/Q2835232</td><td>Pasembur</td><td>India</td><td>https://en.wikipedia.org/wiki/Pasembur</td></tr><tr><td>http://www.wikidata.org/entity/Q3668413</td><td>kesme</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Kesme</td></tr><tr><td>http://www.wikidata.org/entity/Q4247887</td><td>katsu sandwich</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Katsu-sando</td></tr><tr><td>http://www.wikidata.org/entity/Q1505500</td><td>tavukgöğsü</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Tavukg%C3%B6%C4%9Fs%C3%BC</td></tr><tr><td>http://www.wikidata.org/entity/Q3520299</td><td>Nasi kandar</td><td>India</td><td>https://en.wikipedia.org/wiki/Nasi_kandar</td></tr><tr><td>http://www.wikidata.org/entity/Q3520287</td><td>Puttu</td><td>India</td><td>https://en.wikipedia.org/wiki/Puttu</td></tr><tr><td>http://www.wikidata.org/entity/Q3520287</td><td>Puttu</td><td>Sri Lanka</td><td>https://en.wikipedia.org/wiki/Puttu</td></tr><tr><td>http://www.wikidata.org/entity/Q6008497</td><td>Circassian chicken</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Circassian_chicken</td></tr><tr><td>http://www.wikidata.org/entity/Q6967046</td><td>nasi bogana</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_bogana</td></tr><tr><td>http://www.wikidata.org/entity/Q2721752</td><td>Murukku</td><td>India</td><td>https://en.wikipedia.org/wiki/Murukku</td></tr><tr><td>http://www.wikidata.org/entity/Q2746599</td><td>tumpeng</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Tumpeng</td></tr><tr><td>http://www.wikidata.org/entity/Q6076542</td><td>hoşmerim</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Ho%C5%9Fmerim</td></tr><tr><td>http://www.wikidata.org/entity/Q4103061</td><td>lumpia Semarang</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Lumpia_semarang</td></tr><tr><td>http://www.wikidata.org/entity/Q22127654</td><td>tataki gobō</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Tataki_gobo</td></tr><tr><td>http://www.wikidata.org/entity/Q3273951</td><td>Nasi Campur</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_campur</td></tr><tr><td>http://www.wikidata.org/entity/Q6012372</td><td>kuzu fırın</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Kuzu_tand%C4%B1r</td></tr><tr><td>http://www.wikidata.org/entity/Q7167670</td><td>perdeli pilav</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Perdeli_pilav</td></tr><tr><td>http://www.wikidata.org/entity/Q6013161</td><td>Kandil simidi</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Kandil_simidi</td></tr><tr><td>http://www.wikidata.org/entity/Q2414031</td><td>lemper</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Lemper</td></tr><tr><td>http://www.wikidata.org/entity/Q2431975</td><td>yakiniku</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Yakiniku</td></tr><tr><td>http://www.wikidata.org/entity/Q8025241</td><td>wingko</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Wingko</td></tr><tr><td>http://www.wikidata.org/entity/Q3909175</td><td>es doger</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Es_doger</td></tr><tr><td>http://www.wikidata.org/entity/Q2723965</td><td>Dhansak</td><td>India</td><td>https://en.wikipedia.org/wiki/Dhansak</td></tr><tr><td>http://www.wikidata.org/entity/Q2916235</td><td>Piyaz</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Piyaz</td></tr><tr><td>http://www.wikidata.org/entity/Q2402333</td><td>Buddha's delight</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Buddha%27s_delight</td></tr><tr><td>http://www.wikidata.org/entity/Q6816534</td><td>menchi-katsu</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Menchi-katsu</td></tr><tr><td>http://www.wikidata.org/entity/Q6017615</td><td>Dilber dudağı</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Dilber_duda%C4%9F%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q2468860</td><td>chè trôi nước</td><td>Vietnam</td><td>https://en.wikipedia.org/wiki/Ch%C3%A8_tr%C3%B4i_n%C6%B0%E1%BB%9Bc</td></tr><tr><td>http://www.wikidata.org/entity/Q8055913</td><td>kalburabastı</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Kalburabast%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q2634430</td><td>Curd rice</td><td>India</td><td>https://en.wikipedia.org/wiki/Curd_rice</td></tr><tr><td>http://www.wikidata.org/entity/Q7145091</td><td>eggplant kebab</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Eggplant_kebab</td></tr><tr><td>http://www.wikidata.org/entity/Q6782752</td><td>Masaura</td><td>Nepal</td><td>https://en.wikipedia.org/wiki/Masaura</td></tr><tr><td>http://www.wikidata.org/entity/Q2916235</td><td>Piyaz</td><td>Iraq</td><td>https://en.wikipedia.org/wiki/Piyaz</td></tr><tr><td>http://www.wikidata.org/entity/Q5162437</td><td>Serabi</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Serabi</td></tr><tr><td>http://www.wikidata.org/entity/Q5376675</td><td>Enduri Pitha</td><td>India</td><td>https://en.wikipedia.org/wiki/Enduri_pitha</td></tr><tr><td>http://www.wikidata.org/entity/Q1044246</td><td>furikake</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Furikake</td></tr><tr><td>http://www.wikidata.org/entity/Q2725826</td><td>Undhiyu</td><td>India</td><td>https://en.wikipedia.org/wiki/Undhiyu</td></tr><tr><td>http://www.wikidata.org/entity/Q6022608</td><td>pumpkin dessert</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Kabak_tatl%C4%B1s%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q2457455</td><td>sayur asem</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Sayur_asem</td></tr><tr><td>http://www.wikidata.org/entity/Q3269818</td><td>nasi kuning</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_kuning</td></tr><tr><td>http://www.wikidata.org/entity/Q4189615</td><td>nagasari</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nagasari</td></tr><tr><td>http://www.wikidata.org/entity/Q3537474</td><td>neera</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Neera</td></tr><tr><td>http://www.wikidata.org/entity/Q5254542</td><td>rengginang</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Rengginang</td></tr><tr><td>http://www.wikidata.org/entity/Q5171054</td><td>corn fritter</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Corn_fritter</td></tr><tr><td>http://www.wikidata.org/entity/Q8210687</td><td>ayam rica-rica</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Ayam_rica-rica</td></tr><tr><td>http://www.wikidata.org/entity/Q3866940</td><td>muhammara</td><td>Syria</td><td>https://en.wikipedia.org/wiki/Muhammara</td></tr><tr><td>http://www.wikidata.org/entity/Q5995345</td><td>ikan bakar</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Ikan_bakar</td></tr><tr><td>http://www.wikidata.org/entity/Q3234931</td><td>otak-otak</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Otak-otak</td></tr><tr><td>http://www.wikidata.org/entity/Q3236175</td><td>nasi uduk</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_uduk</td></tr><tr><td>http://www.wikidata.org/entity/Q7075129</td><td>oblaat</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Oblaat</td></tr><tr><td>http://www.wikidata.org/entity/Q6029320</td><td>tahini roll</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Tahini_roll</td></tr><tr><td>http://www.wikidata.org/entity/Q7195443</td><td>pineapple tart</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Pineapple_tart</td></tr><tr><td>http://www.wikidata.org/entity/Q7447375</td><td>Sel roti</td><td>Nepal</td><td>https://en.wikipedia.org/wiki/Sel_roti</td></tr><tr><td>http://www.wikidata.org/entity/Q6068180</td><td>İskilip dolması</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/%C4%B0skilip_dolmas%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q1520778</td><td>ketupat</td><td>Malaysia</td><td>https://en.wikipedia.org/wiki/Ketupat</td></tr><tr><td>http://www.wikidata.org/entity/Q3244647</td><td>nasi kucing</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_kucing</td></tr><tr><td>http://www.wikidata.org/entity/Q2548021</td><td>appam</td><td>India</td><td>https://en.wikipedia.org/wiki/Appam</td></tr><tr><td>http://www.wikidata.org/entity/Q6002018</td><td>ıslama köfte</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Islama_k%C3%B6fte</td></tr><tr><td>http://www.wikidata.org/entity/Q2548021</td><td>appam</td><td>Sri Lanka</td><td>https://en.wikipedia.org/wiki/Appam</td></tr><tr><td>http://www.wikidata.org/entity/Q8215673</td><td>Kabab koobideh</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Kabab_koobideh</td></tr><tr><td>http://www.wikidata.org/entity/Q2899201</td><td>rousong</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Meat_floss</td></tr><tr><td>http://www.wikidata.org/entity/Q2916235</td><td>Piyaz</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Piyaz</td></tr><tr><td>http://www.wikidata.org/entity/Q8053485</td><td>yi mein</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Yi_mein</td></tr><tr><td>http://www.wikidata.org/entity/Q2428787</td><td>ayam Taliwang</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Ayam_Taliwang</td></tr><tr><td>http://www.wikidata.org/entity/Q5211509</td><td>Dalma</td><td>India</td><td>https://en.wikipedia.org/wiki/Dalma_(dish)</td></tr><tr><td>http://www.wikidata.org/entity/Q6967043</td><td>Nasi bakar</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_bakar</td></tr><tr><td>http://www.wikidata.org/entity/Q6967048</td><td>Nasi liwet</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_liwet</td></tr><tr><td>http://www.wikidata.org/entity/Q6135401</td><td>Kara Mucho</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Karamucho</td></tr><tr><td>http://www.wikidata.org/entity/Q2557649</td><td>amba</td><td>India</td><td>https://en.wikipedia.org/wiki/Amba_(condiment)</td></tr><tr><td>http://www.wikidata.org/entity/Q4907305</td><td>Bika Ambon</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Bika_ambon</td></tr><tr><td>http://www.wikidata.org/entity/Q7127953</td><td>Pallubasa</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Pallubasa</td></tr><tr><td>http://www.wikidata.org/entity/Q5262436</td><td>Onde-onde</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Klepon</td></tr><tr><td>http://www.wikidata.org/entity/Q12491347</td><td>Skin Crackers</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Krupuk_kulit</td></tr><tr><td>http://www.wikidata.org/entity/Q12492558</td><td>Krecek</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Krechek</td></tr><tr><td>http://www.wikidata.org/entity/Q12492887</td><td>Kuluban</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kuluban</td></tr><tr><td>http://www.wikidata.org/entity/Q6432257</td><td>Kori Rotti</td><td>India</td><td>https://en.wikipedia.org/wiki/Kori_rotti</td></tr><tr><td>http://www.wikidata.org/entity/Q4264051</td><td>geplak</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Geplak</td></tr><tr><td>http://www.wikidata.org/entity/Q11113287</td><td>Arem-Arem</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Arem-arem</td></tr><tr><td>http://www.wikidata.org/entity/Q6406382</td><td>Lentil rice</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Lentil_rice</td></tr><tr><td>http://www.wikidata.org/entity/Q11293966</td><td>kaki fry</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Kaki_furai</td></tr><tr><td>http://www.wikidata.org/entity/Q5120165</td><td>Cimpa</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Cimpa</td></tr><tr><td>http://www.wikidata.org/entity/Q2879351</td><td>Bai ye</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Bai_ye</td></tr><tr><td>http://www.wikidata.org/entity/Q4796545</td><td>Arsik</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Arsik</td></tr><tr><td>http://www.wikidata.org/entity/Q6387099</td><td>Kemplang</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kemplang</td></tr><tr><td>http://www.wikidata.org/entity/Q12500151</td><td>Nasi gandul</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_gandul</td></tr><tr><td>http://www.wikidata.org/entity/Q2625025</td><td>Zosui</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Zosui</td></tr><tr><td>http://www.wikidata.org/entity/Q4272221</td><td>Papeda</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Papeda_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q4192299</td><td>oncom</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Oncom</td></tr><tr><td>http://www.wikidata.org/entity/Q4887922</td><td>pepes</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Pepes</td></tr><tr><td>http://www.wikidata.org/entity/Q4920553</td><td>Nasi ulam</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_ulam</td></tr><tr><td>http://www.wikidata.org/entity/Q11538378</td><td>Umegaemochi</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Umegae_mochi</td></tr><tr><td>http://www.wikidata.org/entity/Q11458898</td><td>Ogura toast</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Ogura_toast</td></tr><tr><td>http://www.wikidata.org/entity/Q5261363</td><td>pecel</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Pecel</td></tr><tr><td>http://www.wikidata.org/entity/Q4197759</td><td>botok</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Botok</td></tr><tr><td>http://www.wikidata.org/entity/Q4803469</td><td>asam pedas</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Asam_pedas</td></tr><tr><td>http://www.wikidata.org/entity/Q7675482</td><td>tahinli pide</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Tahinli_pide</td></tr><tr><td>http://www.wikidata.org/entity/Q6393299</td><td>kerak telor</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kerak_telor</td></tr><tr><td>http://www.wikidata.org/entity/Q4199436</td><td>lawar</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Lawar_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q4201329</td><td>rice lengko</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_lengko</td></tr><tr><td>http://www.wikidata.org/entity/Q4202016</td><td>lupis</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Lupis_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q4203530</td><td>karedok</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Karedok</td></tr><tr><td>http://www.wikidata.org/entity/Q7878708</td><td>Ulam</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Ulam_(salad)</td></tr><tr><td>http://www.wikidata.org/entity/Q7808550</td><td>tinutuan porridge</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Tinutuan</td></tr><tr><td>http://www.wikidata.org/entity/Q12404884</td><td>Gondi dumpling</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Gondi_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q6395436</td><td>Ketoprak</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Ketoprak_(dish)</td></tr><tr><td>http://www.wikidata.org/entity/Q3043512</td><td>Kalamay</td><td>Philippines</td><td>https://en.wikipedia.org/wiki/Kalamay</td></tr><tr><td>http://www.wikidata.org/entity/Q2548949</td><td>vine leaf roll</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Ntolm%C3%A1s</td></tr><tr><td>http://www.wikidata.org/entity/Q4205452</td><td>nasi kebuli</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_kebuli</td></tr><tr><td>http://www.wikidata.org/entity/Q4205456</td><td>Sangsang</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Saksang</td></tr><tr><td>http://www.wikidata.org/entity/Q12481254</td><td>Dengke Mas Naniura</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Dengke_mas_naniura</td></tr><tr><td>http://www.wikidata.org/entity/Q4208144</td><td>bakwan</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Bakwan</td></tr><tr><td>http://www.wikidata.org/entity/Q4899060</td><td>betutu</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Betutu</td></tr><tr><td>http://www.wikidata.org/entity/Q6787315</td><td>Mathri</td><td>India</td><td>https://en.wikipedia.org/wiki/Mathri</td></tr><tr><td>http://www.wikidata.org/entity/Q4208661</td><td>Mie celor</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Mie_celor</td></tr><tr><td>http://www.wikidata.org/entity/Q10971166</td><td>timphan</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Timphan</td></tr><tr><td>http://www.wikidata.org/entity/Q7124365</td><td>pagit-pagit</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Pagit-pagit</td></tr><tr><td>http://www.wikidata.org/entity/Q12484569</td><td>gulai otak</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Gulai_otak</td></tr><tr><td>http://www.wikidata.org/entity/Q4748563</td><td>Tempoyak</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Tempoyak</td></tr><tr><td>http://www.wikidata.org/entity/Q5373825</td><td>empal gentong</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Empal_gentong</td></tr><tr><td>http://www.wikidata.org/entity/Q11229708</td><td>Kamir</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kamir</td></tr><tr><td>http://www.wikidata.org/entity/Q483163</td><td>yakitori</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Yakitori</td></tr><tr><td>http://www.wikidata.org/entity/Q12812711</td><td>Zerde</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Zerde</td></tr><tr><td>http://www.wikidata.org/entity/Q12812924</td><td>Izmir bomb</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/%C4%B0zmir_Bomb_Kurabiye</td></tr><tr><td>http://www.wikidata.org/entity/Q12486868</td><td>Itak Gurgur</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Itak_gurgur</td></tr><tr><td>http://www.wikidata.org/entity/Q17085540</td><td>pichi-pichi</td><td>Philippines</td><td>https://en.wikipedia.org/wiki/Pichi-pichi</td></tr><tr><td>http://www.wikidata.org/entity/Q12523907</td><td>wajik</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Wajik</td></tr><tr><td>http://www.wikidata.org/entity/Q7525342</td><td>Siomay</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Siomay</td></tr><tr><td>http://www.wikidata.org/entity/Q12237734</td><td>layali lubnan</td><td>Lebanon</td><td>https://en.wikipedia.org/wiki/Layali_lubnan</td></tr><tr><td>http://www.wikidata.org/entity/Q10964995</td><td>bingka</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_bingka</td></tr><tr><td>http://www.wikidata.org/entity/Q3497556</td><td>karnıyarık</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Karn%C4%B1yar%C4%B1k</td></tr><tr><td>http://www.wikidata.org/entity/Q12490514</td><td>Kelan Antep</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kelan_antep</td></tr><tr><td>http://www.wikidata.org/entity/Q3373858</td><td>Qingtuan</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Qingtuan</td></tr><tr><td>http://www.wikidata.org/entity/Q12492824</td><td>pohulpohul</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Pohulpohul</td></tr><tr><td>http://www.wikidata.org/entity/Q11114189</td><td>Cenil</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Cenil</td></tr><tr><td>http://www.wikidata.org/entity/Q12969705</td><td>Putok</td><td>Philippines</td><td>https://en.wikipedia.org/wiki/Putok</td></tr><tr><td>http://www.wikidata.org/entity/Q7370536</td><td>Roti buaya</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Roti_buaya</td></tr><tr><td>http://www.wikidata.org/entity/Q7780958</td><td>Dali ni Horbo</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Dali_ni_horbo</td></tr><tr><td>http://www.wikidata.org/entity/Q9061039</td><td>plecing kangkung</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Plecing_kangkung</td></tr><tr><td>http://www.wikidata.org/entity/Q13651680</td><td>Natinombur</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Natinombur</td></tr><tr><td>http://www.wikidata.org/entity/Q12496028</td><td>Madumongso</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Madumongso</td></tr><tr><td>http://www.wikidata.org/entity/Q14931087</td><td>İnegöl meatballs</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/%C4%B0neg%C3%B6l_meatballs</td></tr><tr><td>http://www.wikidata.org/entity/Q11142810</td><td>Cilok</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Cilok</td></tr><tr><td>http://www.wikidata.org/entity/Q7695520</td><td>Tekwan</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Tekwan</td></tr><tr><td>http://www.wikidata.org/entity/Q12498031</td><td>mendoan</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Mendoan</td></tr><tr><td>http://www.wikidata.org/entity/Q10978475</td><td>Pekasam</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Pekasam</td></tr><tr><td>http://www.wikidata.org/entity/Q5396648</td><td>es teler</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Es_teler</td></tr><tr><td>http://www.wikidata.org/entity/Q13096825</td><td>Klatak Satay</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Sate_klatak</td></tr><tr><td>http://www.wikidata.org/entity/Q12500148</td><td>Ambeng Rice</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_ambeng</td></tr><tr><td>http://www.wikidata.org/entity/Q12500155</td><td>nasi tempong</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_tempong</td></tr><tr><td>http://www.wikidata.org/entity/Q2963355</td><td>shish taouk</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Shish_taouk</td></tr><tr><td>http://www.wikidata.org/entity/Q3301336</td><td>Negimaki</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Negimaki</td></tr><tr><td>http://www.wikidata.org/entity/Q12489250</td><td>Kapurung</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kapurung</td></tr><tr><td>http://www.wikidata.org/entity/Q15059761</td><td>dak-kkochi</td><td>South Korea</td><td>https://en.wikipedia.org/wiki/Dak-kkochi</td></tr><tr><td>http://www.wikidata.org/entity/Q7808813</td><td>Tipatipa</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Tipatipa</td></tr><tr><td>http://www.wikidata.org/entity/Q12492826</td><td>Ombus ombus</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Ombusombus</td></tr><tr><td>http://www.wikidata.org/entity/Q3272930</td><td>Kyaraben</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Kyaraben</td></tr><tr><td>http://www.wikidata.org/entity/Q3629971</td><td>Pav bhaji</td><td>India</td><td>https://en.wikipedia.org/wiki/Pav_bhaji</td></tr><tr><td>http://www.wikidata.org/entity/Q12197801</td><td>Barazek</td><td>Syria</td><td>https://en.wikipedia.org/wiki/Barazek</td></tr><tr><td>http://www.wikidata.org/entity/Q12476406</td><td>bir pletok</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Bir_pletok</td></tr><tr><td>http://www.wikidata.org/entity/Q7377183</td><td>Leker Cake</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_leker</td></tr><tr><td>http://www.wikidata.org/entity/Q3243732</td><td>bitter almond cookie</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Ac%C4%B1badem_kurabiyesi</td></tr><tr><td>http://www.wikidata.org/entity/Q12508588</td><td>rica-rica</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Rica-rica</td></tr><tr><td>http://www.wikidata.org/entity/Q12509010</td><td>rujak soto</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Rujak_soto</td></tr><tr><td>http://www.wikidata.org/entity/Q7459736</td><td>Sfouf</td><td>Lebanon</td><td>https://en.wikipedia.org/wiki/Sfouf</td></tr><tr><td>http://www.wikidata.org/entity/Q15686391</td><td>pepeçura</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Pepe%C3%A7ura</td></tr><tr><td>http://www.wikidata.org/entity/Q12511759</td><td>Sambal tuktuk</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Sambal_tuktuk</td></tr><tr><td>http://www.wikidata.org/entity/Q14918748</td><td>Lotek</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Lotek_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q3391647</td><td>klappertaart</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Klappertaart</td></tr><tr><td>http://www.wikidata.org/entity/Q10978475</td><td>Pekasam</td><td>Malaysia</td><td>https://en.wikipedia.org/wiki/Pekasam</td></tr><tr><td>http://www.wikidata.org/entity/Q12484057</td><td>Getuk Goreng</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Getuk_goreng</td></tr><tr><td>http://www.wikidata.org/entity/Q3274058</td><td>chả cá Lã Vọng</td><td>Vietnam</td><td>https://en.wikipedia.org/wiki/Ch%E1%BA%A3_c%C3%A1_L%C3%A3_V%E1%BB%8Dng</td></tr><tr><td>http://www.wikidata.org/entity/Q7425996</td><td>padang satay</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Sate_padang</td></tr><tr><td>http://www.wikidata.org/entity/Q13020442</td><td>Luk chup</td><td>Thailand</td><td>https://en.wikipedia.org/wiki/Luk_chup</td></tr><tr><td>http://www.wikidata.org/entity/Q50301470</td><td>kkochi</td><td>South Korea</td><td>https://en.wikipedia.org/wiki/Kkochi</td></tr><tr><td>http://www.wikidata.org/entity/Q7307455</td><td>uih sepit</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_semprong</td></tr><tr><td>http://www.wikidata.org/entity/Q17061273</td><td>Kachumber</td><td>India</td><td>https://en.wikipedia.org/wiki/Kachumber</td></tr><tr><td>http://www.wikidata.org/entity/Q16241452</td><td>bakpia</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Bakpia</td></tr><tr><td>http://www.wikidata.org/entity/Q25052547</td><td>doko-doko</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_bugis</td></tr><tr><td>http://www.wikidata.org/entity/Q12518675</td><td>Kue talam</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_talam</td></tr><tr><td>http://www.wikidata.org/entity/Q12711188</td><td>tahu campur</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Tahu_campur</td></tr><tr><td>http://www.wikidata.org/entity/Q3678059</td><td>çılbır</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/%C3%87%C4%B1lb%C4%B1r</td></tr><tr><td>http://www.wikidata.org/entity/Q18671599</td><td>tas kebab</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Tas_kebab</td></tr><tr><td>http://www.wikidata.org/entity/Q17997299</td><td>Cucur cake</td><td>Malaysia</td><td>https://en.wikipedia.org/wiki/Kue_cucur</td></tr><tr><td>http://www.wikidata.org/entity/Q15976317</td><td>Selat Solo</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Selat_solo</td></tr><tr><td>http://www.wikidata.org/entity/Q16942586</td><td>es goyobod</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Es_goyobod</td></tr><tr><td>http://www.wikidata.org/entity/Q55593280</td><td>nasi minyak</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_minyak</td></tr><tr><td>http://www.wikidata.org/entity/Q19612571</td><td>supangle</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Supangle</td></tr><tr><td>http://www.wikidata.org/entity/Q4818958</td><td>bülbülyuvası</td><td>Syria</td><td>https://en.wikipedia.org/wiki/B%C3%BClb%C3%BCl_yuvas%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q17372871</td><td>boyoz</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Boyoz</td></tr><tr><td>http://www.wikidata.org/entity/Q60740781</td><td>mango float</td><td>Philippines</td><td>https://en.wikipedia.org/wiki/Mango_float</td></tr><tr><td>http://www.wikidata.org/entity/Q16241452</td><td>bakpia</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Bakpia</td></tr><tr><td>http://www.wikidata.org/entity/Q19646375</td><td>sate lilit</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Sate_lilit</td></tr><tr><td>http://www.wikidata.org/entity/Q16738075</td><td>lontong dekem</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Lontong_dekem</td></tr><tr><td>http://www.wikidata.org/entity/Q16834113</td><td>dürüm</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/D%C3%BCr%C3%BCm</td></tr><tr><td>http://www.wikidata.org/entity/Q4272202</td><td>tongseng</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Tongseng</td></tr><tr><td>http://www.wikidata.org/entity/Q16836245</td><td>Ayam goreng</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Ayam_goreng</td></tr><tr><td>http://www.wikidata.org/entity/Q17055540</td><td>bandeng satay</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Sate_bandeng</td></tr><tr><td>http://www.wikidata.org/entity/Q19723512</td><td>fava</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Fava_(Turkish_dish)</td></tr><tr><td>http://www.wikidata.org/entity/Q4850911</td><td>Balila</td><td>Lebanon</td><td>https://en.wikipedia.org/wiki/Balila_(dish)</td></tr><tr><td>http://www.wikidata.org/entity/Q17049555</td><td>Chicken porridge</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Bubur_ayam</td></tr><tr><td>http://www.wikidata.org/entity/Q16975890</td><td>es buah</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Es_buah</td></tr><tr><td>http://www.wikidata.org/entity/Q4197962</td><td>bubur kacang hijau</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Bubur_kacang_hijau</td></tr><tr><td>http://www.wikidata.org/entity/Q19724350</td><td>binte biluhuta</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Binte_biluhuta</td></tr><tr><td>http://www.wikidata.org/entity/Q19725078</td><td>dadar gulung</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Dadar_gulung</td></tr><tr><td>http://www.wikidata.org/entity/Q16044494</td><td>ayam pop</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Ayam_pop</td></tr><tr><td>http://www.wikidata.org/entity/Q4811799</td><td>Ekmek kadayıfı</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Ekmek_kaday%C4%B1f%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q61074537</td><td>Stuffed cookie</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Stuffed_cookie</td></tr><tr><td>http://www.wikidata.org/entity/Q16847884</td><td>spicy porridge</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Bubur_pedas</td></tr><tr><td>http://www.wikidata.org/entity/Q19727660</td><td>cassava chips</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Tapioca_chips</td></tr><tr><td>http://www.wikidata.org/entity/Q19728050</td><td>kue ape</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_ape</td></tr><tr><td>http://www.wikidata.org/entity/Q17997299</td><td>Cucur cake</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_cucur</td></tr><tr><td>http://www.wikidata.org/entity/Q17997301</td><td>kue rangi</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_rangi</td></tr><tr><td>http://www.wikidata.org/entity/Q16913644</td><td>Mi Kocok</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Mie_kocok</td></tr><tr><td>http://www.wikidata.org/entity/Q16773140</td><td>Putri salju cake</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_putri_salju</td></tr><tr><td>http://www.wikidata.org/entity/Q16773515</td><td>Bubur ketan hitam</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Bubur_ketan_hitam</td></tr><tr><td>http://www.wikidata.org/entity/Q4818958</td><td>bülbülyuvası</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/B%C3%BClb%C3%BCl_yuvas%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q4206002</td><td>urap</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Urap</td></tr><tr><td>http://www.wikidata.org/entity/Q19573003</td><td>kale noodles</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Mie_kangkung</td></tr><tr><td>http://www.wikidata.org/entity/Q17997299</td><td>Cucur cake</td><td>Thailand</td><td>https://en.wikipedia.org/wiki/Kue_cucur</td></tr><tr><td>http://www.wikidata.org/entity/Q16938296</td><td>lufu</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Lufu_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q60761467</td><td>Burgo</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Burgo_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q12512536</td><td>buah keluak</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Keluak</td></tr><tr><td>http://www.wikidata.org/entity/Q16046038</td><td>Khoresh bademjan</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Khoresh_bademjan</td></tr><tr><td>http://www.wikidata.org/entity/Q19752274</td><td>Vakfıkebir ekmeği</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Vakf%C4%B1kebir_bread</td></tr><tr><td>http://www.wikidata.org/entity/Q4822464</td><td>nokul</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Nokul</td></tr><tr><td>http://www.wikidata.org/entity/Q19841241</td><td>Açma</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/A%C3%A7ma</td></tr><tr><td>http://www.wikidata.org/entity/Q17355815</td><td>balık ekmek</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Bal%C4%B1k_ekmek</td></tr><tr><td>http://www.wikidata.org/entity/Q19727704</td><td>keumamah</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Keumamah</td></tr><tr><td>http://www.wikidata.org/entity/Q16999470</td><td>Shizuoka oden</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Shizuoka_oden</td></tr><tr><td>http://www.wikidata.org/entity/Q6009729</td><td>kağıt kebabı</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Ka%C4%9F%C4%B1t_kebab%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q6967056</td><td>nasi tim</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_tim</td></tr><tr><td>http://www.wikidata.org/entity/Q30681252</td><td>khao khluk kapi</td><td>Thailand</td><td>https://en.wikipedia.org/wiki/Khao_khluk_kapi</td></tr><tr><td>http://www.wikidata.org/entity/Q20427131</td><td>jalangkote</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Jalangkote</td></tr><tr><td>http://www.wikidata.org/entity/Q65210405</td><td>Ayam panggang</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Ayam_panggang</td></tr><tr><td>http://www.wikidata.org/entity/Q21091894</td><td>ramyeon</td><td>South Korea</td><td>https://en.wikipedia.org/wiki/Ramyeon</td></tr><tr><td>http://www.wikidata.org/entity/Q24950338</td><td>Dhooska</td><td>India</td><td>https://en.wikipedia.org/wiki/Dhooska</td></tr><tr><td>http://www.wikidata.org/entity/Q6088454</td><td>bici bici</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Bici_bici</td></tr><tr><td>http://www.wikidata.org/entity/Q5004794</td><td>bánh bèo</td><td>Vietnam</td><td>https://en.wikipedia.org/wiki/B%C3%A1nh_b%C3%A8o</td></tr><tr><td>http://www.wikidata.org/entity/Q5004800</td><td>bánh cáy</td><td>Vietnam</td><td>https://en.wikipedia.org/wiki/B%C3%A1nh_c%C3%A1y</td></tr><tr><td>http://www.wikidata.org/entity/Q5004810</td><td>bánh rế</td><td>Vietnam</td><td>https://en.wikipedia.org/wiki/B%C3%A1nh_r%E1%BA%BF</td></tr><tr><td>http://www.wikidata.org/entity/Q5004813</td><td>bánh tét</td><td>Vietnam</td><td>https://en.wikipedia.org/wiki/B%C3%A1nh_t%C3%A9t</td></tr><tr><td>http://www.wikidata.org/entity/Q23034858</td><td>türlü</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/T%C3%BCrl%C3%BC</td></tr><tr><td>http://www.wikidata.org/entity/Q20085174</td><td>Kue putu</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_putu</td></tr><tr><td>http://www.wikidata.org/entity/Q5171049</td><td>corn crab soup</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Corn_crab_soup</td></tr><tr><td>http://www.wikidata.org/entity/Q5864774</td><td>Tah Chin</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Tahchin</td></tr><tr><td>http://www.wikidata.org/entity/Q28408000</td><td>Keema Matar</td><td>Pakistan</td><td>https://en.wikipedia.org/wiki/Keema_matar</td></tr><tr><td>http://www.wikidata.org/entity/Q5286620</td><td>dobin mushi</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Dobin_mushi</td></tr><tr><td>http://www.wikidata.org/entity/Q20427541</td><td>Sop saudara</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Sop_saudara</td></tr><tr><td>http://www.wikidata.org/entity/Q55632427</td><td>sambal shrimp</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Udang_balado</td></tr><tr><td>http://www.wikidata.org/entity/Q13186</td><td>raisin</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Raisin</td></tr><tr><td>http://www.wikidata.org/entity/Q97227974</td><td>Egg roll</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Telur_gulung</td></tr><tr><td>http://www.wikidata.org/entity/Q27963899</td><td>Pecel Pitik</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Pecel_ayam</td></tr><tr><td>http://www.wikidata.org/entity/Q5684811</td><td>zeytoon parvardeh</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Zeytoon_parvardeh</td></tr><tr><td>http://www.wikidata.org/entity/Q20108295</td><td>Kuzu haşlama</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Kuzu_ha%C5%9Flama</td></tr><tr><td>http://www.wikidata.org/entity/Q5360549</td><td>Palbochae</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Babaocai</td></tr><tr><td>http://www.wikidata.org/entity/Q5055611</td><td>Cağ kebabı</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Ca%C4%9F_kebab%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q28408000</td><td>Keema Matar</td><td>India</td><td>https://en.wikipedia.org/wiki/Keema_matar</td></tr><tr><td>http://www.wikidata.org/entity/Q6027777</td><td>yayla çorbası</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Yayla_%C3%A7orbas%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q5202996</td><td>cốm</td><td>Vietnam</td><td>https://en.wikipedia.org/wiki/C%E1%BB%91m</td></tr><tr><td>http://www.wikidata.org/entity/Q19738539</td><td>Mi Gomak</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Mie_gomak</td></tr><tr><td>http://www.wikidata.org/entity/Q5208800</td><td>Dahi baigana</td><td>India</td><td>https://en.wikipedia.org/wiki/Dahi_baigana</td></tr><tr><td>http://www.wikidata.org/entity/Q28812188</td><td>Laz böreği</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Laz_b%C3%B6re%C4%9Fi</td></tr><tr><td>http://www.wikidata.org/entity/Q7000528</td><td>nettle soup</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Nettle_soup</td></tr><tr><td>http://www.wikidata.org/entity/Q5104057</td><td>Choila</td><td>Nepal</td><td>https://en.wikipedia.org/wiki/Choila</td></tr><tr><td>http://www.wikidata.org/entity/Q21014439</td><td>Kue gapit</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_gapit</td></tr><tr><td>http://www.wikidata.org/entity/Q19944109</td><td>pukis</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_pukis</td></tr><tr><td>http://www.wikidata.org/entity/Q6027429</td><td>hünkârbeğendi</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/H%C3%BCnk%C3%A2rbe%C4%9Fendi</td></tr><tr><td>http://www.wikidata.org/entity/Q6000077</td><td>Tatar böreği</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Tatar_b%C3%B6re%C4%9Fi</td></tr><tr><td>http://www.wikidata.org/entity/Q5256658</td><td>dendeng</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Dendeng</td></tr><tr><td>http://www.wikidata.org/entity/Q5700175</td><td>Loobia polo</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Loobia_polo</td></tr><tr><td>http://www.wikidata.org/entity/Q13186</td><td>raisin</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Raisin</td></tr><tr><td>http://www.wikidata.org/entity/Q5528400</td><td>Gavvalu</td><td>India</td><td>https://en.wikipedia.org/wiki/Sweet_shells</td></tr><tr><td>http://www.wikidata.org/entity/Q5296979</td><td>Doodhpak</td><td>India</td><td>https://en.wikipedia.org/wiki/Doodhpak</td></tr><tr><td>http://www.wikidata.org/entity/Q19738844</td><td>Pindang</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Pindang</td></tr><tr><td>http://www.wikidata.org/entity/Q5364840</td><td>robatayaki</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Robatayaki</td></tr><tr><td>http://www.wikidata.org/entity/Q6863335</td><td>Minchee</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Minchee</td></tr><tr><td>http://www.wikidata.org/entity/Q19814732</td><td>nankhatai</td><td>India</td><td>https://en.wikipedia.org/wiki/Nankhatai</td></tr><tr><td>http://www.wikidata.org/entity/Q19746552</td><td>Javanese fried rice</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Javanese_fried_rice</td></tr><tr><td>http://www.wikidata.org/entity/Q19747511</td><td>roti gambang</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Roti_gambang</td></tr><tr><td>http://www.wikidata.org/entity/Q7136846</td><td>Pares</td><td>Philippines</td><td>https://en.wikipedia.org/wiki/Pares_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q31173508</td><td>taichan satay</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Sate_taichan</td></tr><tr><td>http://www.wikidata.org/entity/Q25052639</td><td>Kue satu</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_satu</td></tr><tr><td>http://www.wikidata.org/entity/Q124343367</td><td>Sili ice cream</td><td>Philippines</td><td>https://en.wikipedia.org/wiki/Sili_ice_cream</td></tr><tr><td>http://www.wikidata.org/entity/Q8077757</td><td>çoban salad</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/%C3%87oban_salatas%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q10404947</td><td>Bao du</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Baodu</td></tr><tr><td>http://www.wikidata.org/entity/Q13360715</td><td>Khanom chin</td><td>Thailand</td><td>https://en.wikipedia.org/wiki/Khanom_chin</td></tr><tr><td>http://www.wikidata.org/entity/Q7522199</td><td>Sindhi biryani</td><td>Pakistan</td><td>https://en.wikipedia.org/wiki/Sindhi_biryani</td></tr><tr><td>http://www.wikidata.org/entity/Q8066663</td><td>zarda</td><td>India</td><td>https://en.wikipedia.org/wiki/Zarda_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q9026659</td><td>macun şekeri</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Macun</td></tr><tr><td>http://www.wikidata.org/entity/Q6729605</td><td>Magaj</td><td>India</td><td>https://en.wikipedia.org/wiki/Maghaz</td></tr><tr><td>http://www.wikidata.org/entity/Q6581424</td><td>paçanga</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Pa%C3%A7anga_b%C3%B6re%C4%9Fi</td></tr><tr><td>http://www.wikidata.org/entity/Q55639922</td><td>Huamo</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Huamo</td></tr><tr><td>http://www.wikidata.org/entity/Q31830399</td><td>banana flower</td><td>India</td><td>https://en.wikipedia.org/wiki/Banana_flower</td></tr><tr><td>http://www.wikidata.org/entity/Q106086854</td><td>pastel</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kue_pastel</td></tr><tr><td>http://www.wikidata.org/entity/Q10910138</td><td>Luzhu Huoshao</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Luzhu_huoshao</td></tr><tr><td>http://www.wikidata.org/entity/Q7476075</td><td>tahu sumedang</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Tahu_sumedang</td></tr><tr><td>http://www.wikidata.org/entity/Q7666782</td><td>Sütlü Nuriye</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/S%C3%BCtl%C3%BC_Nuriye</td></tr><tr><td>http://www.wikidata.org/entity/Q10931125</td><td>Empanadilla</td><td>Philippines</td><td>https://en.wikipedia.org/wiki/Empanadilla</td></tr><tr><td>http://www.wikidata.org/entity/Q12555954</td><td>Nauryz kozhe</td><td>Kazakhstan</td><td>https://en.wikipedia.org/wiki/Nauryz_kozhe</td></tr><tr><td>http://www.wikidata.org/entity/Q12492825</td><td>lampet</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Lampet</td></tr><tr><td>http://www.wikidata.org/entity/Q100281422</td><td>Megono</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Megono</td></tr><tr><td>http://www.wikidata.org/entity/Q3094709</td><td>bánh tráng</td><td>Vietnam</td><td>https://en.wikipedia.org/wiki/B%C3%A1nh_tr%C3%A1ng</td></tr><tr><td>http://www.wikidata.org/entity/Q7272094</td><td>quince dessert</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Ayva_tatl%C4%B1s%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q11323173</td><td>Doria</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Doria_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q6345995</td><td>Kaeng pa</td><td>Thailand</td><td>https://en.wikipedia.org/wiki/Kaeng_pa</td></tr><tr><td>http://www.wikidata.org/entity/Q7446149</td><td>Rice Jamblang</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nasi_jamblang</td></tr><tr><td>http://www.wikidata.org/entity/Q6404116</td><td>Kichadi</td><td>India</td><td>https://en.wikipedia.org/wiki/Kichadi</td></tr><tr><td>http://www.wikidata.org/entity/Q136373880</td><td>Khurchan</td><td>India</td><td>https://en.wikipedia.org/wiki/Khurchan</td></tr><tr><td>http://www.wikidata.org/entity/Q12496810</td><td>Manuk Napinadar</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Manuk_napinadar</td></tr><tr><td>http://www.wikidata.org/entity/Q7825801</td><td>torikatsu</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Chicken_katsu</td></tr><tr><td>http://www.wikidata.org/entity/Q83165</td><td>nutmeg</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Nutmeg</td></tr><tr><td>http://www.wikidata.org/entity/Q12208569</td><td>Halawet el Jibn</td><td>Syria</td><td>https://en.wikipedia.org/wiki/Halawet_el_jibn</td></tr><tr><td>http://www.wikidata.org/entity/Q7799573</td><td>gỏi cuốn</td><td>Vietnam</td><td>https://en.wikipedia.org/wiki/G%E1%BB%8Fi_cu%E1%BB%91n</td></tr><tr><td>http://www.wikidata.org/entity/Q131564107</td><td>ِAbbas bread</td><td>Iraq</td><td>https://en.wikipedia.org/wiki/Khubz_al-%CA%BEAbbas</td></tr><tr><td>http://www.wikidata.org/entity/Q6827067</td><td>mi krop</td><td>Thailand</td><td>https://en.wikipedia.org/wiki/Mi_krop</td></tr><tr><td>http://www.wikidata.org/entity/Q11128412</td><td>Q11128412</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Mao_xue_wang</td></tr><tr><td>http://www.wikidata.org/entity/Q7554467</td><td>stuffed onions</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Sogan-dolma</td></tr><tr><td>http://www.wikidata.org/entity/Q12473662</td><td>balado</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Balado_(food)</td></tr><tr><td>http://www.wikidata.org/entity/Q55638285</td><td>Çökertme</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/%C3%87%C3%B6kertme_kebab%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q3545233</td><td>champorado</td><td>Philippines</td><td>https://en.wikipedia.org/wiki/Champorado</td></tr><tr><td>http://www.wikidata.org/entity/Q11676485</td><td>Kagoshima ramen</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Kagoshima_ramen</td></tr><tr><td>http://www.wikidata.org/entity/Q7231310</td><td>Port sausage</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Sosis_Bandari</td></tr><tr><td>http://www.wikidata.org/entity/Q11269155</td><td>Shoyumame</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Shoyumame</td></tr><tr><td>http://www.wikidata.org/entity/Q7852883</td><td>Tunde ke kabab</td><td>India</td><td>https://en.wikipedia.org/wiki/Tunde_ke_kabab</td></tr><tr><td>http://www.wikidata.org/entity/Q7656154</td><td>swikee</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Swikee</td></tr><tr><td>http://www.wikidata.org/entity/Q10894961</td><td>Maocai</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Maocai</td></tr><tr><td>http://www.wikidata.org/entity/Q11343150</td><td>mehallabiyya</td><td>Iran</td><td>https://en.wikipedia.org/wiki/Muhallebi</td></tr><tr><td>http://www.wikidata.org/entity/Q65210830</td><td>Bakakak hayam</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Bakakak_hayam</td></tr><tr><td>http://www.wikidata.org/entity/Q97360429</td><td>Bolu kukus</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Bolu_kukus</td></tr><tr><td>http://www.wikidata.org/entity/Q6789614</td><td>Mattar paneer</td><td>India</td><td>https://en.wikipedia.org/wiki/Matar_paneer</td></tr><tr><td>http://www.wikidata.org/entity/Q7224024</td><td>Shanghai fried noodles</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Shanghai_fried_noodles</td></tr><tr><td>http://www.wikidata.org/entity/Q11076619</td><td>patriotic soup</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Patriotic_soup</td></tr><tr><td>http://www.wikidata.org/entity/Q11269912</td><td>Surimi</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Surimi</td></tr><tr><td>http://www.wikidata.org/entity/Q2899201</td><td>rousong</td><td>People's Republic of China</td><td>https://en.wikipedia.org/wiki/Meat_floss</td></tr><tr><td>http://www.wikidata.org/entity/Q96741549</td><td>peynirli pide</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Peinirli</td></tr><tr><td>http://www.wikidata.org/entity/Q28015549</td><td>Sohari</td><td>Nepal</td><td>https://en.wikipedia.org/wiki/Sohari</td></tr><tr><td>http://www.wikidata.org/entity/Q35586024</td><td>rummaneyye</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Rummaniyeh</td></tr><tr><td>http://www.wikidata.org/entity/Q30671978</td><td>Java Rice</td><td>Philippines</td><td>https://en.wikipedia.org/wiki/Java_rice</td></tr><tr><td>http://www.wikidata.org/entity/Q987291</td><td>taboon bread</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Taboon_bread</td></tr><tr><td>http://www.wikidata.org/entity/Q19943522</td><td>Kalio</td><td>Indonesia</td><td>https://en.wikipedia.org/wiki/Kalio</td></tr><tr><td>http://www.wikidata.org/entity/Q65087240</td><td>Philippine asado</td><td>Philippines</td><td>https://en.wikipedia.org/wiki/Philippine_asado</td></tr><tr><td>http://www.wikidata.org/entity/Q39057643</td><td>Roust</td><td>Bangladesh</td><td>https://en.wikipedia.org/wiki/Roust</td></tr><tr><td>http://www.wikidata.org/entity/Q55633641</td><td>Soğan kebabı</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/So%C4%9Fan_kebab%C4%B1</td></tr><tr><td>http://www.wikidata.org/entity/Q97246919</td><td>Tulshimala rice</td><td>Bangladesh</td><td>https://en.wikipedia.org/wiki/Tulshimala_rice</td></tr><tr><td>http://www.wikidata.org/entity/Q918148</td><td>papad</td><td>India</td><td>https://en.wikipedia.org/wiki/Papadam</td></tr><tr><td>http://www.wikidata.org/entity/Q106111046</td><td>Bursa cantık pide</td><td>Turkey</td><td>https://en.wikipedia.org/wiki/Bursa_Cantik_Pide</td></tr><tr><td>http://www.wikidata.org/entity/Q1644022</td><td>kibbeh</td><td>Lebanon</td><td>https://en.wikipedia.org/wiki/Kibbeh</td></tr><tr><td>http://www.wikidata.org/entity/Q7080639</td><td>ohaw</td><td>Japan</td><td>https://en.wikipedia.org/wiki/Ohaw</td></tr><tr><td>http://www.wikidata.org/entity/Q107804272</td><td>Mashed potato</td><td>India</td><td>https://en.wikipedia.org/wiki/Aloo_chokha</td></tr><tr><td>http://www.wikidata.org/entity/Q25066353</td><td>Indori Poha</td><td>India</td><td>https://en.wikipedia.org/wiki/Indori_poha</td></tr></tbody></table>
+  </template>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY = 'food_of_asia_gap_explorer_v1';
+
+      const LABEL_OVERRIDES = {
+        Q11128412: 'Mao xue wang'
+      };
+
+      const DEFAULT_PREFS = {
+        langCode: 'awa',
+        pageLimit: 100,
+        randomize: false,
+        shuffleSeed: 1,
+        theme: 'light',
+        viewMode: 'table',
+        groupMode: 'all',
+        searchQuery: '',
+        selectedCountry: '__ALL__',
+        selectedCategory: '__ALL__',
+        sortField: 'label',
+        sortDirection: 'asc'
+      };
+
+      const state = {
+        prefs: { ...DEFAULT_PREFS },
+        bundledRows: [],
+        activeRows: [],
+        groupedItems: [],
+        isLiveData: false,
+        isFetching: false
+      };
+
+      const els = {
+        htmlRoot: document.documentElement,
+        btnTableView: document.getElementById('btnTableView'),
+        btnCardView: document.getElementById('btnCardView'),
+        btnThemeToggle: document.getElementById('btnThemeToggle'),
+        themeIcon: document.getElementById('themeIcon'),
+        themeLabel: document.getElementById('themeLabel'),
+        statusBanner: document.getElementById('statusBanner'),
+        statusText: document.getElementById('statusText'),
+        btnDismissBanner: document.getElementById('btnDismissBanner'),
+        codeLangPreview: document.getElementById('codeLangPreview'),
+        dataSourceBadge: document.getElementById('dataSourceBadge'),
+        langCodeInput: document.getElementById('langCodeInput'),
+        pageLimitSelect: document.getElementById('pageLimitSelect'),
+        btnRandomizeToggle: document.getElementById('btnRandomizeToggle'),
+        btnShuffleNow: document.getElementById('btnShuffleNow'),
+        seedInfo: document.getElementById('seedInfo'),
+        btnRunSparql: document.getElementById('btnRunSparql'),
+        btnUseBundled: document.getElementById('btnUseBundled'),
+        sparqlQueryCode: document.getElementById('sparqlQueryCode'),
+        statLoadedRows: document.getElementById('statLoadedRows'),
+        statMissingLangCode: document.getElementById('statMissingLangCode'),
+        statUniqueItems: document.getElementById('statUniqueItems'),
+        statCountries: document.getElementById('statCountries'),
+        statFiltered: document.getElementById('statFiltered'),
+        statFilteredSub: document.getElementById('statFilteredSub'),
+        searchInput: document.getElementById('searchInput'),
+        btnClearSearch: document.getElementById('btnClearSearch'),
+        countrySelect: document.getElementById('countrySelect'),
+        categorySelect: document.getElementById('categorySelect'),
+        btnAllRows: document.getElementById('btnAllRows'),
+        btnGrouped: document.getElementById('btnGrouped'),
+        btnCopyWikitext: document.getElementById('btnCopyWikitext'),
+        btnCopyMarkdown: document.getElementById('btnCopyMarkdown'),
+        btnDownloadCsv: document.getElementById('btnDownloadCsv'),
+        btnCopySparql: document.getElementById('btnCopySparql'),
+        btnResetFilters: document.getElementById('btnResetFilters'),
+        tableSection: document.getElementById('tableSection'),
+        cardsSection: document.getElementById('cardsSection'),
+        activeSummaryText: document.getElementById('activeSummaryText'),
+        targetWikiColHeader: document.getElementById('targetWikiColHeader'),
+        resultsTableBody: document.getElementById('resultsTableBody'),
+        emptyState: document.getElementById('emptyState'),
+        btnEmptyReset: document.getElementById('btnEmptyReset'),
+        cardsGrid: document.getElementById('cardsGrid'),
+        btnGoTop: document.getElementById('btnGoTop'),
+        btnGoBottom: document.getElementById('btnGoBottom'),
+        btnToggleCredits: document.getElementById('btnToggleCredits'),
+        translationCreditsBox: document.getElementById('translationCreditsBox')
+      };
+
+      /**
+       * Sanitizes target Wikipedia language code (e.g., "awa", "hi", "bho").
+       */
+      function normalizeLangCode(raw) {
+        const cleaned = String(raw || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+        return cleaned || 'awa';
+      }
+
+      /**
+       * Escapes HTML strings for safe DOM injection.
+       */
+      function escapeHtml(value) {
+        return String(value ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      /**
+       * Extracts Q-ID from Wikidata entity URI.
+       */
+      function extractQid(uriOrId) {
+        const match = String(uriOrId || '').match(/(Q\d+)/i);
+        return match ? match[1].toUpperCase() : String(uriOrId || '').trim();
+      }
+
+      /**
+       * Classifies a food/culinary item into one of the Food of Asia theme categories.
+       */
+      function classifyCulinaryCategory(label, articleUrl) {
+        const text = `${label} ${articleUrl}`.toLowerCase();
+
+        if (/(tea|coffee|lassi|ayran|juice|drink|beverage|milk|bir_pletok|es_doger|es_teler|es_buah|neera|nauryz_kozhe|porridge|soup|çorba|broth|oden|soto|konro|mushi|ramen|noodle|soba|udon|mi_|mie_)/.test(text)) {
+          if (/(lassi|ayran|bir_pletok|es_doger|es_teler|es_buah|neera|nauryz_kozhe|tea|coffee)/.test(text)) {
+            return 'Beverages';
+          }
+          if (/(soup|çorba|porridge|bubur|zosui|soto|konro|mushi|ramen|noodle|soba|udon|mi_|mie_)/.test(text)) {
+            return 'Traditional Dishes';
+          }
+        }
+
+        if (/(halwa|halva|kheer|payasam|sweet|dessert|cake|cookie|pastry|mooncakes|mooncake|mochi|dango|manjū|pudding|kadayıf|güllaç|baklava|lokma|bamiyeh|zarda|falooda|ice_cream|kue_|bánh_phu_thê|pitha|laddu|barfi|custard|tatlı|şeker)/.test(text)) {
+          return 'Desserts & Sweets';
+        }
+
+        if (/(street|snack|satay|sate|takoyaki|okonomiyaki|katsu|yakitori|dumpling|wonton|shumai|bao|empanada|empanadilla|fritter|chips|crackers|kerupuk|krupuk|poha|pav_bhaji|chaat|roti|bread|pide|ekmek|yufka|naan|paratha|bing|youtiao|pan_bhaji|kkochi|tamago)/.test(text)) {
+          return 'Street Food';
+        }
+
+        if (/(spice|masala|turmeric|nutmeg|keluak|ginger|garlic|chili|pepper|herb|sambal|paste|curd|bean_curd|tempeh|oncom|fermented|raisin|rice|flour|flower|soy|condiment|amba|torshi|pickle|zuke|kimchi|miso|floss|rousong)/.test(text)) {
+          return 'Ingredients & Spices';
+        }
+
+        if (/(cooking|frying|roasting|grilling|steaming|fermentation|smoking|braising|baking|robatayaki|yakiniku|tandoor|shabu|hot_pot|stir_fry)/.test(text)) {
+          return 'Cooking Techniques';
+        }
+
+        if (/(cuisine|tradition|festival|feast|osechi|sadya|meze|banquet|heritage|custom)/.test(text)) {
+          return 'Regional Cuisines & Traditions';
+        }
+
+        return 'Traditional Dishes';
+      }
+
+      /**
+       * Builds target Wikipedia search URL and direct create/edit URL.
+       */
+      function buildTargetWikiSearchUrl(langCode, term) {
+        return `https://${langCode}.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(term)}`;
+      }
+
+      function buildTargetWikiPageUrl(langCode, term) {
+        const slug = encodeURIComponent(String(term || '').trim().replace(/\s+/g, '_'));
+        return `https://${langCode}.wikipedia.org/wiki/${slug}`;
+      }
+
+      /**
+       * Generates the live Wikidata SPARQL query for the chosen target language code and limit.
+       */
+      function buildSparqlQuery(langCode, limit, randomize, seed) {
+        const safeLang = normalizeLangCode(langCode);
+        const safeLimit = Math.max(1, Math.min(500, parseInt(limit, 10) || 100));
+        const orderClause = randomize
+          ? `ORDER BY MD5(CONCAT(STR(?item), "-${seed}"))`
+          : `ORDER BY ?countryLabel ?itemLabel`;
+
+        return `SELECT DISTINCT ?item ?itemLabel ?countryLabel ?enArticle WHERE {
+  VALUES ?country {
+    wd:Q668  # India
+    wd:Q148  # China
+    wd:Q17   # Japan
+    wd:Q884  # South Korea
+    wd:Q869  # Thailand
+    wd:Q881  # Vietnam
+    wd:Q252  # Indonesia
+    wd:Q833  # Malaysia
+    wd:Q928  # Philippines
+    wd:Q796  # Iraq
+    wd:Q794  # Iran
+    wd:Q43   # Turkey
+    wd:Q858  # Syria
+    wd:Q822  # Lebanon
+    wd:Q851  # Saudi Arabia
+    wd:Q265  # Uzbekistan
+    wd:Q232  # Kazakhstan
+    wd:Q902  # Bangladesh
+    wd:Q843  # Pakistan
+    wd:Q854  # Sri Lanka
+    wd:Q837  # Nepal
+    wd:Q711  # Mongolia
+  }
+
+  ?item wdt:P495 ?country ;
+        wdt:P31/wdt:P279* wd:Q2095 .
+
+  ?enArticle schema:about ?item ;
+             schema:isPartOf <https://en.wikipedia.org/> .
+
+  MINUS {
+    ?targetArticle schema:about ?item ;
+                   schema:isPartOf <https://${safeLang}.wikipedia.org/> .
+  }
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+${orderClause}
+LIMIT ${safeLimit}`;
+      }
+
+      /**
+       * Parses rows from the bundled query (1).html dataset.
+       */
+      function parseBundledRows() {
+        const tpl = document.getElementById('bundledQueryTemplate');
+        const trs = Array.from(tpl.content.querySelectorAll('tbody tr'));
+        const langCode = normalizeLangCode(state.prefs.langCode);
+
+        return trs.map((tr, idx) => {
+          const cells = Array.from(tr.querySelectorAll('td')).map(td => td.textContent.trim());
+          const [itemUri, rawLabel, country, enArticle] = cells;
+          const qid = extractQid(itemUri);
+          const label = /^Q\d+$/i.test(rawLabel) && LABEL_OVERRIDES[qid] ? LABEL_OVERRIDES[qid] : rawLabel;
+          const category = classifyCulinaryCategory(label, enArticle);
+
+          return {
+            index: idx + 1,
+            itemUri: itemUri || `http://www.wikidata.org/entity/${qid}`,
+            qid,
+            label,
+            country,
+            countries: [country],
+            category,
+            enArticle,
+            targetSearchUrl: buildTargetWikiSearchUrl(langCode, label),
+            targetPageUrl: buildTargetWikiPageUrl(langCode, label)
+          };
+        });
+      }
+
+      /**
+       * Applies limit and optional deterministic/seeded shuffle to a list of rows.
+       */
+      function applyLimitAndRandomize(rows, limit, randomize, seed) {
+        const cloned = rows.map(r => ({ ...r }));
+        if (randomize) {
+          // Mulberry32 PRNG keyed by shuffleSeed
+          let t = (parseInt(seed, 10) || 1) >>> 0;
+          function rand() {
+            t += 0x6D2B79F5;
+            let r = Math.imul(t ^ (t >>> 15), 1 | t);
+            r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+            return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+          }
+          for (let i = cloned.length - 1; i > 0; i--) {
+            const j = Math.floor(rand() * (i + 1));
+            [cloned[i], cloned[j]] = [cloned[j], cloned[i]];
+          }
+        }
+        return cloned.slice(0, Math.max(1, parseInt(limit, 10) || 100));
+      }
+
+      /**
+       * Deduplicates items by Wikidata Q-ID while collecting all linked countries.
+       */
+      function buildGroupedItems(rows) {
+        const map = new Map();
+        rows.forEach(row => {
+          if (!map.has(row.qid)) {
+            map.set(row.qid, {
+              ...row,
+              countries: [...row.countries],
+              country: row.country
+            });
+          } else {
+            const existing = map.get(row.qid);
+            row.countries.forEach(c => {
+              if (!existing.countries.includes(c)) existing.countries.push(c);
+            });
+            existing.country = existing.countries.join(', ');
+          }
+        });
+        return Array.from(map.values());
+      }
+
+      /**
+       * Displays a non-blocking banner message.
+       */
+      function showBanner(msg) {
+        els.statusText.textContent = msg;
+        els.statusBanner.classList.remove('hidden');
+        els.statusBanner.classList.add('flex');
+      }
+
+      function hideBanner() {
+        els.statusBanner.classList.add('hidden');
+        els.statusBanner.classList.remove('flex');
+      }
+
+      /**
+       * Persists current preferences to localStorage.
+       */
+      function savePrefs() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.prefs));
+        } catch (_) {
+          // Ignore storage quota or privacy mode errors
+        }
+      }
+
+      /**
+       * Loads saved preferences from localStorage.
+       */
+      function loadPrefs() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          state.prefs = {
+            ...DEFAULT_PREFS,
+            ...parsed,
+            langCode: normalizeLangCode(parsed.langCode || DEFAULT_PREFS.langCode),
+            pageLimit: parseInt(parsed.pageLimit, 10) || DEFAULT_PREFS.pageLimit,
+            shuffleSeed: parseInt(parsed.shuffleSeed, 10) || DEFAULT_PREFS.shuffleSeed
+          };
+        } catch (_) {
+          state.prefs = { ...DEFAULT_PREFS };
+        }
+      }
+
+      /**
+       * Applies light or dark theme to documentElement and updates toggle UI.
+       */
+      function applyTheme(theme) {
+        const mode = theme === 'dark' ? 'dark' : 'light';
+        state.prefs.theme = mode;
+        els.htmlRoot.setAttribute('data-theme', mode);
+        if (mode === 'dark') {
+          els.themeIcon.innerHTML = '&#9728;';
+          els.themeLabel.textContent = 'Light Mode';
+        } else {
+          els.themeIcon.innerHTML = '&#9790;';
+          els.themeLabel.textContent = 'Dark Mode';
+        }
+        savePrefs();
+      }
+
+      /**
+       * Refreshes target Wikipedia links on active rows when language code changes.
+       */
+      function rebindTargetWikiLinks(rows) {
+        const lang = normalizeLangCode(state.prefs.langCode);
+        return rows.map(r => ({
+          ...r,
+          targetSearchUrl: buildTargetWikiSearchUrl(lang, r.label),
+          targetPageUrl: buildTargetWikiPageUrl(lang, r.label)
+        }));
+      }
+
+      /**
+       * Populates the Country dropdown from activeRows.
+       */
+      function populateCountryDropdown() {
+        const counts = new Map();
+        state.activeRows.forEach(r => {
+          counts.set(r.country, (counts.get(r.country) || 0) + 1);
+        });
+        const sorted = Array.from(counts.entries())
+          .map(([country, count]) => ({ country, count }))
+          .sort((a, b) => b.count - a.count || a.country.localeCompare(b.country));
+
+        const prev = state.prefs.selectedCountry;
+        els.countrySelect.innerHTML = `<option value="__ALL__">All Countries (${state.activeRows.length})</option>`;
+        sorted.forEach(({ country, count }) => {
+          const opt = document.createElement('option');
+          opt.value = country;
+          opt.textContent = `${country} (${count})`;
+          els.countrySelect.appendChild(opt);
+        });
+
+        const exists = Array.from(els.countrySelect.options).some(o => o.value === prev);
+        state.prefs.selectedCountry = exists ? prev : '__ALL__';
+        els.countrySelect.value = state.prefs.selectedCountry;
+      }
+
+      /**
+       * Returns filtered and sorted rows based on current preferences.
+       */
+      function getFilteredAndSorted() {
+        const source = state.prefs.groupMode === 'grouped' ? state.groupedItems : state.activeRows;
+        const q = state.prefs.searchQuery.trim().toLowerCase();
+        const country = state.prefs.selectedCountry;
+        const category = state.prefs.selectedCategory;
+
+        const filtered = source.filter(item => {
+          const matchesCountry =
+            country === '__ALL__' ||
+            (Array.isArray(item.countries) ? item.countries.includes(country) : item.country === country);
+          if (!matchesCountry) return false;
+
+          const matchesCategory = category === '__ALL__' || item.category === category;
+          if (!matchesCategory) return false;
+
+          if (!q) return true;
+          const hay = [
+            item.label,
+            item.qid,
+            item.category,
+            ...(item.countries || [item.country]),
+            item.enArticle
+          ]
+            .join(' ')
+            .toLowerCase();
+          return hay.includes(q);
+        });
+
+        const dir = state.prefs.sortDirection === 'desc' ? -1 : 1;
+        filtered.sort((a, b) => {
+          if (state.prefs.sortField === 'qid') {
+            const na = parseInt(a.qid.replace(/\D+/g, ''), 10) || 0;
+            const nb = parseInt(b.qid.replace(/\D+/g, ''), 10) || 0;
+            return (na - nb) * dir;
+          }
+          if (state.prefs.sortField === 'country') {
+            return (a.country || '').localeCompare(b.country || '', undefined, { sensitivity: 'base' }) * dir;
+          }
+          if (state.prefs.sortField === 'category') {
+            return (a.category || '').localeCompare(b.category || '', undefined, { sensitivity: 'base' }) * dir;
+          }
+          return (a.label || '').localeCompare(b.label || '', undefined, { sensitivity: 'base' }) * dir;
+        });
+
+        return filtered;
+      }
+
+      /**
+       * Updates SPARQL preview text, statistics, table, cards, and button states.
+       */
+      function renderAll() {
+        const lang = normalizeLangCode(state.prefs.langCode);
+        state.prefs.langCode = lang;
+        els.langCodeInput.value = lang;
+        els.codeLangPreview.textContent = `${lang}.wikipedia.org`;
+        els.statMissingLangCode.textContent = lang;
+        els.targetWikiColHeader.textContent = `Target Wiki (${lang})`;
+
+        els.pageLimitSelect.value = String(state.prefs.pageLimit);
+        els.btnRandomizeToggle.textContent = state.prefs.randomize ? 'Random Order: ON' : 'Random Order: OFF';
+        els.btnRandomizeToggle.setAttribute('aria-pressed', String(state.prefs.randomize));
+        els.seedInfo.textContent = state.prefs.randomize
+          ? `Random sample active (seed #${state.prefs.shuffleSeed})`
+          : 'Deterministic order';
+
+        els.searchInput.value = state.prefs.searchQuery;
+        els.btnClearSearch.classList.toggle('hidden', !state.prefs.searchQuery);
+        els.categorySelect.value = state.prefs.selectedCategory;
+
+        // Grouping toggle styles
+        const isGrouped = state.prefs.groupMode === 'grouped';
+        els.btnAllRows.setAttribute('aria-pressed', String(!isGrouped));
+        els.btnGrouped.setAttribute('aria-pressed', String(isGrouped));
+        els.btnAllRows.className = !isGrouped
+          ? 'flex-1 px-2 py-1.5 rounded-lg text-xs font-medium theme-accent-bg'
+          : 'flex-1 px-2 py-1.5 rounded-lg text-xs font-medium theme-muted';
+        els.btnGrouped.className = isGrouped
+          ? 'flex-1 px-2 py-1.5 rounded-lg text-xs font-medium theme-accent-bg'
+          : 'flex-1 px-2 py-1.5 rounded-lg text-xs font-medium theme-muted';
+
+        // View toggle styles
+        const isCards = state.prefs.viewMode === 'cards';
+        els.tableSection.classList.toggle('hidden', isCards);
+        els.cardsSection.classList.toggle('hidden', !isCards);
+        els.btnTableView.setAttribute('aria-pressed', String(!isCards));
+        els.btnCardView.setAttribute('aria-pressed', String(isCards));
+        els.btnTableView.className = !isCards
+          ? 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all theme-accent-bg shadow-2xs'
+          : 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all theme-muted hover:opacity-100';
+        els.btnCardView.className = isCards
+          ? 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all theme-accent-bg shadow-2xs'
+          : 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all theme-muted hover:opacity-100';
+
+        // Update SPARQL query inspector
+        els.sparqlQueryCode.textContent = buildSparqlQuery(
+          lang,
+          state.prefs.pageLimit,
+          state.prefs.randomize,
+          state.prefs.shuffleSeed
+        );
+
+        // Source badge
+        els.dataSourceBadge.textContent = state.isLiveData
+          ? `Live Wikidata SPARQL (${lang})`
+          : `Bundled Dataset (query 1.html • ${lang})`;
+
+        // Stats
+        const uniqueCountries = new Set(state.activeRows.map(r => r.country)).size;
+        const filtered = getFilteredAndSorted();
+
+        els.statLoadedRows.textContent = String(state.activeRows.length);
+        els.statUniqueItems.textContent = String(state.groupedItems.length);
+        els.statCountries.textContent = String(uniqueCountries);
+        els.statFiltered.textContent = String(filtered.length);
+        els.statFilteredSub.textContent = isGrouped ? 'Unique Wikidata items' : 'Matching rows';
+
+        els.activeSummaryText.textContent = `${filtered.length} matching item(s) • EN present, ${lang}.wikipedia.org missing`;
+
+        // Sort indicators
+        document.querySelectorAll('.sort-arrow').forEach(arrow => {
+          const field = arrow.dataset.arrow;
+          if (field === state.prefs.sortField) {
+            arrow.innerHTML = state.prefs.sortDirection === 'asc' ? '&#8593;' : '&#8595;';
+            arrow.style.opacity = '1';
+          } else {
+            arrow.innerHTML = '&#8597;';
+            arrow.style.opacity = '0.45';
+          }
+        });
+
+        const isEmpty = filtered.length === 0;
+        els.emptyState.classList.toggle('hidden', !isEmpty);
+        els.resultsTableBody.parentElement.classList.toggle('hidden', isEmpty);
+        els.cardsGrid.classList.toggle('hidden', isEmpty);
+
+        if (!isEmpty) {
+          renderTableRows(filtered, lang);
+          renderCardItems(filtered, lang);
+        }
+
+        savePrefs();
+      }
+
+      /**
+       * Renders rows into the table view.
+       */
+      function renderTableRows(items, lang) {
+        const frag = document.createDocumentFragment();
+        items.forEach((item, index) => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:opacity-95 transition-opacity';
+
+          const countriesHtml = (item.countries || [item.country])
+            .map(c => `<span class="inline-block px-2 py-0.5 rounded-full text-xs border theme-subtle">${escapeHtml(c)}</span>`)
+            .join(' ');
+
+          tr.innerHTML = `
+            <td class="py-3 px-4 sm:px-5 text-xs theme-muted text-center tabular-nums">${index + 1}</td>
+            <td class="py-3 px-4 sm:px-5 font-medium">
+              <a
+                href="${escapeHtml(item.enArticle)}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="underline underline-offset-2 theme-accent-text hover:opacity-80"
+              >
+                ${escapeHtml(item.label)}
+              </a>
+            </td>
+            <td class="py-3 px-4 sm:px-5">
+              <div class="flex flex-wrap gap-1">${countriesHtml}</div>
+            </td>
+            <td class="py-3 px-4 sm:px-5 text-xs">
+              <span class="px-2.5 py-1 rounded-full border theme-subtle font-medium">${escapeHtml(item.category)}</span>
+            </td>
+            <td class="py-3 px-4 sm:px-5 font-mono text-xs whitespace-nowrap">
+              <a
+                href="${escapeHtml(item.itemUri)}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="px-2 py-1 rounded-lg border theme-subtle hover:opacity-80"
+              >
+                ${escapeHtml(item.qid)}
+              </a>
+            </td>
+            <td class="py-3 px-4 sm:px-5 text-right whitespace-nowrap space-x-1.5">
+              <a
+                href="${escapeHtml(item.targetSearchUrl)}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-block px-2.5 py-1 rounded-lg text-xs font-medium border theme-accent-border theme-accent-text hover:opacity-80"
+              >
+                Search ${escapeHtml(lang)}
+              </a>
+              <a
+                href="${escapeHtml(item.targetPageUrl)}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-block px-2.5 py-1 rounded-lg text-xs font-medium theme-accent-bg hover:opacity-90"
+              >
+                Create / Open
+              </a>
+            </td>
+          `;
+          frag.appendChild(tr);
+        });
+        els.resultsTableBody.innerHTML = '';
+        els.resultsTableBody.appendChild(frag);
+      }
+
+      /**
+       * Renders items as cards for Card View.
+       */
+      function renderCardItems(items, lang) {
+        const frag = document.createDocumentFragment();
+        items.forEach(item => {
+          const card = document.createElement('article');
+          card.className = 'rounded-2xl border p-4 sm:p-5 theme-card flex flex-col justify-between gap-4';
+
+          const countriesHtml = (item.countries || [item.country])
+            .map(c => `<span class="px-2 py-0.5 rounded-full text-xs border theme-subtle">${escapeHtml(c)}</span>`)
+            .join(' ');
+
+          card.innerHTML = `
+            <div class="space-y-2.5">
+              <div class="flex items-start justify-between gap-2">
+                <h3 class="editorial-title text-lg font-semibold leading-snug">
+                  <a
+                    href="${escapeHtml(item.enArticle)}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="underline underline-offset-4 theme-accent-text hover:opacity-80"
+                  >
+                    ${escapeHtml(item.label)}
+                  </a>
+                </h3>
+                <a
+                  href="${escapeHtml(item.itemUri)}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="font-mono text-xs px-2 py-0.5 rounded border theme-subtle shrink-0"
+                >
+                  ${escapeHtml(item.qid)}
+                </a>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                <span class="px-2 py-0.5 rounded-full text-xs font-medium border theme-accent-border theme-accent-text">
+                  ${escapeHtml(item.category)}
+                </span>
+                ${countriesHtml}
+              </div>
+            </div>
+            <div class="pt-3 border-t flex items-center justify-between gap-2 text-xs" style="border-color: var(--bd);">
+              <a
+                href="${escapeHtml(item.targetSearchUrl)}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="font-medium underline theme-accent-text"
+              >
+                Search ${escapeHtml(lang)}.wiki &#8599;
+              </a>
+              <a
+                href="${escapeHtml(item.targetPageUrl)}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="px-2.5 py-1 rounded-lg font-medium theme-accent-bg"
+              >
+                ${escapeHtml(lang)} Page &#8599;
+              </a>
+            </div>
+          `;
+          frag.appendChild(card);
+        });
+        els.cardsGrid.innerHTML = '';
+        els.cardsGrid.appendChild(frag);
+      }
+
+      /**
+       * Copies text to clipboard using modern API with execCommand fallback.
+       */
+      function copyText(text, successMsg) {
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(
+            () => showBanner(successMsg),
+            () => legacyCopy(text, successMsg)
+          );
+        } else {
+          legacyCopy(text, successMsg);
+        }
+      }
+
+      function legacyCopy(text, successMsg) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showBanner(successMsg);
+      }
+
+      function formatWikitextTable(items, lang) {
+        const lines = [
+          '{| class="wikitable sortable"',
+          `! Food / Culinary Topic !! Country !! Category !! EN Wikipedia !! Target (${lang}.wikipedia.org)`
+        ];
+        items.forEach(item => {
+          const slug = decodeURIComponent((item.enArticle.split('/wiki/')[1] || item.label)).replace(/_/g, ' ');
+          const countries = (item.countries || [item.country]).join(', ');
+          lines.push('|-');
+          lines.push(`| ${item.label} || ${countries} || ${item.category} || [[${slug}|${item.label}]] || [[:${lang}:${item.label}|Search/Create]]`);
+        });
+        lines.push('|}');
+        return lines.join('\n');
+      }
+
+      function formatMarkdownList(items, lang) {
+        return items
+          .map(item => {
+            const countries = (item.countries || [item.country]).join(', ');
+            return `- [${item.label}](${item.enArticle}) (${countries}, *${item.category}*) — [Wikidata](${item.itemUri}) | [Search ${lang}.wiki](${item.targetSearchUrl})`;
+          })
+          .join('\n');
+      }
+
+      function downloadCsvFile(items, lang) {
+        const headers = ['label', 'country', 'category', 'qid', 'wikidata_uri', 'en_wikipedia', `target_wiki_${lang}_search`];
+        const escapeCsv = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+        const csvLines = [
+          headers.map(escapeCsv).join(','),
+          ...items.map(item => [
+            item.label,
+            (item.countries || [item.country]).join('; '),
+            item.category,
+            item.qid,
+            item.itemUri,
+            item.enArticle,
+            item.targetSearchUrl
+          ].map(escapeCsv).join(','))
+        ];
+        const blob = new Blob([csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `food-of-asia-en-missing-${lang}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showBanner(`Downloaded CSV for ${items.length} item(s) missing from ${lang}.wikipedia.org.`);
+      }
+
+      /**
+       * Executes live Wikidata SPARQL query with graceful fallback to bundled dataset.
+       */
+      async function fetchLiveSparql() {
+        if (state.isFetching) return;
+        state.isFetching = true;
+        const lang = normalizeLangCode(state.prefs.langCode);
+        state.prefs.langCode = lang;
+        const limit = parseInt(state.prefs.pageLimit, 10) || 100;
+        const query = buildSparqlQuery(lang, limit, state.prefs.randomize, state.prefs.shuffleSeed);
+
+        els.btnRunSparql.disabled = true;
+        els.btnRunSparql.textContent = 'Querying Wikidata...';
+        showBanner(`Running live SPARQL query for items on en.wikipedia.org missing from ${lang}.wikipedia.org...`);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 18000);
+
+        try {
+          const endpoint = `https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(query)}`;
+          const res = await fetch(endpoint, {
+            signal: controller.signal,
+            headers: {
+              Accept: 'application/sparql-results+json'
+            }
+          });
+          clearTimeout(timeoutId);
+
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+          }
+
+          const data = await res.json();
+          const bindings = data?.results?.bindings || [];
+
+          const parsed = bindings.map((b, i) => {
+            const itemUri = b.item?.value || '';
+            const qid = extractQid(itemUri);
+            const rawLabel = b.itemLabel?.value || qid;
+            const label = /^Q\d+$/i.test(rawLabel) && LABEL_OVERRIDES[qid] ? LABEL_OVERRIDES[qid] : rawLabel;
+            const country = b.countryLabel?.value || 'Asia';
+            const enArticle = b.enArticle?.value || '';
+            return {
+              index: i + 1,
+              itemUri,
+              qid,
+              label,
+              country,
+              countries: [country],
+              category: classifyCulinaryCategory(label, enArticle),
+              enArticle,
+              targetSearchUrl: buildTargetWikiSearchUrl(lang, label),
+              targetPageUrl: buildTargetWikiPageUrl(lang, label)
+            };
+          }).filter(r => r.label && r.enArticle);
+
+          if (!parsed.length) {
+            throw new Error('Empty result set returned');
+          }
+
+          state.isLiveData = true;
+          state.activeRows = parsed;
+          state.groupedItems = buildGroupedItems(state.activeRows);
+          populateCountryDropdown();
+          renderAll();
+          showBanner(`Loaded ${state.activeRows.length} live Wikidata items present on EN Wikipedia and missing on ${lang}.wikipedia.org.`);
+        } catch (err) {
+          clearTimeout(timeoutId);
+          loadBundledDataset(
+            `Live SPARQL unavailable (${err.message || 'timeout/network'}). Switched to bundled Asian foods dataset filtered for ${lang}.wikipedia.org.`
+          );
+        } finally {
+          state.isFetching = false;
+          els.btnRunSparql.disabled = false;
+          els.btnRunSparql.textContent = 'Fetch Live Wikidata SPARQL';
+        }
+      }
+
+      /**
+       * Loads bundled dataset with current limit, randomization, and target language links.
+       */
+      function loadBundledDataset(customMessage) {
+        state.isLiveData = false;
+        const lang = normalizeLangCode(state.prefs.langCode);
+        state.prefs.langCode = lang;
+        const sampled = applyLimitAndRandomize(
+          state.bundledRows,
+          state.prefs.pageLimit,
+          state.prefs.randomize,
+          state.prefs.shuffleSeed
+        );
+        state.activeRows = rebindTargetWikiLinks(sampled);
+        state.groupedItems = buildGroupedItems(state.activeRows);
+        populateCountryDropdown();
+        renderAll();
+        if (customMessage) {
+          showBanner(customMessage);
+        }
+      }
+
+      /**
+       * Smoothly scrolls page to top or bottom.
+       */
+      function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function scrollToBottom() {
+        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+      }
+
+      // Event Listeners
+      els.btnThemeToggle.addEventListener('click', () => {
+        applyTheme(state.prefs.theme === 'dark' ? 'light' : 'dark');
+      });
+
+      els.btnTableView.addEventListener('click', () => {
+        state.prefs.viewMode = 'table';
+        renderAll();
+      });
+
+      els.btnCardView.addEventListener('click', () => {
+        state.prefs.viewMode = 'cards';
+        renderAll();
+      });
+
+      els.langCodeInput.addEventListener('change', e => {
+        state.prefs.langCode = normalizeLangCode(e.target.value);
+        state.activeRows = rebindTargetWikiLinks(state.activeRows);
+        state.groupedItems = buildGroupedItems(state.activeRows);
+        renderAll();
+      });
+
+      document.querySelectorAll('.quick-lang').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.prefs.langCode = normalizeLangCode(btn.dataset.quickLang);
+          state.activeRows = rebindTargetWikiLinks(state.activeRows);
+          state.groupedItems = buildGroupedItems(state.activeRows);
+          renderAll();
+          showBanner(`Target language switched to "${state.prefs.langCode}" (${state.prefs.langCode}.wikipedia.org).`);
+        });
+      });
+
+      els.pageLimitSelect.addEventListener('change', e => {
+        state.prefs.pageLimit = parseInt(e.target.value, 10) || 100;
+        if (!state.isLiveData) {
+          loadBundledDataset();
+        } else {
+          renderAll();
+        }
+      });
+
+      els.btnRandomizeToggle.addEventListener('click', () => {
+        state.prefs.randomize = !state.prefs.randomize;
+        if (state.prefs.randomize && !state.prefs.shuffleSeed) {
+          state.prefs.shuffleSeed = Math.floor(Math.random() * 899999) + 100000;
+        }
+        if (!state.isLiveData) {
+          loadBundledDataset();
+        } else {
+          renderAll();
+        }
+      });
+
+      els.btnShuffleNow.addEventListener('click', () => {
+        state.prefs.randomize = true;
+        state.prefs.shuffleSeed = Math.floor(Math.random() * 899999) + 100000;
+        if (!state.isLiveData) {
+          loadBundledDataset(`Shuffled bundled dataset with random seed #${state.prefs.shuffleSeed}.`);
+        } else {
+          renderAll();
+          showBanner(`Updated random seed to #${state.prefs.shuffleSeed}. Click "Fetch Live Wikidata SPARQL" to run with this seed.`);
+        }
+      });
+
+      els.btnRunSparql.addEventListener('click', fetchLiveSparql);
+      els.btnUseBundled.addEventListener('click', () => {
+        loadBundledDataset(`Loaded bundled dataset from query (1).html for target wiki "${state.prefs.langCode}".`);
+      });
+
+      els.searchInput.addEventListener('input', e => {
+        state.prefs.searchQuery = e.target.value;
+        renderAll();
+      });
+
+      els.btnClearSearch.addEventListener('click', () => {
+        state.prefs.searchQuery = '';
+        renderAll();
+      });
+
+      els.countrySelect.addEventListener('change', e => {
+        state.prefs.selectedCountry = e.target.value;
+        renderAll();
+      });
+
+      els.categorySelect.addEventListener('change', e => {
+        state.prefs.selectedCategory = e.target.value;
+        renderAll();
+      });
+
+      els.btnAllRows.addEventListener('click', () => {
+        state.prefs.groupMode = 'all';
+        renderAll();
+      });
+
+      els.btnGrouped.addEventListener('click', () => {
+        state.prefs.groupMode = 'grouped';
+        renderAll();
+      });
+
+      document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const field = btn.dataset.sort;
+          if (state.prefs.sortField === field) {
+            state.prefs.sortDirection = state.prefs.sortDirection === 'asc' ? 'desc' : 'asc';
+          } else {
+            state.prefs.sortField = field;
+            state.prefs.sortDirection = 'asc';
+          }
+          renderAll();
+        });
+      });
+
+      els.btnCopyWikitext.addEventListener('click', () => {
+        const items = getFilteredAndSorted();
+        if (!items.length) {
+          showBanner('No filtered items available to copy as Wikitext.');
+          return;
+        }
+        copyText(
+          formatWikitextTable(items, state.prefs.langCode),
+          `Copied Wikitext table for ${items.length} item(s).`
+        );
+      });
+
+      els.btnCopyMarkdown.addEventListener('click', () => {
+        const items = getFilteredAndSorted();
+        if (!items.length) {
+          showBanner('No filtered items available to copy as Markdown.');
+          return;
+        }
+        copyText(
+          formatMarkdownList(items, state.prefs.langCode),
+          `Copied Markdown list for ${items.length} item(s).`
+        );
+      });
+
+      els.btnDownloadCsv.addEventListener('click', () => {
+        const items = getFilteredAndSorted();
+        if (!items.length) {
+          showBanner('No filtered items available to export as CSV.');
+          return;
+        }
+        downloadCsvFile(items, state.prefs.langCode);
+      });
+
+      els.btnCopySparql.addEventListener('click', () => {
+        const query = buildSparqlQuery(
+          state.prefs.langCode,
+          state.prefs.pageLimit,
+          state.prefs.randomize,
+          state.prefs.shuffleSeed
+        );
+        copyText(query, `Copied SPARQL query for target wiki "${state.prefs.langCode}".`);
+      });
+
+      function resetAll() {
+        state.prefs = { ...DEFAULT_PREFS, theme: state.prefs.theme };
+        try {
+          localStorage.removeItem(STORAGE_KEY);
+        } catch (_) {}
+        loadBundledDataset('Reset filters and preferences to defaults.');
+      }
+
+      els.btnResetFilters.addEventListener('click', resetAll);
+      els.btnEmptyReset.addEventListener('click', resetAll);
+      els.btnDismissBanner.addEventListener('click', hideBanner);
+
+      // Go to Top & Go to Bottom actions
+      els.btnGoTop.addEventListener('click', scrollToTop);
+      els.btnGoBottom.addEventListener('click', scrollToBottom);
+
+      window.addEventListener('keydown', e => {
+        const tag = (e.target && e.target.tagName) || '';
+        const isTyping = ['INPUT', 'TEXTAREA', 'SELECT'].includes(tag);
+        if (e.altKey && e.key === 'ArrowUp') {
+          e.preventDefault();
+          scrollToTop();
+        } else if (e.altKey && e.key === 'ArrowDown') {
+          e.preventDefault();
+          scrollToBottom();
+        } else if (!isTyping && e.key === 'Home') {
+          e.preventDefault();
+          scrollToTop();
+        } else if (!isTyping && e.key === 'End') {
+          e.preventDefault();
+          scrollToBottom();
+        }
+      });
+
+      // Translation credits toggle
+      els.btnToggleCredits.addEventListener('click', () => {
+        const expanded = els.btnToggleCredits.getAttribute('aria-expanded') === 'true';
+        els.btnToggleCredits.setAttribute('aria-expanded', String(!expanded));
+        els.translationCreditsBox.classList.toggle('hidden', expanded);
+      });
+
+      // Initialization
+      loadPrefs();
+      applyTheme(state.prefs.theme);
+      state.bundledRows = parseBundledRows();
+      loadBundledDataset();
+    })();
+  </script>
+</body>
+</html>
