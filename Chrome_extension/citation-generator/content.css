@@ -2,6 +2,7 @@
 #wiki-cite-btn {
   position: fixed;
   top: 100px;
+  left: auto;
   right: 20px;
   width: 40px;
   height: 40px;
@@ -10,21 +11,34 @@
   border: none;
   color: white;
   font-size: 20px;
-  cursor: pointer;
+  cursor: grab;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 999999;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  touch-action: none;
+  user-select: none;
 }
 #wiki-cite-btn:hover {
   transform: scale(1.1);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
-#wiki-cite-btn:active  { transform: scale(0.95); }
-#wiki-cite-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+#wiki-cite-btn:active {
+  transform: scale(0.95);
+}
+#wiki-cite-btn.is-dragging {
+  cursor: grabbing;
+  transition: none;
+  transform: scale(1.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+}
+#wiki-cite-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /* ── Tab picker panel ── */
 #wiki-cite-picker {

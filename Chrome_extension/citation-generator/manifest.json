@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Wikipedia Citation Generator",
-  "version": "1.2",
+  "version": "1.4",
   "description": "Generate Wikipedia citations - by Suyash Dwivedi",
   "permissions": [
     "activeTab",
@@ -29,9 +29,15 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "css": ["content.css"]
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ]
     }
   ],
   "icons": {

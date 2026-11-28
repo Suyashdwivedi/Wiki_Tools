@@ -118,4 +118,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse({ status: 'done' });
   }
 
+  // 4. Fetch a URL on behalf of the content script.
+  // Content-script fetch() calls run in the page's context and are subject to
+  // that page's Content-Security-Policy (connect-src), so on sites with a
+  // strict CSP a direct fetch to citer.toolforge.org / googleapis.com /
+  // openlibrary.org can be silently blocked. The service worker has no such
+  // restriction, so we proxy the request through here instead.
+  if (message.action === 'fetchUrl') {
+    const opts = { method: message.method || 'GET' };
+    if (message.headers) opts.headers = message.headers;
+    if (message.body !== undefined) opts.body = message.body;
+
+    fetch(message.url, opts)
+      .then(async (res) => {
+        const text = await res.text();
+        sendResponse({ ok: res.ok, status: res.status, text });
+      })
+      .catch((err) => {
+        sendResponse({ ok: false, error: err.message || String(err) });
+      });
+    return true; // async
+  }
+
 });
